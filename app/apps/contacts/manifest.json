@@ -1,0 +1,19 @@
+{
+    "name": "Contacts",
+    "views": [
+        "home",
+        "form",
+        "connect",
+        "connectKeyForm"
+    ],
+    "actions": [
+        "exists",
+        "get",
+        "getList",
+        "getAccessKey",
+        "getProvidedAccessKeys",
+        "getIdentityKey"
+    ],
+    "library": true,
+    "inbox": true
+}

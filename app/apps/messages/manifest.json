@@ -1,0 +1,10 @@
+{
+    "name": "Messages",
+    "views": [
+        "home",
+        "select",
+        "thread"
+    ],
+    "library": true,
+    "inbox": true
+}

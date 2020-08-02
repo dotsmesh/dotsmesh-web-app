@@ -1,0 +1,14 @@
+{
+    "name": "User",
+    "views": [
+        "home",
+        "menu",
+        "changePassword"
+    ],
+    "actions": [
+        "modifyUserPostsNotification",
+        "getProfileImage"
+    ],
+    "library": true,
+    "propertyObserver": true
+}

@@ -1,0 +1,13 @@
+{
+    "name": "Posts",
+    "views": [
+        "post",
+        "form"
+    ],
+    "actions": [
+        "getPostResource",
+        "getRawPosts",
+        "getPostReactionsIDs"
+    ],
+    "library": true
+}

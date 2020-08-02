@@ -1,0 +1,14 @@
+{
+    "name": "Explore",
+    "views": [
+        "home",
+        "followForm"
+    ],
+    "actions": [
+        "follow",
+        "unfollow",
+        "isFollowing"
+    ],
+    "library": true,
+    "propertyObserver": true
+}

@@ -1,0 +1,13 @@
+{
+    "authors": [
+        {
+            "name": "Ivo Petkov",
+            "email": "ivo@dotsmesh.com",
+            "homepage": "https://about.dotsmesh.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "bearframework/bearframework": "1.*"
+    }
+}

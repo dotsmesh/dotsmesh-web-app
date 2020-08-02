@@ -1,0 +1,7 @@
+{
+    "name": "Home",
+    "views": [
+        "home"
+    ],
+    "library": true
+}

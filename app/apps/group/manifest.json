@@ -1,0 +1,25 @@
+{
+    "name": "Group",
+    "views": [
+        "home",
+        "members",
+        "invitations",
+        "member",
+        "membership",
+        "approve",
+        "invite",
+        "inviteGetURL",
+        "remove"
+    ],
+    "actions": [
+        "isMember",
+        "getMemberData",
+        "modifyPendingMembersNotification",
+        "modifyGroupPostsNotification",
+        "updateGroupPostReactionsNotification",
+        "modifyGroupPostReactionsNotification",
+        "getProfileImage"
+    ],
+    "library": true,
+    "propertyObserver": true
+}

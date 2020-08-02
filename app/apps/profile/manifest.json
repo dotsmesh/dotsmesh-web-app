@@ -1,0 +1,12 @@
+{
+    "name": "Profile",
+    "views": [
+        "form"
+    ],
+    "actions": [
+        "getDetails",
+        "getData",
+        "setData"
+    ],
+    "library": true
+}
