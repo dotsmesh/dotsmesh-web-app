@@ -624,7 +624,7 @@
                     signupData.profileKey = hashValue.substr(3, hashValue.length);
                     if (x.currentUser.exists()) {
                         await showHome();
-                    }else{
+                    } else {
                         await showWelcomeScreen();
                         await showSignupScreen(2);
                     }
@@ -796,21 +796,22 @@
 
     css += '.x-home-screen-back-button{width:42px;height:42px;cursor:pointer;position:absolute;top:0;left:0;background-size:50% 50%;background-position:center center;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.icons.back) + '\');}';
     css += '.x-home-screen-title{padding-bottom:30px;font-size:17px;line-height:24px;text-align:center;font-family:' + x.fontFamily + ';font-weight:bold;font-size:25px;line-height:160%;}';
-    css += '.x-home-screen-textbox{max-width:260px;text-align:center;display:block;border:0;border-radius:4px;width:100%;padding:0 16px;height:42px;box-sizing:border-box;background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.2);color:#fff;}';
-    css += '.x-home-screen-button{user-select:none;margin-top:40px;background-color:#fff;font-size:15px;display:inline-block;border-radius:4px;padding:0 30px;height:42px;box-sizing:border-box;background-color:#fff;color:#111;line-height:42px;text-align:center;cursor:pointer;}';
-    css += '.x-home-screen-content .x-home-screen-button{margin-top:30px;}'
-    css += '.x-home-screen-content .x-home-screen-button+.x-home-screen-button{margin-top:15px;}'
+    css += '.x-home-screen-textbox{max-width:260px;text-align:center;display:block;border:0;border-radius:4px;width:100%;padding:0 13px;height:42px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
+    css += '.x-home-screen-textbox:focus{border:1px solid rgba(255,255,255,0.3);}';
+    css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:4px;padding:0 30px;height:42px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:42px;text-align:center;cursor:pointer;text-decoration:none;}';
+    css += '.x-home-screen-button:hover{background-color:rgba(255,255,255,0.96);}';
+    css += '.x-home-screen-button:active{background-color:rgba(255,255,255,0.92);}';
     css += '.x-home-screen-button-2{background-color:rgba(255,255,255,0.04);color:#fff;}';
     css += '.x-home-screen-button-2:hover{background-color:rgba(255,255,255,0.08);}';
     css += '.x-home-screen-button-2:active{background-color:rgba(255,255,255,0.12);}';
-    css += '.x-home-screen-text{padding-bottom:10px;font-size:15px;line-height:24px;text-align:center;}';
+    css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:16px 19px 15px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
+    css += '.x-home-screen-button-3>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
+    css += '.x-home-screen-text{font-size:15px;line-height:24px;text-align:center;}';
     css += '.x-home-screen-text a{text-decoration:underline;cursor:pointer;color:#fff;}';
-    css += '.x-home-screen-hint{font-size:15px;line-height:24px;text-align:center;color:#999;margin-top:20px;}';
+    css += '.x-home-screen-hint{font-size:15px;line-height:24px;text-align:center;color:#999;}';//margin-top:20px;
     css += '.x-home-screen-hint a{text-decoration:underline;}';
     css += '.x-home-screen-image-button{cursor:pointer;width:150px;height:150px;border-radius:50%;background-color:#fff;margin:0 auto;background-size:cover;background-position:center center;}';
     css += '.x-home-screen-image-preview{width:150px;height:150px;border-radius:50%;background-color:#333;margin:0 auto;background-size:cover;background-position:center center;}';
-    css += ".x-home-screen-big-button{user-select:none;border-radius:8px;font-size:15px;cursor:pointer;display:block;padding:15px 19px;background-color:#fff;color:#000;width:220px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat: no-repeat;background-position:right 10px center;background-size:24px;}";
-    css += '.x-home-screen-big-button>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
 
     var hideVisibleScreen = async () => {
         return new Promise((resolve, reject) => {
@@ -979,7 +980,7 @@
         var privateUsersIDs = await x.currentUser.getPrivateUsers();
         if (privateUsersIDs.length > 0) {
             var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-big-button');
+            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
             button.innerHTML = 'Continue with a private profile';
             button.addEventListener('click', async () => {
                 await showContinuePrivateUserScreen();
@@ -988,7 +989,7 @@
         }
 
         var button = document.createElement('a');
-        button.setAttribute('class', 'x-home-screen-big-button');
+        button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
         button.innerHTML = 'Create new profile';
         button.addEventListener('click', async () => {
             await showSignupScreen();
@@ -996,7 +997,7 @@
         screen.addHTML(button);
 
         var button = document.createElement('a');
-        button.setAttribute('class', 'x-home-screen-big-button');
+        button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
         button.innerHTML = 'Sign in';
         button.addEventListener('click', async () => {
             await showLoginScreen();
@@ -1090,7 +1091,7 @@
             screen.addText("Choose a profile type:");
 
             var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-big-button');
+            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
             button.innerHTML = 'Private profile<span>Free. Following, groups, etc.</span>';
             button.addEventListener('click', async () => {
                 var privateUsersIDs = await x.currentUser.getPrivateUsers();
@@ -1103,7 +1104,7 @@
             screen.addHTML(button);
 
             var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-big-button');
+            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
             button.innerHTML = 'Public profile<span>Public posts, private messaging, etc.</span>';
             button.addEventListener('click', async () => {
                 await showNextStep();
