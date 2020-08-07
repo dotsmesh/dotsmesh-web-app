@@ -789,27 +789,27 @@
 
     //css += '.x-home-screen{display:flex;align-items:center;}';
 
-    css += '.x-home-screen-content{max-width:480px;margin:0 auto;padding:20px;display:flex;flex-direction:column;overflow:hidden;display:flex;justify-content:center;min-height:100vh;box-sizing:border-box;}';//background-position:center 20px;background-size:20px;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.logo) + '\')
+    css += '.x-home-screen-content{font-family:' + x.fontFamily + ';max-width:480px;margin:0 auto;padding:20px;display:flex;flex-direction:column;overflow:hidden;display:flex;justify-content:center;min-height:100vh;box-sizing:border-box;}';//background-position:center 20px;background-size:20px;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.logo) + '\')
     css += '.x-home-screen-content >*{max-width:360px;margin:0 auto;}';
     css += '.x-home-screen-content >*:not(:first-child){margin-top:15px;}';
-    css += '.x-welcome-screen-header{background-size:contain;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960&v=3);padding-top:200px;}';
+    css += '.x-welcome-screen-header{background-size:480px;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960&v=3);padding-top:200px;}';
 
     css += '.x-home-screen-back-button{width:42px;height:42px;cursor:pointer;position:absolute;top:0;left:0;background-size:50% 50%;background-position:center center;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.icons.back) + '\');}';
-    css += '.x-home-screen-title{padding-bottom:30px;font-size:17px;line-height:24px;text-align:center;font-family:' + x.fontFamily + ';font-weight:bold;font-size:25px;line-height:160%;}';
-    css += '.x-home-screen-textbox{max-width:260px;text-align:center;display:block;border:0;border-radius:4px;width:100%;padding:0 13px;height:42px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
+    css += '.x-home-screen-title{padding-bottom:30px;font-size:17px;line-height:24px;text-align:center;font-weight:bold;font-size:25px;line-height:160%;}';
+    css += '.x-home-screen-textbox{font-family:' + x.fontFamily + ';max-width:260px;text-align:center;display:block;border:0;border-radius:8px;width:100%;padding:0 13px;height:48px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
     css += '.x-home-screen-textbox:focus{border:1px solid rgba(255,255,255,0.3);}';
-    css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:4px;padding:0 30px;height:42px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:42px;text-align:center;cursor:pointer;text-decoration:none;}';
+    css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:8px;padding:0 30px;min-height:48px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:48px;text-align:center;cursor:pointer;text-decoration:none;}';
     css += '.x-home-screen-button:hover{background-color:rgba(255,255,255,0.96);}';
     css += '.x-home-screen-button:active{background-color:rgba(255,255,255,0.92);}';
     css += '.x-home-screen-button-2{background-color:rgba(255,255,255,0.04);color:#fff;}';
     css += '.x-home-screen-button-2:hover{background-color:rgba(255,255,255,0.08);}';
     css += '.x-home-screen-button-2:active{background-color:rgba(255,255,255,0.12);}';
-    css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:16px 19px 15px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
+    css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:18px 19px 17px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
     css += '.x-home-screen-button-3>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
     css += '.x-home-screen-text{font-size:15px;line-height:24px;text-align:center;}';
     css += '.x-home-screen-text a{text-decoration:underline;cursor:pointer;color:#fff;}';
-    css += '.x-home-screen-hint{font-size:15px;line-height:24px;text-align:center;color:#999;}';//margin-top:20px;
-    css += '.x-home-screen-hint a{text-decoration:underline;}';
+    css += '.x-home-screen-hint{font-size:13px;line-height:24px;text-align:center;color:#999;}';//margin-top:20px;
+    css += '.x-home-screen-hint a{text-decoration:underline;color:#999;}';
     css += '.x-home-screen-image-button{cursor:pointer;width:150px;height:150px;border-radius:50%;background-color:#fff;margin:0 auto;background-size:cover;background-position:center center;}';
     css += '.x-home-screen-image-preview{width:150px;height:150px;border-radius:50%;background-color:#333;margin:0 auto;background-size:cover;background-position:center center;}';
 
@@ -910,7 +910,7 @@
             addHint: html => {
                 var div = document.createElement('div');
                 div.setAttribute('class', 'x-home-screen-hint');
-                div.innerText = html;
+                div.innerHTML = html;
                 contentContainer.appendChild(div);
             },
             addHTML: element => {
@@ -973,8 +973,8 @@
             }
         }
         if (!done) {
-            screen.addTitle('Your social platform!');
-            screen.addText("Public profiles, private messages and groups\nNo spam, no ads, no tracking");//\nHighly encrypted and distributed\nOpen source
+            // screen.addTitle('Your social platform!');
+            // screen.addText("Public profiles, private messages and groups\nNo spam, no ads, no tracking");//\nHighly encrypted and distributed\nOpen source
         }
 
         var privateUsersIDs = await x.currentUser.getPrivateUsers();
@@ -1007,6 +1007,17 @@
         screen.addButton('Learn more', async () => {
             window.open('https://about.dotsmesh.com/', '_blank');
         }, '2');
+
+        var host = location.host;
+        if (host === 'dotsmesh.com') {
+            screen.addHint("<br><br>The official Dots Mesh web app<br>dotsmesh.com");
+        } else if (host.indexOf('dotsmesh.') === 0) {
+            screen.addHint("<br><br>The app is hosted by " + host.substring(9) + "<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
+        } else {
+            screen.addHint("<br><br>The app is hosted by " + host);
+        }
+
+
 
         // screen.addText("");
         //screen.addHint('This is an early preview of the platform and many improvements are expected in the future. Your feedback is highly appreciated.');
