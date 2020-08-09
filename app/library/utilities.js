@@ -1,3 +1,9 @@
+/*
+ * Dots Mesh Web App
+ * https://github.com/dotsmesh/dotsmesh-web-app
+ * Free to use under the GPL-3.0 license.
+ */
+
 (x) => {
 
     x.fontFamily = '-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Oxygen,Ubuntu,Cantarell,\'Open Sans\',\'Helvetica Neue\',sans-serif';

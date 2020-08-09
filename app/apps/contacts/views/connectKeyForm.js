@@ -1,3 +1,9 @@
+/*
+ * Dots Mesh Web App
+ * https://github.com/dotsmesh/dotsmesh-web-app
+ * Free to use under the GPL-3.0 license.
+ */
+
 async (args, library) => {
     var key = typeof args.key !== 'undefined' ? args.key : null;
     var resultMode = typeof args.resultMode !== 'undefined';

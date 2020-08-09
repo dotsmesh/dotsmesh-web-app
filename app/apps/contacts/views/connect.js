@@ -1,3 +1,9 @@
+/*
+ * Dots Mesh Web App
+ * https://github.com/dotsmesh/dotsmesh-web-app
+ * Free to use under the GPL-3.0 license.
+ */
+
 async (args, library) => {
     var typedID = args.id;
     var connectKey = typeof args.connectKey !== 'undefined' ? args.connectKey : null;
