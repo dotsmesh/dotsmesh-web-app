@@ -795,7 +795,7 @@
     css += '.x-welcome-screen-header{background-size:480px;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960&v=3);padding-top:200px;}';
 
     css += '.x-home-screen-back-button{width:42px;height:42px;cursor:pointer;position:absolute;top:0;left:0;background-size:50% 50%;background-position:center center;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.icons.back) + '\');}';
-    css += '.x-home-screen-title{padding-bottom:30px;font-size:17px;line-height:24px;text-align:center;font-weight:bold;font-size:25px;line-height:160%;}';
+    css += '.x-home-screen-title{text-align:center;font-weight:bold;font-size:25px;line-height:160%;}';
     css += '.x-home-screen-textbox{font-family:' + x.fontFamily + ';max-width:260px;text-align:center;display:block;border:0;border-radius:8px;width:100%;padding:0 13px;height:48px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
     css += '.x-home-screen-textbox:focus{border:1px solid rgba(255,255,255,0.3);}';
     css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:8px;padding:0 30px;min-height:48px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:48px;text-align:center;cursor:pointer;text-decoration:none;}';
@@ -807,6 +807,7 @@
     css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:18px 19px 17px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
     css += '.x-home-screen-button-3>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
     css += '.x-home-screen-text{font-size:15px;line-height:24px;text-align:center;}';
+    css += '.x-home-screen-text-1{font-size:20px;font-weight:bold;}';
     css += '.x-home-screen-text a{text-decoration:underline;cursor:pointer;color:#fff;}';
     css += '.x-home-screen-hint{font-size:13px;line-height:24px;text-align:center;color:#999;}';//margin-top:20px;
     css += '.x-home-screen-hint a{text-decoration:underline;color:#999;}';
@@ -890,7 +891,7 @@
             },
             addButton: (text, callback, style) => {
                 var button = document.createElement('a');
-                button.setAttribute('class', 'x-home-screen-button' + (typeof style !== 'undefined' ? ' x-home-screen-button-' + style : ''));
+                button.setAttribute('class', 'x-home-screen-button' + (style !== undefined ? ' x-home-screen-button-' + style : ''));
                 button.innerText = text;
                 contentContainer.appendChild(button);
                 button.addEventListener('click', async () => {
@@ -901,9 +902,9 @@
                     }
                 });
             },
-            addText: text => {
+            addText: (text, style) => {
                 var div = document.createElement('div');
-                div.setAttribute('class', 'x-home-screen-text');
+                div.setAttribute('class', 'x-home-screen-text' + (style !== undefined ? ' x-home-screen-text-' + style : ''));
                 div.innerText = text;
                 contentContainer.appendChild(div);
             },
@@ -1010,11 +1011,11 @@
 
         var host = location.host;
         if (host === 'dotsmesh.com') {
-            screen.addHint("<br><br>The official Dots Mesh web app<br>dotsmesh.com");
+            screen.addHint("<br><br>This is the official<br>Dots Mesh web app");
         } else if (host.indexOf('dotsmesh.') === 0) {
-            screen.addHint("<br><br>The app is hosted by " + host.substring(9) + "<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
+            screen.addHint("<br><br>This Dots Mesh web app<br>is hosted by " + host.substring(9) + "<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
         } else {
-            screen.addHint("<br><br>The app is hosted by " + host);
+            screen.addHint("<br><br>This Dots Mesh web app<br>is hosted by " + host);
         }
 
 
@@ -1032,7 +1033,7 @@
         var screen = makeHomeScreen(addToHistory ? 'login#' : null);
         screen.addBackButton();
         screen.addTitle('Hello!');
-        screen.addText('Enter your ID and password to\nlog in to your profile.');
+        screen.addText('\nEnter your ID and password to\nlog in to your profile.');
         screen.addTextbox('id', 'ID');
         screen.addPassword('password', 'Password');
         screen.addButton('Log in', async () => {
@@ -1063,7 +1064,8 @@
                     text = 'Such user does not exists!';
                 }
                 var errorScreen = makeHomeScreen('login#error');
-                errorScreen.addText(text);
+                errorScreen.addTitle('Oops!');
+                errorScreen.addText("\n" + text + "\n\n");
                 errorScreen.addButton('Back', () => {
                     historyBack();
                     //history.back();
@@ -1079,9 +1081,9 @@
     };
 
     var signupData = {
-        profileKey: null,//'dotshost1.local:m8ktkv5eca0',//
-        id: null,//'4545',//
-        password: null,//'454545',//
+        profileKey: null,
+        id: null,
+        password: null,
         name: null,
         image: null
     };
@@ -1098,8 +1100,8 @@
         var screen = makeHomeScreen(addToHistory ? 'signup#' + index : null);
         screen.addBackButton();
         if (index === 1) {
-            screen.addTitle('Let\'s create a new' + "\n" + ' profile for you!');
-            screen.addText("Choose a profile type:");
+            screen.addTitle('Great! Let\'s make\nyou a profile!');
+            screen.addText("\nChoose a profile type:");
 
             var button = document.createElement('a');
             button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
@@ -1124,10 +1126,11 @@
 
         } else if (index === 2) {
             if (signupData.profileKey !== null) {
-                screen.addTitle('Let\'s create a new' + "\n" + ' public profile for you!');
-                screen.addText('The key entered points to the hosting provider that will take care of your profile, and make sure it\'s online all the time.');
+                screen.addTitle('Welcome! Let\'s make\nyou a profile!');
+                screen.addText('\nThe key entered points to the hosting provider that will take care of your profile, and make sure it\'s online all the time.');
             } else {
                 screen.addTitle('A new public profile' + "\n" + 'requires a key!');
+                screen.addText('');
                 //screen.addText('Do you have a profile key?');
                 screen.addHint('These keys are provided by individuals and ogranizations, that will take care of hosting your profile, and make sure it\'s online all the time.');// <a>Learn more</a>.
                 screen.addButton('Get one now', async () => {
@@ -1168,14 +1171,16 @@
                     await showNextStep();
                 } else if (result === 'invalid') {
                     var screen3 = makeHomeScreen('signup#error');
-                    screen3.addText('The key provided is not valid!');
+                    screen3.addTitle('Oops!');
+                    screen3.addText('\nThe key provided is not valid!\n\n');
                     screen3.addButton('Try another one', () => {
                         historyBack();
                     });
                     await screen3.show();
                 } else {
                     var screen3 = makeHomeScreen('signup#error');
-                    screen3.addText('There was an error trying to check this key! Please try another one or try later.');
+                    screen3.addTitle('Oops!');
+                    screen3.addText('\nThere was an error trying to check this key! Please try another one or try later.\n\n');
                     screen3.addButton('Back', () => {
                         historyBack();
                     });
@@ -1189,7 +1194,7 @@
             var fullProfileKey = x.getPropertyFullKey(signupData.profileKey);
             var host = x.getPropertyKeyHost(fullProfileKey);
             screen.addTitle('The profile key is valid!');
-            screen.addText('Now it\'s time to choose an ID that will help everyone identify you. Only letters and numbers are allowed.');
+            screen.addText('\nNow it\'s time to choose an ID that will help everyone identify you. Only letters and numbers are allowed.');
             screen.addTextbox('id', 'ID');
             screen.setValue('id', signupData.id);
             var hostAlias = x.getHostAlias(host);
@@ -1224,20 +1229,21 @@
                     await showNextStep();
                 } else { // taken, invalid
                     var screen3 = makeHomeScreen('signup#error');
+                    screen3.addTitle('Oops!');
                     if (result === 'taken') {
-                        screen3.addText(x.getShortID(idToCheck) + ' is already taken!');
+                        screen3.addText('\n' + x.getShortID(idToCheck) + ' is already taken!\n\n');
                         screen3.addButton('Choose another one', () => {
                             historyBack();
                             //history.back();
                         });
                     } else if (result === 'invalid') {
-                        screen3.addText('The ID choosen is invalid!');
+                        screen3.addText('\nThe ID choosen is invalid!\n\n');
                         screen3.addButton('Choose another one', () => {
                             historyBack();
                             //history.back();
                         });
                     } else {
-                        screen3.addText('There is a problem checking the ID! Please, try again later!');
+                        screen3.addText('\nThere is a problem checking the ID! Please, try again later!\n\n');
                         screen3.addButton('Back', () => {
                             historyBack();
                             //history.back();
@@ -1254,7 +1260,7 @@
             var host = x.getPropertyKeyHost(fullProfileKey);
             var fullID = signupData.id + '.' + host;
             screen.addTitle(x.getShortID(fullID) + "\n" + 'is available!');
-            screen.addText('Choose a strong password');
+            screen.addText('\nChoose a strong password');
             screen.addPassword('password', 'Password');
             screen.addPassword('password2', 'Repeat password');
             screen.setValue('password', signupData.password);
@@ -1283,7 +1289,8 @@
                 return false;
             }
             var image = signupData.image;
-            screen.addText('Select an image and enter a name for your public profile');
+            screen.addTitle('\nSet up your profile now?');
+            screen.addText('\nSelect an image and enter\na name for your public profile');
             var imageField = document.createElement('div');
             imageField.innerHTML = '<div class="x-home-screen-image-button"></div><input type="file" accept="image/*" style="display:none;"></input>';
             screen.addHTML(imageField);
@@ -1318,7 +1325,7 @@
 
             screen.addTextbox('name', 'Name');
             screen.setValue('name', signupData.name);
-            screen.addHint('You can easily customize them when your profile is created.');
+            screen.addHint('You can easily customize them later.');
 
             screen.addButton('Next', async () => {
                 signupData.name = screen.getValue('name');
@@ -1329,7 +1336,8 @@
             if (signupData.name === null) {
                 return false;
             }
-            screen.addText('Here is a preview of your profile.\nEverything looks ok?');
+            screen.addTitle('\nLooks good?');
+            screen.addHint('<br>This is a preview of your profile.<br>You can customize it later.<br><br>');
             var imageElement = document.createElement('div');
             imageElement.innerHTML = '<div class="x-home-screen-image-preview"></div>';
             screen.addHTML(imageElement);
@@ -1338,7 +1346,8 @@
             var fullProfileKey = x.getPropertyFullKey(signupData.profileKey);
             var host = x.getPropertyKeyHost(fullProfileKey);
             var fullID = signupData.id + '.' + host;
-            screen.addText((signupData.name === '' ? 'Unknown' : signupData.name) + "\n" + x.getShortID(fullID));
+            screen.addText((signupData.name === '' ? 'Unknown' : signupData.name), '1');
+            screen.addText(x.getShortID(fullID) + "\n\n");
             screen.addButton('Yes, create my profile', async () => {
                 //Creating your profile ...
                 //This may take up to 20 seconds - your device is working on cryptography related stuff, that will make your profile more secure.
@@ -1358,8 +1367,8 @@
                         signupData.name = null;
                         signupData.image = null;
                         var screen2 = makeHomeScreen();
-                        screen2.addTitle('Done!');
-                        screen2.addText('Your profile is successfully created!');
+                        screen2.addTitle('It\'s done!');
+                        screen2.addText('\nYour profile is successfully created!\n\n');
                         screen2.addButton('Enter', async () => {
                             await showAppScreen(false);
                             await x.open('user/home', { userID: x.currentUser.getID() });
@@ -1386,8 +1395,8 @@
         }
         var screen = makeHomeScreen(addToHistory ? 'private#new' : null);
         screen.addBackButton();
-        screen.addTitle('Let\'s make you a private profile');
-        screen.addText('This type of profile is free and lives on your device. It\'s perfect for following your friends and people you admire, and join groups to discuss and share.');
+        screen.addTitle('Let\'s make you\na private profile!');
+        screen.addText('\nThis type of profile is free and lives on your device. It\'s perfect for following your friends and people you admire, and join groups to discuss and share.\n\n');
         screen.addButton('Activate', async () => {
             await showLoadingScreen();
             var userID = await x.currentUser.createPrivateUser();
@@ -1407,7 +1416,8 @@
         }
         var screen = makeHomeScreen(addToHistory ? 'private#continue' : null);
         screen.addBackButton();
-        screen.addTitle('Continue with the private profile that lives on this device');
+        screen.addTitle('Continue with the private profile that already exists on this device');
+        screen.addText("\n");
         screen.addButton('Enter', async () => {
             await showLoadingScreen();
             var privateUsersIDs = await x.currentUser.getPrivateUsers();

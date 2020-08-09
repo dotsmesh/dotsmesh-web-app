@@ -50,7 +50,7 @@ async (args, library) => {
                 return null;
             },
             showUser: false,
-            emptyText: isCurrentUser ? 'All your posts are be publicly visible by everyone, including your contacts and followers. They can share easy share when with their audience too.' : 'No posts have been publiblished yet.'
+            emptyText: isCurrentUser ? 'All your posts are be publicly visible by everyone, including your contacts and followers. They can share easily with their audience too.' : 'No posts have been publiblished yet.'
         });
         listComponent.observeChanges(['user/' + userID + '/profile', 'user/' + userID + '/posts']);
         x.add(listComponent, { template: 'column2' });
