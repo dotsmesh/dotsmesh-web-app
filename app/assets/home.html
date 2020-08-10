@@ -47,13 +47,14 @@
 
 <body>
     <script>
-        // temp
-        // self.addEventListener('error', e => {
-        //     alert(e.message);
-        // });
-        // self.addEventListener('unhandledrejection', e => {
-        //     alert(e.reason);
-        // });
+        if (location.href.indexOf('&debug') !== -1 || location.href.indexOf('?debug') !== -1) {
+            self.addEventListener('error', e => {
+                alert(e.message);
+            });
+            self.addEventListener('unhandledrejection', e => {
+                alert(e.reason);
+            });
+        }
 
         x = {};
 

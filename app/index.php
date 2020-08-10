@@ -103,7 +103,8 @@ $app->routes
                     $content = str_replace('?app&sw', '?app&sw&v=' . $getVersion(), $content);
                 }
             } else {
-                $content = file_get_contents(__DIR__ . '/assets/app.min.js');
+                $isDebugEnabled = $request->query->exists('debug');
+                $content = file_get_contents(__DIR__ . '/assets/' . ($isDebugEnabled ? 'app.js' : 'app.min.js'));
                 $content = str_replace('?app&sw', '?app&sw&v=' . $getVersion(), $content);
             }
             $response = new App\Response($content);
@@ -132,8 +133,9 @@ $app->routes
             ]));
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400'));
         } else {
+            $isDebugEnabled = $request->query->exists('debug');
             $content = file_get_contents(__DIR__ . '/assets/home.html');
-            $content = str_replace('src="?app&a"', 'src="?app&a&v=' . $getVersion() . '"', $content);
+            $content = str_replace('src="?app&a"', 'src="?app&a&v=' . $getVersion() . ($isDebugEnabled ? '&debug' : '') . '"', $content);
             $response = new App\Response\HTML($content);
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=600'));
         }
