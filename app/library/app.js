@@ -971,11 +971,11 @@
             if (context.type === 'follow') {
                 var details = await x.services.call('profile', 'getDetails', { propertyType: 'user', propertyID: context.id, details: ['name'] });
                 screen.addTitle('Hey, hello!' + "\n" + 'You\'ll need a profile for that!');
-                screen.addText("A profile is required for following " + details.name + ". Luckily, that's easy. You can freely create a private one or sign up for a public one.");
+                screen.addText("\nA profile is required for following " + details.name + ". Luckily, that's easy. You can freely create a private one or sign up for a public one.\n\n");
                 done = true;
             } else if (context.type === 'profile') {
                 screen.addTitle('Hello!' + "\n" + 'Interested in your own profile?');
-                screen.addText("A profile gives you the ability to follow and connect with others. It's free and unbelievably easy to create a private profile. You can also sign up for a public one.");
+                screen.addText("\nA profile gives you the ability to follow and connect with others. It's free and unbelievably easy to create a private profile. You can also sign up for a public one.\n\n");
                 done = true;
             }
         }
