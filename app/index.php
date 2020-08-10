@@ -60,7 +60,12 @@ $getVersion = function () {
 
 $app = new App();
 
-$app->enableErrorHandler(['logErrors' => true, 'displayErrors' => DOTSMESH_WEB_APP_DEV_MODE]);
+$hasLogsDirs = defined('DOTSMESH_WEB_APP_LOGS_DIR');
+$app->enableErrorHandler(['logErrors' => $hasLogsDirs, 'displayErrors' => DOTSMESH_WEB_APP_DEV_MODE]);
+
+if ($hasLogsDirs) {
+    $app->logs->useFileLogger(DOTSMESH_WEB_APP_LOGS_DIR);
+}
 
 if (isset($_SERVER['HTTP_X_CLOUDFRONT_PROXY_DOMAIN'])) {
     $app->request->host = $_SERVER['HTTP_X_CLOUDFRONT_PROXY_DOMAIN'];
