@@ -100,6 +100,7 @@ $app->routes
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'application/javascript'));
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('a')) {
             if (DOTSMESH_WEB_APP_DEV_MODE) {
                 $object = require __DIR__ . '/appjs-builder.php';
@@ -115,11 +116,13 @@ $app->routes
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'application/javascript'));
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400000'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('h960')) {
             $content = file_get_contents(__DIR__ . '/assets/h960.jpg');
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'image/jpeg'));
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400000'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
             $response = new App\Response\JSON(json_encode([
                 "short_name" => "Dots Mesh",
@@ -143,9 +146,9 @@ $app->routes
             $content = str_replace('src="?app&a"', 'src="?app&a&v=' . $getVersion() . ($isDebugEnabled ? '&debug' : '') . '"', $content);
             $response = new App\Response\HTML($content);
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=600'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', $app->request->host === 'dotsmesh.com' ? 'nofollow' : 'noindex,nofollow'));
         }
         if ($response !== null) {
-            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
             $response->headers->set($response->headers->make('Strict-Transport-Security', 'max-age=63072000; preload'));
             return $response;
         }
