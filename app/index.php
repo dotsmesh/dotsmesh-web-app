@@ -85,7 +85,7 @@ if (substr($app->request->host, 0, 4) === 'www.') {
 }
 
 $app->routes
-    ->add('/', function (App\Request $request) use ($getVersion) {
+    ->add('/', function (App\Request $request) use ($app, $getVersion) {
         $isAppRequest = $request->query->exists('app');
         if ($isAppRequest && $request->query->exists('sw')) {
             if (DOTSMESH_WEB_APP_DEV_MODE) {
