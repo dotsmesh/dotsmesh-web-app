@@ -1809,7 +1809,7 @@
                     var tooltip = x.makeTooltip(document.body);
                     tooltip.addButton('Image', () => {
                         x.pickFile(async file => {
-                            var value = await x.image.resize(await x.image.make(file.dataURI), 600, null, 85);
+                            var value = await x.image.resize(await x.image.make(file.dataURI), 600, null, 100); // 85
                             var attachment = x.attachment.make();
                             attachment.type = 'i';
                             attachment.value = value;

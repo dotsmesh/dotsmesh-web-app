@@ -112,7 +112,7 @@
                 if (image === null) {
                     buffer.delete(dataKey);
                 } else {
-                    var resizedImage = await x.image.resize(image, size, size, 92);
+                    var resizedImage = await x.image.resize(image, size, size, 100); //92
                     buffer.set(dataKey, await ds.prepareSharedFunction(resizedImage));
                 }
             }
