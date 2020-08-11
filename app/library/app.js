@@ -1013,11 +1013,11 @@
 
         var host = location.host;
         if (host === 'dotsmesh.com') {
-            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This is the official app");
+            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This is the official app.");
         } else if (host.indexOf('dotsmesh.') === 0) {
-            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This app is hosted by " + host.substring(9) + "<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
+            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This app is hosted by " + host.substring(9) + ".<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
         } else {
-            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This app is hosted by " + host);
+            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This app is hosted by " + host + ".");
         }
 
         screen.addButton('Learn more', async () => {
