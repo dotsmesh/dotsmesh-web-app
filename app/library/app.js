@@ -1139,7 +1139,7 @@
                 screen.addTitle('A new public profile' + "\n" + 'requires a key!');
                 screen.addText('');
                 //screen.addText('Do you have a profile key?');
-                screen.addHint('These keys are provided by individuals and ogranizations, that will take care of hosting your profile, and make sure it\'s online all the time.');// <a>Learn more</a>.
+                screen.addHint('These keys are provided by individuals and organizations, that will take care of hosting your profile, and make sure it\'s online all the time.');// <a>Learn more</a>.
                 screen.addButton('Get one now', async () => {
                     window.open('https://hosting.dotsmesh.com/', '_blank');
                 }, '2');
