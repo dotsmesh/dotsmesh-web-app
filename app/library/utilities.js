@@ -88,40 +88,45 @@
     };
 
     x.makeEventTarget = () => {
-        if (typeof EventTarget === 'undefined') { // Needed for iOS
-            var listeners = [];
-            return {
-                addEventListener: (type, callback) => {
-                    if (!(type in listeners)) {
-                        listeners[type] = [];
-                    }
-                    listeners[type].push(callback);
-                },
-                removeEventListener: (type, callback) => {
-                    if (!(type in listeners)) {
-                        return;
-                    }
-                    var stack = listeners[type];
-                    for (var i = 0, l = stack.length; i < l; i++) {
-                        if (stack[i] === callback) {
-                            stack.splice(i, 1);
-                            return;
-                        }
-                    }
-                },
-                dispatchEvent: (event) => {
-                    if (!(event.type in listeners)) {
-                        return true;
-                    }
-                    var stack = listeners[event.type].slice();
-                    for (var i = 0, l = stack.length; i < l; i++) {
-                        stack[i].call(this, event);
-                    }
-                    return !event.defaultPrevented;
-                }
+        if (EventTarget !== undefined && EventTarget.constructor !== undefined) {
+            try {
+                return new EventTarget();
+            } catch (e) {
+
             }
         }
-        return new EventTarget();
+        // Needed for iOS
+        var listeners = [];
+        return {
+            addEventListener: (type, callback) => {
+                if (!(type in listeners)) {
+                    listeners[type] = [];
+                }
+                listeners[type].push(callback);
+            },
+            removeEventListener: (type, callback) => {
+                if (!(type in listeners)) {
+                    return;
+                }
+                var stack = listeners[type];
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    if (stack[i] === callback) {
+                        stack.splice(i, 1);
+                        return;
+                    }
+                }
+            },
+            dispatchEvent: (event) => {
+                if (!(event.type in listeners)) {
+                    return true;
+                }
+                var stack = listeners[event.type].slice();
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    stack[i].call(this, event);
+                }
+                return !event.defaultPrevented;
+            }
+        }
     };
 
     // MESSAGING
