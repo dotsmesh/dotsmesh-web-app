@@ -274,7 +274,9 @@
         css += '.x-message > :first-child{color:#000;}';
         css += '.x-body > .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
     } else {
-        css += '.x-header{height:42px;position:fixed;top:0;left:0;background-color:#111;}';//width:calc(100% - 42px);
+        css += '.x-header{height:50px;position:fixed;top:0;left:0;background-color:#111;}';
+        css += '.x-header-title{line-height:50px;height:50px;}';
+        css += '.x-header-button{width:50px;height:50px;background-size:20px;}';
         css += 'body[x-has-scroll] .x-header{box-shadow:0 0 5px 0 #111;}';
         css += '.x-header-title{color:#999;opacity:0;transition:opacity ' + x.animationTime + 'ms;}';
         css += 'body[x-message] .x-header>:last-child{display:none;}';
@@ -282,7 +284,7 @@
         css += 'body[x-has-scroll] .x-header-title{opacity:1;}';
         css += '.x-header-title:first-child{padding-left:' + contentSpacing + '}';
         css += '[x-template*="message"] .x-header-title{display:block;}';
-        css += '.x-body{overscroll-behavior:contain;margin-top:42px;overflow:auto;height:calc(100vh - 42px);padding:' + smallEdgeSpacing + ';padding-top:0;}';
+        css += '.x-body{overscroll-behavior:contain;margin-top:50px;overflow:auto;height:calc(100vh - 50px);padding:' + smallEdgeSpacing + ';padding-top:0;}';
         css += 'body:not([x-template]) .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '[x-template*="tiny"] .x-body > *{width:100%;max-width:400px;margin-left:auto;margin-right:auto;}';
         css += '[x-template*="big"] .x-body > *{width:100%;max-width:600px;margin-left:auto;margin-right:auto;}';
@@ -296,9 +298,6 @@
         css += '[x-template*="message"] [x-template="content"]{display:flex;justify-content:flex-end;flex-direction:column;min-height:min-content;height:100%;}';
         css += '[x-template*="message"] [x-template="content"] > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
 
-        css += '.x-header{height:50px;}';//width:100%;
-        css += '.x-header-title{line-height:50px;height:50px;}';
-        css += '.x-header-button{width:50px;height:50px;background-size:20px;}';
         css += '@media only screen and (min-width:800px){'; // large screens
         css += '.x-header-title:first-child{padding-left:calc(' + contentSpacing + ' + ' + largeEdgeSpacing + ')}';
         css += '.x-body{margin-top:50px;height:calc(100vh - 50px);padding:' + largeEdgeSpacing + ';padding-top:0;}';
