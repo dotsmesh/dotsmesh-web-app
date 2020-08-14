@@ -6,6 +6,42 @@
 
 (x) => {
 
+    // Promise.allSettled polyfill
+    if (Promise.allSettled === undefined) {
+        Promise.allSettled = promises => {
+            var mappedPromises = promises.map(promise => {
+                return promise
+                    .then(value => {
+                        return {
+                            status: 'fulfilled',
+                            value: value
+                        };
+                    })
+                    .catch(reason => {
+                        return {
+                            status: 'rejected',
+                            reason: reason
+                        };
+                    });
+            });
+            return Promise.all(mappedPromises);
+        };
+    };
+
+    // Test code for the Promise.allSettled polyfill
+
+    // var p1 = new Promise((resolve, reject) => {
+    //     resolve('value1');
+    // });
+
+    // var p2 = new Promise((resolve, reject) => {
+    //     reject('error1');
+    // });
+
+    // Promise.allSettled([p1, p2]).then(values => {
+    //     console.log(JSON.stringify(values));
+    // });
+
     x.fontFamily = '-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Oxygen,Ubuntu,Cantarell,\'Open Sans\',\'Helvetica Neue\',sans-serif';
 
     /**
