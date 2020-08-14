@@ -205,15 +205,16 @@
     // }
 
     var contentSpacing = '15px';
+    var contentSpacingInt = 15;
     var smallEdgeSpacing = '5px';
     var largeEdgeSpacing = '15px';
     var edgeContentSpacing = '10px'; // 15 - 5px // todo responsive maybe
-    var edgeSpacingInt = null;
-    var updateEdgeSpacing = () => {
-        edgeSpacingInt = document.body.getClientRects()[0].width > 800 ? 15 : 5;
-    }
-    updateEdgeSpacing();
-    x.windowEvents.addEventListener('resize', updateEdgeSpacing);
+    // var edgeSpacingInt = null;
+    // var updateEdgeSpacing = () => {
+    //     edgeSpacingInt = document.body.getClientRects()[0].width > 800 ? 15 : 5;
+    // }
+    // updateEdgeSpacing();
+    // x.windowEvents.addEventListener('resize', updateEdgeSpacing);
 
 
 
@@ -284,7 +285,7 @@
         css += 'body[x-has-scroll] .x-header-title{opacity:1;}';
         css += '.x-header-title:first-child{padding-left:' + contentSpacing + '}';
         css += '[x-template*="message"] .x-header-title{display:block;}';
-        css += '.x-body{overscroll-behavior:contain;margin-top:50px;overflow:auto;height:calc(100vh - 50px);padding:' + smallEdgeSpacing + ';padding-top:0;}';
+        css += '.x-body{overscroll-behavior:contain;margin-top:50px;overflow:auto;height:calc(100vh - 50px);padding:0 ' + smallEdgeSpacing + ' ' + contentSpacing + ' ' + smallEdgeSpacing + ';}';
         css += 'body:not([x-template]) .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '[x-template*="tiny"] .x-body > *{width:100%;max-width:400px;margin-left:auto;margin-right:auto;}';
         css += '[x-template*="big"] .x-body > *{width:100%;max-width:600px;margin-left:auto;margin-right:auto;}';
@@ -300,7 +301,7 @@
 
         css += '@media only screen and (min-width:800px){'; // large screens
         css += '.x-header-title:first-child{padding-left:calc(' + contentSpacing + ' + ' + largeEdgeSpacing + ')}';
-        css += '.x-body{margin-top:50px;height:calc(100vh - 50px);padding:' + largeEdgeSpacing + ';padding-top:0;}';
+        css += '.x-body{padding:0 ' + largeEdgeSpacing + ' ' + largeEdgeSpacing + ' ' + largeEdgeSpacing + ';}';
         css += '[x-template*="columns"] .x-body{display:flex;flex-direction:row;}';
         css += '[x-template*="columns"] [x-templatec="column1"]{min-height:100%;flex:0 0 auto;border-right:1px solid #222;padding-right:' + contentSpacing + ';}';
         css += '[x-template*="columns"] [x-templatec="column2"]{flex:1 1 auto;padding-top:0;padding-left:' + largeEdgeSpacing + ';}';
@@ -310,9 +311,7 @@
 
     css += '.x-block, .x-block-click, .x-block-dark, .x-block-dark-click, .x-block-light, .x-block-light-click{max-width:100%;word-break:break-word;padding:' + edgeContentSpacing + ';border-radius:4px;display:flex;flex-direction:column;box-sizing:border-box;}';
     if (!modal) {
-        css += '@media only screen and (min-width:800px){';
         css += '.x-block, .x-block-click, .x-block-dark, .x-block-dark-click, .x-block-light, .x-block-light-click{border-radius:8px;}';
-        css += '}';
     }
     css += '.x-block-click{cursor:pointer;}';
     css += '.x-block-click:hover{background-color:rgba(255,255,255,0.04);}';
@@ -576,7 +575,7 @@
             container.appendChild(itemContainer);
         };
         if (type === 'grid') {
-            var spacing = showSpacing ? edgeSpacingInt : 0;
+            var spacing = showSpacing ? contentSpacingInt : 0; // edgeSpacingInt
             var gridItemWidth = 500;
             var lastUpdatedContainerWidth = null;
             var updateSize = () => {
