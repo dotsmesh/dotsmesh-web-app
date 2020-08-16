@@ -1988,16 +1988,24 @@
     };
 
     x.unpack = value => {
-        var index = value.indexOf(':');
-        if (index !== -1) {
-            return {
-                name: value.substr(0, index),
-                value: JSON.parse(value.substr(index + 1))
-            };
+        try {
+            var index = value.indexOf(':');
+            if (index !== -1) {
+                return {
+                    name: value.substr(0, index),
+                    value: JSON.parse(value.substr(index + 1))
+                };
+            }
+            var error = x.makeAppError('Invalid value!');
+        } catch (e) {
+            var error = x.makeAppError(e);
         }
-        throw new Error('x.unpack!');
+        error.details['unpack'] = {
+            value: value,
+            index: index
+        };
+        throw error;
     };
-
 
     // TOOLTIPS
 
