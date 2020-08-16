@@ -631,6 +631,8 @@
                 } catch (e) {
                     if (e.name === 'networkError') {
                         return null;
+                    } else {
+                        throw e;
                     }
                 }
             };
