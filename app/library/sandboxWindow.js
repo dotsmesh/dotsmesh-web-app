@@ -2230,7 +2230,7 @@
                 return button;
             };
 
-            var getConnectButtons = async () => {
+            var getConnectButtons = async publicUserID => {
                 var result = [];
                 if (x.currentUser.exists()) {
 
@@ -2241,7 +2241,7 @@
                     var connectKey = null;
                     var showNotificationBadge = false;
 
-                    var contact = await x.services.call('contacts', 'get', { userID: id });
+                    var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
                     var connected = false;
                     var text = null;
                     if (contact !== null) {
@@ -2264,19 +2264,19 @@
                         }
                     }
                     var button = x.makeButton('', async () => {
-                        x.open('contacts/connect', { id: id, connectKey: connectKey }, { modal: true, width: 300 });
+                        x.open('contacts/connect', { id: publicUserID, connectKey: connectKey }, { modal: true, width: 300 });
                     }, { style: 'style2', icon: contact !== null ? 'contacts-tick' : 'contacts-plus' });
                     if (showNotificationBadge) {
                         button.element.setAttribute('x-notification-badge', '');
                     }
                     result.push(button);
-                    component.observeChanges(['contacts/' + id]);
+                    component.observeChanges(['contacts/' + publicUserID]);
 
                     if (x.currentUser.isPublic() && connected) {
                         var button = x.makeButton('', async () => {
-                            var contact = await x.services.call('contacts', 'get', { userID: id });
+                            var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
                             if (contact !== null && contact.providedAccessKey !== null && contact.accessKey !== null) {
-                                x.open('messages/thread', { userID: id });
+                                x.open('messages/thread', { userID: publicUserID });
                             } else {
                                 x.alert('Not connected yet!');
                             }
@@ -2296,7 +2296,7 @@
                     var button = await getFollowButton();
                     buttonsContainer.appendChild(button.element);
 
-                    var buttons = await getConnectButtons();
+                    var buttons = await getConnectButtons(id);
                     for (var button of buttons) {
                         buttonsContainer.appendChild(button.element);
                     }
@@ -2318,7 +2318,7 @@
                         }, { style: 'style2' });
                         buttonsContainer.appendChild(button.element);
 
-                        var buttons = await getConnectButtons();
+                        var buttons = await getConnectButtons(userID);
                         for (var button of buttons) {
                             buttonsContainer.appendChild(button.element);
                         }
