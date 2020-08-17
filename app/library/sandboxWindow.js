@@ -25,11 +25,15 @@
         }
         var error = x.makeAppError(error);
         if (errorHandlers[error.name] !== undefined) {
-            errorHandlers[error.name]();// async call
+            errorHandlers[error.name](); // async call
             hasShownAnErrorMessage = true;
             return null;
         } else {
-            x.showMessage('');
+            try {
+                x.showMessage('');
+            } catch (e) {
+                // ignore
+            }
         }
         return error;
     };
@@ -96,7 +100,7 @@
         } catch (e) {
             var errorToThrow = showErrorMessage(e);
             if (errorToThrow !== null) {
-                throw e;
+                throw errorToThrow;
             }
         }
         return {
@@ -145,7 +149,7 @@
         } catch (e) {
             var errorToThrow = showErrorMessage(e);
             if (errorToThrow !== null) {
-                throw errorToThrow
+                throw errorToThrow;
             }
         }
     });
