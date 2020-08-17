@@ -160,15 +160,10 @@
         }
     });
 
-
-    try {
-        x.sandboxEvents.addEventListener('announceChanges', async e => {
-            var keys = e.detail.keys;
-            await updateOnAnnouncedChanges(keys);
-        });
-    } catch (e) { // temp for ios
-
-    }
+    x.sandboxEvents.addEventListener('announceChanges', async e => {
+        var keys = e.detail.keys;
+        await updateOnAnnouncedChanges(keys);
+    });
 
     x.proxyCall = async (method, ...args) => {
         return await channel.send('call', {

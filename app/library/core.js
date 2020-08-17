@@ -6,11 +6,7 @@
 
 (x) => {
 
-    try {
-        x.coreEvents = x.makeEventTarget();
-    } catch (e) { // temp for ios
-
-    }
+    x.coreEvents = x.makeEventTarget();
 
     var localCache = {};
 
@@ -1631,11 +1627,7 @@
                 source: typeof options.source !== 'undefined' ? options.source : 'window'
             }
         });
-        try {
-            x.coreEvents.dispatchEvent(event);
-        } catch (e) { // temp for ios
-
-        }
+        x.coreEvents.dispatchEvent(event);
         var isServiceWorker = typeof self.serviceWorker !== 'undefined';
         if (isServiceWorker) {
             var allClients = await clients.matchAll({ type: "window", includeUncontrolled: true });

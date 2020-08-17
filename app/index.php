@@ -67,23 +67,6 @@ if ($hasLogsDirs) {
     $app->logs->useFileLogger(DOTSMESH_WEB_APP_LOGS_DIR);
 }
 
-if (isset($_SERVER['HTTP_X_CLOUDFRONT_PROXY_DOMAIN'])) {
-    $app->request->host = $_SERVER['HTTP_X_CLOUDFRONT_PROXY_DOMAIN'];
-}
-
-if ($app->request->query->exists('_heartbeat')) {
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Pragma: no-cache");
-    echo time();
-    exit;
-}
-
-if (substr($app->request->host, 0, 4) === 'www.') {
-    $app->request->host = substr($app->request->host, 4);
-    $app->send(new BearFramework\App\Response\PermanentRedirect($app->request->getURL()));
-    exit;
-}
-
 $app->routes
     ->add('/', function (App\Request $request) use ($app, $getVersion) {
         $isAppRequest = $request->query->exists('app');

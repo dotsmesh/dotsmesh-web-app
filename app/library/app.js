@@ -1602,37 +1602,33 @@
 
         // TODO MOVE
 
-        try {
-            x.coreEvents.addEventListener('announceChanges', async e => {
-                var changes = e.detail.changes;
-                var source = e.detail.source;
-                // console.log(source);
-                // console.log(changes);
-                for (var windowID in windows) {
-                    var window = windows[windowID];
-                    if (window.exists) {
-                        window.announcedChanges = window.announcedChanges.concat(changes);
-                        if (source === 'worker') {
-                            window.update(); // todo update only the visible one and maybe the previous one
-                        } else {
-                            // should update only the previous one (to be ready) and on prepareBack
-                        }
+        x.coreEvents.addEventListener('announceChanges', async e => {
+            var changes = e.detail.changes;
+            var source = e.detail.source;
+            // console.log(source);
+            // console.log(changes);
+            for (var windowID in windows) {
+                var window = windows[windowID];
+                if (window.exists) {
+                    window.announcedChanges = window.announcedChanges.concat(changes);
+                    if (source === 'worker') {
+                        window.update(); // todo update only the visible one and maybe the previous one
+                    } else {
+                        // should update only the previous one (to be ready) and on prepareBack
                     }
                 }
-                var currentUserID = x.currentUser.getID();
-                for (var i = 0; i < changes.length; i++) {
-                    var change = changes[i];
-                    if (change.key === 'user/' + currentUserID + '/profile') {
-                        updateAppToolbarUserImage();
-                    }
-                    if (change.key === 'notifications') {
-                        updateAppToolbarNotificationsCount();
-                    }
+            }
+            var currentUserID = x.currentUser.getID();
+            for (var i = 0; i < changes.length; i++) {
+                var change = changes[i];
+                if (change.key === 'user/' + currentUserID + '/profile') {
+                    updateAppToolbarUserImage();
                 }
-            });
-        } catch (e) { // temp for ios
-
-        }
+                if (change.key === 'notifications') {
+                    updateAppToolbarNotificationsCount();
+                }
+            }
+        });
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', e => {
@@ -1648,11 +1644,7 @@
                                 source: 'worker'
                             }
                         });
-                        try {
-                            x.coreEvents.dispatchEvent(event);
-                        } catch (e) { // temp for ios
-
-                        }
+                        x.coreEvents.dispatchEvent(event);
                     }
                 }
             });

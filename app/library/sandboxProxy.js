@@ -280,11 +280,7 @@
 
     // CHANGES
 
-    try {
-        x.sandboxEvents = x.makeEventTarget();
-    } catch (e) { // temp for ios
-
-    }
+    x.sandboxEvents = x.makeEventTarget();
 
     x.announceChanges = async keys => {
         var event = new CustomEvent('announceChanges', {
@@ -292,11 +288,7 @@
                 keys: keys
             }
         });
-        try {
-            x.sandboxEvents.dispatchEvent(event);
-        } catch (e) { // temp for ios
-
-        }
+        x.sandboxEvents.dispatchEvent(event);
         await x.proxyCall('announceChanges', keys);
     };
 
