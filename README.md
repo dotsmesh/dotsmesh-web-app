@@ -11,7 +11,6 @@ This is the code for the UI of the platform. There is an officially hosted versi
 #### Requirements
 - A web server (Apache, NGINX, etc.)
 - PHP 7.2+
-- A domain starting with "dotsmesh." (dotsmesh.example.com)
 - SSL/TLS certificate
 
 #### Get the code
