@@ -4,7 +4,31 @@ This is the code for the UI of the platform. There is an officially hosted versi
 
 ## How to install
 
-[The Dots Mesh installer](https://about.dotsmesh.com/self-host/) is the recommended way to create your own host and join the platform.
+[The Dots Mesh installer](https://about.dotsmesh.com/self-host/) is the recommended way to create your own host and join the platform. It will guide you through all the requirements and will install everything needed. There is an auto-update option, so you'll always use the latest stable version of the software.
+
+### Custom installation
+
+#### Requirements
+- A web server (Apache, NGINX, etc.)
+- PHP 7.2+
+- A domain starting with "dotsmesh." (dotsmesh.example.com)
+- SSL/TLS certificate
+
+#### Get the code
+
+Youn can [download the latest release as a PHAR file](https://github.com/dotsmesh/dotsmesh-web-app/releases) and run the web app this way. Create the index.php with the following content:
+```php
+<?php
+
+require 'dotsmesh-web-app-x.x.x.phar';
+```
+
+There is a [ZIP file](https://github.com/dotsmesh/dotsmesh-web-app/releases) option too. Just extract the content to a directory and point the index.php file to it.
+```php
+<?php
+
+require 'dotsmesh-web-app-x.x.x/app/index.php';
+```
 
 ## License
 
