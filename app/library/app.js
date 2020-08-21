@@ -15,10 +15,18 @@
         }
         hasHandeledAnError = true;
         var error = x.makeAppError(error);
-        //console.log(JSON.stringify(error));
         setTimeout(async () => {
             await backAllModals();
             error.location = location.toString();
+            var state = history.state;
+            if (state !== null) {
+                error.state = {
+                    type: state.type,
+                    details: state.details !== undefined ? {
+                        location: state.details.location
+                    } : null
+                };
+            }
             error.date = (new Date()).toUTCString();
             x.open('system/reportError', { error: JSON.stringify(error) }, { modal: true });
         }, 1000);

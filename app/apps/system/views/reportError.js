@@ -12,7 +12,9 @@ async (args, library) => {
             errorText = [];
             var jsData = JSON.parse(error);
             errorText.push('location:\n' + jsData.location);
+            errorText.push('state:\n' + JSON.stringify(jsData.state));
             errorText.push('date:\n' + jsData.date);
+            errorText.push('user agent:\n' + navigator.userAgent);
             errorText.push('name:\n' + jsData.name);
             for (var k in jsData.details) {
                 var value = jsData.details[k];
