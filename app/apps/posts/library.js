@@ -140,12 +140,21 @@
         return await x.posts.makeFromRaw(propertyType, propertyID, postID, json);
     };
 
-    var addPost = async (propertyType, propertyID, post) => {
-        var changeKey = propertyType + '/' + propertyID + '/posts';
+    var setPost = async (isEdit, propertyType, propertyID, post) => {
+        var changeKeys = [propertyType + '/' + propertyID + '/posts'];
         if (propertyType === 'user') {
             if (propertyID === x.currentUser.getID()) {
                 var dataStorage = x.currentUser.getDataStorage('s/a/');
-                var postID = x.generateDateBasedID();//post.id !== null ? post.id : 
+                if (isEdit) {
+                    if (post.id !== null) {
+                        var postID = post.id;
+                    } else {
+                        throw new Error();
+                    }
+                    changeKeys.push(propertyType + '/' + propertyID + '/post/' + postID);
+                } else {
+                    var postID = x.generateDateBasedID();
+                }
                 var serializedPost = await post.pack();
                 var buffer = dataStorage.getBuffer();
                 buffer.set('p/' + postID, x.pack('', [serializedPost.value, await x.currentUser.sign(serializedPost.value)]));
@@ -157,8 +166,11 @@
                     buffer.delete('a/' + postID + '-' + serializedPost.resourcesToDelete[resourceID]);
                 }
                 await buffer.flush();
+                if (isEdit) {
+                    await clearPostCache(propertyID, postID);
+                }
                 await clearListCache(propertyID);
-                await x.announceChanges([changeKey]);
+                await x.announceChanges(changeKeys);
                 await x.currentUser.announceChanges(['up']);
                 return postID;
             }
@@ -169,16 +181,30 @@
                 var resourceValue = serializedPost.resourcesToSave[resourceID];
                 resourcesToSave[resourceID] = x.pack('', await x.group.encryptShared(propertyID, x.pack('', [resourceValue, await x.currentUser.sign(resourceValue)])));
             }
-            var response = await x.group.call(propertyID, 'group.posts.add', {
-                post: x.pack('', await x.group.encryptShared(propertyID, x.pack('', [serializedPost.value, await x.currentUser.sign(serializedPost.value)]))),
-                resources: resourcesToSave,
-            }, { auth: 'auto' });
-            if (response.status === 'ok') {
+            var callMethod = 'group.posts.add';
+            var callArgs = {
+                post: x.pack('', await x.group.encryptShared(propertyID, x.pack('', [serializedPost.value, await x.currentUser.sign(serializedPost.value)])))
+            };
+            if (isEdit) {
+                changeKeys.push(propertyType + '/' + propertyID + '/post/' + post.id);
+                callMethod = 'group.posts.edit';
+                callArgs.postID = post.id;
+                callArgs.resourcesToSave = resourcesToSave;
+                callArgs.resourcesToDelete = serializedPost.resourcesToDelete;
+            } else {
+                callArgs.resources = resourcesToSave;
+            }
+            var response = await x.group.call(propertyID, callMethod, callArgs, { auth: 'auto' });
+            var responseStatus = response.status;
+            if (responseStatus === 'ok') {
+                if (isEdit) {
+                    await clearPostCache(propertyID, post.id);
+                }
                 await clearListCache(propertyID);
-                await x.announceChanges([changeKey]);
+                await x.announceChanges(changeKeys);
                 return response.id;
             }
-            throw new Error('Error posting');
+            throw new Error(isEdit ? 'Error editing (' + responseStatus + ')' : 'Error posting (' + responseStatus + ')');
         }
         throw new Error();
     }
@@ -205,14 +231,14 @@
             var response = await x.group.call(propertyID, 'group.posts.delete', {
                 postID: postID
             }, { auth: 'auto' });
-            //console.log(response);
-            if (response.status === 'ok') {
+            var responseStatus = response.status;
+            if (responseStatus === 'ok') {
                 await clearPostCache(propertyID, postID);
                 await clearListCache(propertyID);
                 await x.announceChanges([changeKey]);
                 return;
             }
-            throw new Error('Error posting');
+            throw new Error('Error deleting (' + responseStatus + ')');
         }
         throw new Error();
     };
@@ -225,28 +251,30 @@
         }
         var dataStorage = await getDataStorage(propertyType, propertyID);
         var value = await dataStorage.get('a/' + postID + '-' + resourceID);
-        if (propertyType === 'user') {
-            value = x.unpack(value);
-            if (value.name === '') {
-                value = value.value[0]; // todo check signature
-            } else {
-                throw new Error();
-            }
-        } else if (propertyType === 'group') {
-            var value = x.unpack(value);
-            if (value.name === '') {
-                var value = await x.group.decryptShared(propertyID, value.value);
+        if (value !== null) {
+            if (propertyType === 'user') {
                 value = x.unpack(value);
                 if (value.name === '') {
                     value = value.value[0]; // todo check signature
                 } else {
                     throw new Error();
                 }
+            } else if (propertyType === 'group') {
+                var value = x.unpack(value);
+                if (value.name === '') {
+                    var value = await x.group.decryptShared(propertyID, value.value);
+                    value = x.unpack(value);
+                    if (value.name === '') {
+                        value = value.value[0]; // todo check signature
+                    } else {
+                        throw new Error();
+                    }
+                } else {
+                    throw new Error();
+                }
             } else {
                 throw new Error();
             }
-        } else {
-            throw new Error();
         }
         await cache.set(cacheKey, value);
         return value;
@@ -354,7 +382,7 @@
         getRawPosts: getRawPosts,
         getPostResource: getPostResource,
         getPost: getPost,
-        addPost: addPost,
+        setPost: setPost,
         deletePost: deletePost,
         addPostReaction: addPostReaction,
         getPostReactions: getPostReactions,

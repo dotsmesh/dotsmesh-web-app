@@ -8,19 +8,21 @@ async (args, library) => {
     var postID = args.postID;
     var currentUserID = x.currentUser.getID();
 
+    var canEdit = false;
     var canDelete = false;
     var canReact = false;
 
     var propertyType = null;
     var propertyID = null;
-    if (typeof args.userID !== 'undefined') { // USER
+    if (args.userID !== undefined) { // USER
         propertyType = 'user';
         propertyID = args.userID;
         x.setHash(x.getShortID(propertyID) + '/p/' + postID);
         var profile = await x.user.getProfile(propertyID);
         x.setTitle('Public post by ' + profile.name);
+        canEdit = true;
         canDelete = true;
-    } else if (typeof args.groupID !== 'undefined') { // GROUP
+    } else if (args.groupID !== undefined) { // GROUP
         propertyType = 'group';
         propertyID = args.groupID;
         var profile = await x.group.getProfile(propertyID);
@@ -28,6 +30,7 @@ async (args, library) => {
 
         var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: propertyID, details: ['status'] });
         if (memberGroupDetails.status === 'joined') {
+            canEdit = true;
             canDelete = true;
             canReact = true;
         }
@@ -37,6 +40,20 @@ async (args, library) => {
 
     // todo wait
     var post = await library.getPost(propertyType, propertyID, postID, { cache: true });
+    if (post === null) {
+        x.showMessage('The post requested cannot be found! Maybe it was deleted.');
+        return;
+    }
+
+    if (post.userID === currentUserID && canEdit) {  // observe user join
+        x.addToolbarEditButton(async () => {
+            if (propertyType === 'user') {
+                x.open('posts/form', { userID: propertyID, postID: postID }, { modal: true });
+            } else {
+                x.open('posts/form', { groupID: propertyID, postID: postID }, { modal: true });
+            }
+        });
+    }
 
     if (post.userID === currentUserID && canDelete) {  // observe user join
         x.addToolbarDeleteButton(async () => {
@@ -60,10 +77,18 @@ async (args, library) => {
             });
         }
     }
-
-    x.add(x.makePostPreviewComponent(() => {
-        return post;
-    }, { showGroup: true }));//, { template: 'column1' }
+    var alreadyShown = false;
+    var component = x.makePostPreviewComponent(async () => {
+        if (!alreadyShown) {
+            alreadyShown = true;
+            return post;
+        } else {
+            // Updated, maybe because of an edit
+            return await library.getPost(propertyType, propertyID, postID, { cache: true });
+        }
+    }, { showGroup: true });
+    component.observeChanges([propertyType + '/' + propertyID + '/post/' + postID]);
+    x.add(component);//, { template: 'column1' }
 
     if (propertyType === 'group') {
         //x.add(x.makeSeparator());

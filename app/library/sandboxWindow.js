@@ -509,9 +509,9 @@
         x.addToolbarButton(callback, 'delete', 'right');
     };
 
-    // x.addToolbarEditButton = callback => {
-    //     x.addToolbarButton(callback, 'x-icon-edit', 'right');
-    // };
+    x.addToolbarEditButton = callback => {
+        x.addToolbarButton(callback, 'edit', 'right');
+    };
 
     x.addToolbarShareButton = callback => {
         x.addToolbarButton(callback, 'share', 'right');
