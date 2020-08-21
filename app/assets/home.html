@@ -53,7 +53,7 @@
                 alert(e.message);
             });
             self.addEventListener('unhandledrejection', e => {
-                alert(e.reason);
+                alert(JSON.stringify(e.reason));
             });
         }
 

@@ -29,7 +29,7 @@
             hasShownAnErrorMessage = true;
             return null;
         } else {
-            try {
+            try { // There might be an error before this file is executed
                 x.showMessage('');
             } catch (e) {
                 // ignore

@@ -58,7 +58,7 @@
             type: 'x-app-error'
         };
         if (typeof error === 'object' && error !== null) {
-            if (error.error !== undefined) {
+            if (error.error !== undefined && error.error !== null) {
                 error = error.error;
             }
             if (error.reason !== undefined) {
@@ -136,106 +136,114 @@
      * Supported types: window-iframe (target is required), iframe-window, window-worker (target is required), worker-window
      */
     x.createMessagingChannel = (type, target) => {
+        try {
+            var listeners = [];
+            var pending = [];
+            var send = null;
+            var destroy = null;
 
-        var listeners = [];
-        var pending = [];
-        var send = null;
-        var destroy = null;
-
-        var processMessage = message => {
-            if (typeof message.type !== 'undefined') {
-                if (message.type === 'x-call') {
-                    var action = message.action;
-                    //console.log(message);
-                    if (typeof listeners[action] !== 'undefined') {
-                        (async () => {
-                            try {
-                                var result = await listeners[action](message.args);
-                                send({ type: 'x-response', contextID: message.contextID, status: 'ok', result: result });
-                            } catch (e) {
-                                var error = x.makeAppError(e);
-                                send({ type: 'x-response', contextID: message.contextID, status: 'error', error: JSON.stringify(error) });
-                            }
-                        })();
-                    }
-                } else if (message.type === 'x-response') {
-                    var contextID = message.contextID;
-                    if (typeof pending[contextID] !== 'undefined') {
-                        if (message.status === 'ok') {
-                            pending[contextID][0](message.result);
-                        } else if (message.status === 'error') {
-                            var appError = JSON.parse(message.error);
-                            pending[contextID][1](appError);
-                        } else {
-                            //todo
+            var processMessage = message => {
+                if (typeof message.type !== 'undefined') {
+                    if (message.type === 'x-call') {
+                        var action = message.action;
+                        //console.log(message);
+                        if (typeof listeners[action] !== 'undefined') {
+                            (async () => {
+                                try {
+                                    var result = await listeners[action](message.args);
+                                    send({ type: 'x-response', contextID: message.contextID, status: 'ok', result: result });
+                                } catch (e) {
+                                    var error = x.makeAppError(e);
+                                    send({ type: 'x-response', contextID: message.contextID, status: 'error', error: JSON.stringify(error) });
+                                }
+                            })();
                         }
-                        delete pending[contextID];
+                    } else if (message.type === 'x-response') {
+                        var contextID = message.contextID;
+                        if (typeof pending[contextID] !== 'undefined') {
+                            if (message.status === 'ok') {
+                                pending[contextID][0](message.result);
+                            } else if (message.status === 'error') {
+                                var appError = JSON.parse(message.error);
+                                pending[contextID][1](appError);
+                            } else {
+                                //todo
+                            }
+                            delete pending[contextID];
+                        }
                     }
                 }
-            }
-        };
-        if (type === 'window-iframe') {
-            send = data => {
-                if (target.contentWindow !== null) { // may be closed
-                    target.contentWindow.postMessage(data, '*');
-                }
             };
-            var messageListener = e => {
-                if (e.source === target.contentWindow) {
+            if (type === 'window-iframe') {
+                send = data => {
+                    if (target.contentWindow !== null) { // may be closed
+                        target.contentWindow.postMessage(data, '*');
+                    }
+                };
+                var messageListener = e => {
+                    if (e.source === target.contentWindow) {
+                        processMessage(e.data);
+                    }
+                };
+                addEventListener('message', messageListener);
+                destroy = () => {
+                    removeEventListener('message', messageListener);
+                };
+            } else if (type === 'iframe-window') {
+                send = data => {
+                    window.parent.postMessage(data, '*');
+                };
+                addEventListener('message', e => {
                     processMessage(e.data);
-                }
-            };
-            addEventListener('message', messageListener);
-            destroy = () => {
-                removeEventListener('message', messageListener);
-            };
-        } else if (type === 'iframe-window') {
-            send = data => {
-                window.parent.postMessage(data, '*');
-            };
-            addEventListener('message', e => {
-                processMessage(e.data);
-            });
-        } else if (type === 'window-worker') {
-            send = data => {
-                target.postMessage(data);
-            };
-            target.onmessage = e => {
-                processMessage(e.data);
-            };
-        } else if (type === 'worker-window') {
-            send = data => {
-                self.postMessage(data);
-            };
-            self.onmessage = e => {
-                processMessage(e.data);
-            };
-        } else {
-            throw new Error('Not supported');
-        }
-
-        return {
-            addListener: (action, callback) => {
-                listeners[action] = callback;
-            },
-            send: (action, args) => {
-                return new Promise((resolve, reject) => {
-                    var contextID = x.generateID();
-                    pending[contextID] = [resolve, reject];
-                    send({
-                        type: 'x-call',
-                        contextID: contextID,
-                        action: action,
-                        args: args
-                    });
                 });
-            },
-            destroy: () => {
-                if (destroy !== null) {
-                    destroy();
-                }
+            } else if (type === 'window-worker') {
+                send = data => {
+                    target.postMessage(data);
+                };
+                target.onmessage = e => {
+                    processMessage(e.data);
+                };
+            } else if (type === 'worker-window') {
+                send = data => {
+                    self.postMessage(data);
+                };
+                self.onmessage = e => {
+                    processMessage(e.data);
+                };
+            } else {
+                throw new Error('Not supported');
             }
-        };
+
+            return {
+                addListener: (action, callback) => {
+                    listeners[action] = callback;
+                },
+                send: (action, args) => {
+                    return new Promise((resolve, reject) => {
+                        var contextID = x.generateID();
+                        pending[contextID] = [resolve, reject];
+                        send({
+                            type: 'x-call',
+                            contextID: contextID,
+                            action: action,
+                            args: args
+                        });
+                    });
+                },
+                destroy: () => {
+                    if (destroy !== null) {
+                        destroy();
+                    }
+                }
+            };
+        } catch (e) {
+            var error = x.makeAppError('messagingChannelError', e.message);
+            error.details['createMessagingChannel'] = {
+                type: type,
+                target: target
+            };
+            throw error;
+        }
     };
 
 
