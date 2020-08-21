@@ -1170,15 +1170,8 @@
                 //Checking the code ...
                 await showLoadingScreen();
                 try {
-                    //var host = profileKeyData.host;
-                    // if (host === 'p') { // dotsmesh premium
-                    //     host = 'x.dotsmesh.com';
-                    // } else if (host === 's') { // dotsmesh standard
-                    //     host = 'x.dotsmesh.com'; // optimize
-                    // }
                     var result = await x.host.call(host, 'host.validatePropertyKey', { key: fullProfileKey, context: 'user' });
                 } catch (e) {
-                    //console.log(e);
                     var result = null;
                 }
                 if (result === 'valid') {
