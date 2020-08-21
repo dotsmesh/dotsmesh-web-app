@@ -1935,9 +1935,9 @@
         if (type === 'i') { // image
             var setContent = src => {
                 if (size !== null) {
-                    container.firstChild.innerHTML = '<div style="width:' + size + 'px;height:' + size + 'px;background-image:url(\'' + src + '\');background-size:cover;background-position:center;"></div>';
+                    container.firstChild.innerHTML = '<div style="width:' + size + 'px;height:' + size + 'px;' + (src !== null ? 'background-image:url(\'' + src + '\');background-size:cover;background-position:center;' : '') + '"></div>';
                 } else {
-                    container.firstChild.innerHTML = '<img src="' + src + '" style="width:100%;">';
+                    container.firstChild.innerHTML = src !== null ? '<img src="' + src + '" style="width:100%;">' : '';
                 }
             }
             if (details.value === 'data:r') {
