@@ -17,7 +17,7 @@ async (args, library) => {
     var fieldNewRepeatPassword = x.makeFieldTextbox('Repeat new password', { maxLength: 100, type: 'password' });
     x.add(fieldNewRepeatPassword);
 
-    x.add(x.makeButton('Save Changes', async () => {
+    x.add(x.makeSubmitButton('Save Changes', async () => {
         var oldPassword = fieldOldPassword.getValue();
         var newPassword = fieldNewPassword.getValue();
         var newPassword2 = fieldNewRepeatPassword.getValue();

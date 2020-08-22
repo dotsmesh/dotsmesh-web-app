@@ -2035,7 +2035,10 @@
             addButton: (text, callback) => {
                 var button = document.createElement('a');
                 button.innerText = text;
-                button.addEventListener('click', (e) => {
+                button.setAttribute('tabindex', '0');
+                button.setAttribute('role', 'button');
+                button.setAttribute('aria-label', text);
+                x.addClickToOpen(button, e => {
                     e.stopPropagation();
                     hide();
                     callback();
@@ -2076,13 +2079,13 @@
 
     x.addClickToOpen = (element, data) => {
         var tempData = null;
-        var run = preload => {
+        var run = (preload, e) => {
             if (tempData === null) {
                 tempData = {};
                 if (typeof data === 'object') {
                     tempData.location = data.location;
-                    tempData.args = typeof data.args !== 'undefined' ? data.args : {};
-                    tempData.preload = typeof data.preload !== 'undefined';
+                    tempData.args = data.args !== undefined ? data.args : {};
+                    tempData.preload = data.preload !== undefined;
                 } else {
                     tempData.location = null;
                     tempData.preload = false;
@@ -2090,41 +2093,49 @@
             }
             if (tempData.preload) {
                 if (preload) {
-                    if (typeof tempData.preloadData === 'undefined') {
+                    if (tempData.preloadData === undefined) {
                         //console.time('preload ' + tempData.location);
                         tempData.preloadData = x.preload(tempData.location, tempData.args);
                     }
+                    return;
                 } else {
                     //console.timeEnd('preload ' + tempData.location);
-                    Promise.resolve(tempData.preloadData)
-                        .then(windowID => {
-                            tempData = null;
-                            x.openPreloaded(windowID);
-                        });
-                }
-            } else {
-                if (tempData.location !== null) {
-                    x.open(tempData.location, tempData.args);
-                } else if (typeof data === 'function') {
-                    if (!preload) {
-                        data();
+                    if (tempData.preloadData !== undefined) {
+                        Promise.resolve(tempData.preloadData)
+                            .then(windowID => {
+                                tempData = null;
+                                x.openPreloaded(windowID);
+                            });
+                        return;
                     }
-                } else {
-                    throw new Exception('Should not get here addClickToOpen');
                 }
             }
+            if (tempData.location !== null) {
+                x.open(tempData.location, tempData.args);
+            } else if (typeof data === 'function') {
+                if (!preload) {
+                    data(e);
+                }
+            } else {
+                throw new Exception('Should not get here addClickToOpen');
+            }
         };
-        element.addEventListener('touchstart', () => { // todo detect touch scroll
+        element.addEventListener('touchstart', e => { // todo detect touch scroll
             //console.log('touchstart ' + (new Date()).getTime());
-            run(true);
+            run(true, e);
         });
-        element.addEventListener('mousedown', () => {
+        element.addEventListener('mousedown', e => {
             //console.log('mousedown ' + (new Date()).getTime());
-            run(true);
+            run(true, e);
         });
-        element.addEventListener('click', () => {
+        element.addEventListener('click', e => {
             //console.log('click ' + (new Date()).getTime());
-            run(false);
+            run(false, e);
+        });
+        element.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                run(false, e);
+            }
         });
     };
 

@@ -46,7 +46,7 @@ async (args, library) => {
     }
 
     if (post.userID === currentUserID && canEdit) {  // observe user join
-        x.addToolbarEditButton(async () => {
+        x.addToolbarEditButton('Edit this post', async () => {
             if (propertyType === 'user') {
                 x.open('posts/form', { userID: propertyID, postID: postID }, { modal: true });
             } else {
@@ -56,7 +56,7 @@ async (args, library) => {
     }
 
     if (post.userID === currentUserID && canDelete) {  // observe user join
-        x.addToolbarDeleteButton(async () => {
+        x.addToolbarDeleteButton('Delete this post', async () => {
             if (await x.confirm('Are you sure you want to delete this post?')) {
                 x.showLoading();
                 await library.deletePost(propertyType, propertyID, postID);
@@ -69,7 +69,7 @@ async (args, library) => {
 
     if (propertyType === 'user') {
         if (x.currentUser.isPublic()) {
-            x.addToolbarShareButton(() => {
+            x.addToolbarShareButton('Share this post', () => {
                 x.share('p', {
                     o: x.getTypedID(propertyType, propertyID),
                     p: postID

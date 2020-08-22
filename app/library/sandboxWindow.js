@@ -50,12 +50,12 @@
                 }
             });
             if (modal) {
-                x.addToolbarButton(async () => {
+                x.addToolbarButton('Close', async () => {
                     x.back();
                 }, 'close', 'right', 999);
             } else {
                 if (args.showBackButton) {
-                    x.addToolbarButton(async () => {
+                    x.addToolbarButton('Back', async () => {
                         x.back();
                     }, 'back', 'left', -1);
                 }
@@ -228,6 +228,7 @@
     css += '.x-header-button>span{display:block;width:calc(100% - 10px);height:calc(100% - 10px);margin-top:5px;margin-left:5px;border-radius:50%;}';
     css += '.x-header-button:hover>span{background-color:rgba(255,255,255,0.04);}';
     css += '.x-header-button:active>span{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-header-button:focus>span{background-color:rgba(255,255,255,0.08);}';
     css += '.x-header{transition:opacity ' + x.animationTime + 'ms;opacity:1;}';// for the manual loading indicator
     if (!modal) {
         css += '.x-header > :last-child{transition:opacity ' + x.animationTime + 'ms;opacity:0;}'; // hide header button while loading
@@ -268,6 +269,7 @@
         css += '.x-header{height:42px;padding-left:' + contentSpacing + ';color:#000;}';
         css += '.x-header-button:hover{background-color:#eee;}';
         css += '.x-header-button:active{background-color:#ddd;}';
+        css += '.x-header-button:focus{background-color:#ddd;}';
         css += '.x-header-button:last-child{border-top-right-radius:4px;border-bottom-left-radius:4px;}';
         css += '.x-body{flex:1 1 auto;displat:flex;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
@@ -315,14 +317,17 @@
     css += '.x-block-click{cursor:pointer;}';
     css += '.x-block-click:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-block-click:active{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-block-click:focus{background-color:rgba(255,255,255,0.08);}';
     css += '.x-block-dark{background-color:rgba(255,255,255,0.04);}';
     css += '.x-block-dark-click{background-color:rgba(255,255,255,0.04);cursor:pointer;}';
     //css += '.x-block-dark-click:hover{background-color:rgba(255,255,255,0.08);}';
     css += '.x-block-dark-click:active{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-block-dark-click:focus{background-color:rgba(255,255,255,0.08);}';
     if (modal) {
         css += '.x-block-light-click{cursor:pointer;}';
         css += '.x-block-light-click:hover{background-color:#eee;}';
         css += '.x-block-light-click:active{background-color:#e8e8e8;}';
+        css += '.x-block-light-click:focus{background-color:#e8e8e8;}';
     } else {
         css += '.x-block-light, .x-block-light-click{padding:' + contentSpacing + ';}';
         css += '.x-block-light{background-color:#fafafa;}';
@@ -464,14 +469,18 @@
         x.open('system/share', { type: type, value: value }, { modal: true, width: 300 });
     };
 
-    x.setTitle = (text, alwaysVisible) => {
+    x.setTitle = (text, alwaysVisible = false) => {
         title = text;
         var container = document.querySelector('.x-header-title');
         if (container === null) {
             container = document.createElement('div');
             container.setAttribute('class', 'x-header-title');
-            if (typeof alwaysVisible !== 'undefined' && alwaysVisible) {
+            if (alwaysVisible) {
                 container.setAttribute('x-always-visible', '1');
+            } else {
+                if (!modal) {
+                    container.setAttribute('aria-hidden', 'true');
+                }
             }
         }
         container.innerText = text;
@@ -482,15 +491,19 @@
         hash = _hash;
     };
 
-    x.addToolbarButton = (callback, icon, position, order) => {
+    x.addToolbarButton = (title, callback, icon, position, order) => {
         var button = document.createElement('div');
         button.setAttribute('class', 'x-header-button');
+        button.setAttribute('tabindex', '0');
+        button.setAttribute('role', 'button');
+        button.setAttribute('title', title);
+        button.setAttribute('aria-label', title);
         if (callback !== null) {
-            button.addEventListener('click', callback);
+            x.addClickToOpen(button, callback);
         } else {
             button.setAttribute('x-info', '1');
         }
-        if (typeof order !== 'undefined') {
+        if (order !== undefined) {
             button.style.order = order;
         }
         var setIcon = icon => {
@@ -505,22 +518,22 @@
         };
     };
 
-    x.addToolbarDeleteButton = callback => {
-        x.addToolbarButton(callback, 'delete', 'right');
+    x.addToolbarDeleteButton = (title, callback) => {
+        x.addToolbarButton(title, callback, 'delete', 'right');
     };
 
-    x.addToolbarEditButton = callback => {
-        x.addToolbarButton(callback, 'edit', 'right');
+    x.addToolbarEditButton = (title, callback) => {
+        x.addToolbarButton(title, callback, 'edit', 'right');
     };
 
-    x.addToolbarShareButton = callback => {
-        x.addToolbarButton(callback, 'share', 'right');
+    x.addToolbarShareButton = (title, callback) => {
+        x.addToolbarButton(title, callback, 'share', 'right');
     };
 
     x.addToolbarNotificationsButton = (notificationID, serviceDataSource, text) => {
         x.wait(async () => {
             var exists = x.currentUser.exists() ? await x.notifications.exists(notificationID) : false;
-            var button = x.addToolbarButton(async () => {
+            var button = x.addToolbarButton('Notification settings', async () => {
                 var action = exists ? 'delete' : 'add';
                 var serviceData = await serviceDataSource(action);
                 await x.open('system/manageNotification', {
@@ -539,7 +552,7 @@
     };
 
     x.addToolbarSecretButton = text => {
-        x.addToolbarButton(() => {
+        x.addToolbarButton('About', () => {
             x.open('system/message', { text: text }, { modal: true, width: 300 });
         }, 'lock', 'right');
     };
@@ -778,21 +791,26 @@
         css += '.x-button{color:#000;width:100%;text-align:center;}';
         css += '.x-button:hover{background-color:#eee;}';
         css += '.x-button:active{background-color:#e8e8e8;}';
+        css += '.x-button:focus{background-color:#e8e8e8;}';
         css += '.x-button:not(:empty){padding:0 16px;}';
     } else {
         css += '.x-button{color:#fff;display:inline-block;border-radius:21px;}';//display:table;margin:0 auto;width:auto;
         css += '.x-button:not(:empty){padding:0 21px;}';
         css += '.x-button:hover{background-color:rgba(255,255,255,0.04)}';//background-color:#2a2a2a;
         css += '.x-button:active{background-color:rgba(255,255,255,0.08)}';
+        css += '.x-button:focus{background-color:rgba(255,255,255,0.08)}';
         css += '.x-button[x-style="style1"]{background-color:#24a4f2;}';
         css += '.x-button[x-style="style1"]:hover{background-color:#1c9be8;}';
         css += '.x-button[x-style="style1"]:active{background-color:#188ed6;}';
+        css += '.x-button[x-style="style1"]:focus{background-color:#188ed6;}';
         css += '.x-button[x-style="style2"]{border:1px solid #333;}';
         css += '.x-button[x-style="style2"]:hover{background-color:rgba(255,255,255,0.04);}';
         css += '.x-button[x-style="style2"]:active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style2"]:focus{background-color:rgba(255,255,255,0.08);}';
         css += '.x-button[x-style="style3"]{font-size:13px;height:32px;line-height:30px;border:1px solid #333;border-radius:16px;padding:0 16px;}';
         css += '.x-button[x-style="style3"]:hover{background-color:rgba(255,255,255,0.04);}';
         css += '.x-button[x-style="style3"]:active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style3"]:focus{background-color:rgba(255,255,255,0.08);}';
     }
 
     x.makeButton = (text, callback, options = {}) => {
@@ -801,12 +819,12 @@
         var title = options.title !== undefined ? options.title : null;
         var container = document.createElement('div');
         container.setAttribute('class', 'x-button');
+        container.setAttribute('tabindex', '0');
+        container.setAttribute('role', 'button');
         if (styleID !== null) {
             container.setAttribute('x-style', styleID);
         }
-        container.addEventListener('click', async () => {
-            callback();
-        });
+        x.addClickToOpen(container, callback);
         if (title !== null) {
             container.setAttribute('title', title);
         }
@@ -838,10 +856,23 @@
         };
     };
 
+    x.makeSubmitButton = (text, callback, options = {}) => {
+        var button = x.makeButton(text, callback, options);
+        button.element.setAttribute('x-role', 'submit');
+        return button;
+    };
+
+    var submitForm = () => {
+        var button = document.querySelector('[x-role="submit"]');
+        if (button !== null) {
+            button.click();
+        }
+    };
+
     css += '.x-field{width:100%;}';
     css += '.x-field > label{' + textStyle + 'display:block;padding-bottom:2px;margin-top:-4px;}';
 
-    let makeField = (label, content, className, options = {}) => {
+    var makeField = (label, content, className, options = {}) => {
         //var addSpacing = typeof options.addSpacing === 'undefined' ? true : options.addSpacing;
         if (typeof label !== 'undefined' && label !== null && label.length > 0) {
             content = '<label>' + label + '</label>' + content;
@@ -870,6 +901,11 @@
         if (options.type !== undefined) {
             input.setAttribute('type', options.type);
         }
+        input.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                submitForm();
+            }
+        });
         return {
             show: () => {
                 container.style.display = 'block';
@@ -895,14 +931,15 @@
     x.makeFieldImage = (label, options = {}) => {
         var emptyValue = typeof options.emptyValue !== 'undefined' ? options.emptyValue : null;
         var fieldValue = null;
-        var container = makeField(label, '<div></div><input type="file" accept="image/*" style="display:none;"></input>', 'x-field-image');
+        var container = makeField(label, '<div tabindex="0" role="button"></div><input type="file" accept="image/*" style="display:none;"></input>', 'x-field-image');
         var buttonElement = container.querySelector('div');
+        buttonElement.setAttribute('aria-label', label);
         var fileInput = container.querySelector('input');
         var setValue = async value => {
             fieldValue = value;
             buttonElement.style.backgroundImage = fieldValue === null ? (emptyValue !== null ? 'url(' + await x.image.getURL(emptyValue) + ')' : '') : 'url(' + await x.image.getURL(fieldValue) + ')';
         };
-        buttonElement.addEventListener('click', (e) => {
+        x.addClickToOpen(buttonElement, e => {
             if (fieldValue === null) {
                 fileInput.click();
             } else {
@@ -1120,6 +1157,8 @@
         if (mode === 'summary') {
             container.setAttribute('class', 'x-post x-block-light-click');
             contentElementsSelectors.push('s'); // summary mode
+            container.setAttribute('tabindex', '0');
+            container.setAttribute('role', 'button');
         } else if (mode === 'attachment') {
             container.setAttribute('class', 'x-post');
             contentElementsSelectors.push('m'); // attachment mode
@@ -1334,7 +1373,10 @@
         var loadMoreLink = document.createElement('a');
         loadMoreLink.innerText = 'Show more';
         loadMoreLink.setAttribute('style', textStyle + 'cursor:pointer;color:#fff;background:#222;display:inline-block;padding:10px 15px;border-radius:8px;');
-        loadMoreLink.addEventListener('click', async () => {
+        loadMoreLink.setAttribute('tabindex', '0');
+        loadMoreLink.setAttribute('role', 'button');
+        loadMoreLink.setAttribute('aria-label', 'Show more messages');
+        x.addClickToOpen(loadMoreLink, async () => {
             await loadMore();
         });
         loadMoreContainer.appendChild(loadMoreLink);
@@ -1561,6 +1603,8 @@
         container.style.display = 'inline-flex';//inline ? 'inline-flex' : 'flex';
         //container.style.flexDirection = 'row';
         container.style.position = 'relative';
+        container.setAttribute('tabindex', '0');
+        container.setAttribute('role', 'button');
 
         var hasImage = imageElement !== null;
 
@@ -1607,6 +1651,9 @@
 
     x.makeProfileButton = async (type, id, options = {}) => {
         var onClick = options.onClick !== undefined ? options.onClick : null;
+        var hasCustomOnClick = onClick !== null;
+        var text = options.text !== undefined ? options.text : null;
+        var hasCustomText = text !== null;
         if (onClick === null) {
             if (type === 'user') {
                 onClick = { location: 'user/home', args: { userID: id }, preload: true };
@@ -1619,17 +1666,21 @@
                 throw new Error();
             }
         }
-        if (options.text !== undefined) {
-            var text = options.text;
-        } else {
+        if (!hasCustomText) {
             var profile = await getPropertyProfile(type, id);
-            var text = profile.name;
+            text = profile.name;
         }
         var details = options.details !== undefined ? options.details : null;
         var hint = options.hint !== undefined ? options.hint : null;
         var imageSize = options.imageSize !== undefined ? options.imageSize : 50;
         var imageElement = await getProfileImageElement(type, id, imageSize);
-        return makeImageButton(onClick, imageElement, imageSize, text, details, hint);//, inline
+        var button = makeImageButton(onClick, imageElement, imageSize, text, details, hint);//, inline
+        if (!hasCustomOnClick && !hasCustomText) {
+            var title = 'Visit ' + profile.name + '\'s profile';
+            button.element.setAttribute('title', title);
+            button.element.setAttribute('aria-label', title);
+        }
+        return button;
     };
 
     x.makeIconButton = (onClick, icon, text = null, details = null, hint = null) => {//, inline
@@ -1699,10 +1750,12 @@
     css += '.x-small-post-form .x-button{color:#fff;font-size:15px;padding-left:13px;padding-right:13px;border-radius:0;border-bottom-left-radius:8px;border-top-right-radius:4px;width:auto;}';
     css += '.x-small-post-form .x-button:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-small-post-form .x-button:active{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-small-post-form .x-button:focus{background-color:rgba(255,255,255,0.08);}';
     css += '.x-small-post-form .x-field-textarea textarea{border:0;background:transparent;color:#fff;padding-top:12px;}';//shape-outside
     css += '.x-small-post-form .x-add-button{border-radius:0;border-bottom-right-radius:8px;border-top-left-radius:4px;}';
     css += '.x-small-post-form .x-add-button:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-small-post-form .x-add-button:active{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-small-post-form .x-add-button:focus{background-color:rgba(255,255,255,0.08);}';
 
     x.makePostForm = async (post, options = {}) => {
         if (typeof post === 'undefined' || post === null) {
@@ -1781,7 +1834,10 @@
             if (post.attachments.getCount() > 0) {
                 var firstAttachment = post.attachments.get(post.attachments.getIDs()[0]);
                 var attachmentPreviewElement = await x.makeAttachmentPreviewElement(firstAttachment, { theme: theme, size: 42 });
-                attachmentPreviewElement.addEventListener('click', (e) => {
+                attachmentPreviewElement.setAttribute('tabindex', '0');
+                attachmentPreviewElement.setAttribute('role', 'button');
+                attachmentPreviewElement.setAttribute('aria-label', 'Attachment');
+                x.addClickToOpen(attachmentPreviewElement, e => {
                     var tooltip = x.makeTooltip(document.body);
                     // tooltip.addButton('Preview', () => {
                     //     x.alert('Not implemented yet!');
@@ -1801,8 +1857,11 @@
                 attachmentButton.setAttribute('title', 'Add an attachment');
                 attachmentButton.setAttribute('class', 'x-add-button');
                 attachmentButton.setAttribute('style', (type === 'small' ? '' : 'border:1px solid #ccc;border-radius:4px;') + 'width:42px;height:42px;box-sizing:border-box;background-repeat:no-repeat;background-size:40% 40%;background-position:center;cursor:pointer;');
+                attachmentButton.setAttribute('tabindex', '0');
+                attachmentButton.setAttribute('role', 'button');
+                attachmentButton.setAttribute('aria-label', 'Add an attachment');
                 attachmentButton.style.backgroundImage = 'url(\'' + x.getIconDataURI('plus', type === 'small' ? '#fff' : '#999') + '\')';
-                attachmentButton.addEventListener('click', e => {
+                x.addClickToOpen(attachmentButton, e => {
                     var tooltip = x.makeTooltip(document.body);
                     tooltip.addButton('Image', () => {
                         x.pickFile(async file => {
@@ -2019,9 +2078,7 @@
         }
         if (previewOnClick && previewCallback !== null) {
             container.style.cursor = 'pointer';
-            container.addEventListener('click', () => {
-                previewCallback();
-            });
+            x.addClickToOpen(container, previewCallback);
         }
         return container;
     };

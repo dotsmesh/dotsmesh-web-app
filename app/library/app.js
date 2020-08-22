@@ -124,8 +124,8 @@
         var locationParts = location.split('/');
         var appID = locationParts[0];
         var viewID = locationParts[1];
-        var modal = typeof options.modal !== 'undefined' ? options.modal : false;
-        var openerID = typeof options.openerID !== 'undefined' ? options.openerID : null;
+        var modal = options.modal !== undefined ? options.modal : false;
+        var openerID = options.openerID !== undefined ? options.openerID : null;
         var windowID = x.generateID();
 
         var container = document.createElement('div');
@@ -167,6 +167,7 @@
                 frame.srcdoc = '<html><head><meta charset="utf-8"></head><body x-type="' + (modal ? 'modal' : 'default') + '"><script>self.xc=' + JSON.stringify(contextData) + ';self.x=' + JSON.stringify({ animationTime: x.animationTime, modalsAnimationTime: x.modalsAnimationTime }) + ';' + x.library.get(['utilities', 'sandboxProxy', 'sandboxWindow'], 'self.x') + 'self.main=(args)=>{' + content + '};</script></body></html>';
                 container.appendChild(frame);
                 container.setAttribute('class', modal ? 'x-app-modal' : 'x-app-window');
+                //container.setAttribute('aria-hidden', 'true');
             } catch (e) {
                 reject();
             }
@@ -238,6 +239,7 @@
             }
             await Promise.allSettled(promisesToWait);
             container.setAttribute('x-visible', '1');
+            //container.setAttribute('aria-hidden', 'false');
             updateModalBackground();
             await initializePromise;
             var result = await window.channel.send('show');
@@ -269,6 +271,7 @@
             }
             try {
                 container.setAttribute('x-visible', '0');
+                //container.setAttribute('aria-hidden', 'true');
             } catch (e) {
 
             }
@@ -509,6 +512,7 @@
     css += '.x-app-toolbar-button-app{font-size:0;color:transparent;background-size:20px;background-repeat:no-repeat;background-position:center;}';
     css += '.x-app-toolbar-button:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-app-toolbar-button:active{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-app-toolbar-button:focus{background-color:rgba(255,255,255,0.08);}';
 
     css += '.x-app-toolbar-button[x-home-app]{align-items:flex-start;}';
     css += '.x-app-toolbar-button[x-home-app]>span:not(:empty){width:20px;height:20px;line-height:21px;text-align:center;display:block;background:#24a4f2;color:#fff;font-size:11px;border-radius:50%;margin-top:4px;margin-left:14px;font-weight:bold;}';
@@ -808,16 +812,23 @@
     css += '.x-home-screen-content >*:not(:first-child){margin-top:15px;}';
     css += '.x-welcome-screen-header{background-size:480px;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960&v=3);padding-top:200px;}';
 
-    css += '.x-home-screen-back-button{width:42px;height:42px;cursor:pointer;position:absolute;top:0;left:0;background-size:50% 50%;background-position:center center;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.icons.back) + '\');}';
+    css += '.x-home-screen-back-button{width:50px;height:50px;cursor:pointer;position:absolute;top:0;left:0;background-size:20px;background-position:center center;background-repeat:no-repeat;background-image:url(\'' + x.getIconDataURI('back', '#999') + '\');}';
+    css += '.x-home-screen-back-button>span{display:block;width:calc(100% - 10px);height:calc(100% - 10px);margin-top:5px;margin-left:5px;border-radius:50%;}';
+    css += '.x-home-screen-back-button:hover>span{background-color:rgba(255,255,255,0.04);}';
+    css += '.x-home-screen-back-button:active>span{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-home-screen-back-button:focus>span{background-color:rgba(255,255,255,0.08);}';
+
     css += '.x-home-screen-title{text-align:center;font-weight:bold;font-size:25px;line-height:160%;}';
     css += '.x-home-screen-textbox{font-family:' + x.fontFamily + ';max-width:260px;text-align:center;display:block;border:0;border-radius:8px;width:100%;padding:0 13px;height:48px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
     css += '.x-home-screen-textbox:focus{border:1px solid rgba(255,255,255,0.3);}';
     css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:8px;padding:0 30px;min-height:48px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:48px;text-align:center;cursor:pointer;text-decoration:none;}';
     css += '.x-home-screen-button:hover{background-color:rgba(255,255,255,0.96);}';
     css += '.x-home-screen-button:active{background-color:rgba(255,255,255,0.92);}';
+    css += '.x-home-screen-button:focus{background-color:rgba(255,255,255,0.92);}';
     css += '.x-home-screen-button-2{background-color:rgba(255,255,255,0.04);color:#fff;}';
     css += '.x-home-screen-button-2:hover{background-color:rgba(255,255,255,0.08);}';
     css += '.x-home-screen-button-2:active{background-color:rgba(255,255,255,0.12);}';
+    css += '.x-home-screen-button-2:focus{background-color:rgba(255,255,255,0.12);}';
     css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:18px 19px 17px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
     css += '.x-home-screen-button-3>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
     css += '.x-home-screen-text{font-size:15px;line-height:24px;text-align:center;}';
@@ -826,6 +837,7 @@
     css += '.x-home-screen-hint{font-size:13px;line-height:24px;text-align:center;color:#999;}';//margin-top:20px;
     css += '.x-home-screen-hint a{text-decoration:underline;color:#999;}';
     css += '.x-home-screen-image-button{cursor:pointer;width:150px;height:150px;border-radius:50%;background-color:#fff;margin:0 auto;background-size:cover;background-position:center center;}';
+    css += '.x-home-screen-image-button:focus{box-shadow:0 0 0 3px rgba(255,255,255,0.12);}';
     css += '.x-home-screen-image-preview{width:150px;height:150px;border-radius:50%;background-color:#333;margin:0 auto;background-size:cover;background-position:center center;}';
 
     var hideVisibleScreen = async () => {
@@ -835,6 +847,7 @@
                 if (otherScreens.length > 0) {
                     otherScreens.forEach(otherScreen => {
                         otherScreen.removeAttribute('x-visible');
+                        //otherScreen.setAttribute('aria-hidden', 'true');
                         setTimeout(() => {
                             otherScreen.parentNode.removeChild(otherScreen);
                         }, x.modalsAnimationTime + 16);
@@ -863,6 +876,7 @@
             historyState = null;
         }
         var container = document.createElement('div');
+        //container.setAttribute('aria-hidden', 'true');
         container.setAttribute('class', 'x-screen x-home-screen');
         container.innerHTML = '<div class="x-home-screen-content"></div>';
         document.body.appendChild(container);
@@ -871,14 +885,25 @@
         var addedFields = {};
 
         var screen = null;
+
+        var clickSubmitButton = () => {
+            var button = container.querySelector('[x-role="submit"]');
+            if (button !== null) {
+                button.click();
+            }
+        }
+
         screen = {
             addBackButton: () => {
                 var div = document.createElement('div');
                 div.setAttribute('class', 'x-home-screen-back-button');
-                div.addEventListener('click', async () => {
+                div.setAttribute('tabindex', '0');
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-label', 'Back');
+                div.innerHTML = '<span></span>'
+                x.addClickToOpen(div, async () => {
                     await historyBack();
                     console.log(history.state);
-                    //history.back();
                 });
                 container.appendChild(div);
             },
@@ -892,6 +917,12 @@
                 var input = document.createElement('input');
                 input.setAttribute('class', 'x-home-screen-textbox');
                 input.setAttribute('placeholder', label);
+                input.setAttribute('aria-label', label);
+                input.addEventListener('keydown', e => {
+                    if (e.keyCode === 13) {
+                        clickSubmitButton();
+                    }
+                });
                 contentContainer.appendChild(input);
                 addedFields[id] = input;
             },
@@ -899,22 +930,35 @@
                 var input = document.createElement('input');
                 input.setAttribute('class', 'x-home-screen-textbox');
                 input.setAttribute('placeholder', label);
+                input.setAttribute('aria-label', label);
                 input.setAttribute('type', 'password');
+                input.addEventListener('keydown', e => {
+                    if (e.keyCode === 13) {
+                        clickSubmitButton();
+                    }
+                });
                 contentContainer.appendChild(input);
                 addedFields[id] = input;
+            },
+            addSubmitButton: (text, callback, style) => {
+                var button = screen.addButton(text, callback, style);
+                button.setAttribute('x-role', 'submit');
             },
             addButton: (text, callback, style) => {
                 var button = document.createElement('a');
                 button.setAttribute('class', 'x-home-screen-button' + (style !== undefined ? ' x-home-screen-button-' + style : ''));
-                button.innerText = text;
+                button.setAttribute('tabindex', '0');
+                button.setAttribute('role', 'button');
+                button.innerHTML = text;
                 contentContainer.appendChild(button);
-                button.addEventListener('click', async () => {
+                x.addClickToOpen(button, async () => {
                     try {
-                        var result = await callback();
+                        await callback();
                     } catch (e) {
                         alert(e.message);
                     }
                 });
+                return button;
             },
             addText: (text, style) => {
                 var div = document.createElement('div');
@@ -939,6 +983,11 @@
             setValue: (id, value) => {
                 return addedFields[id].value = value;
             },
+            focus: id => {
+                if (addedFields[id] !== undefined) {
+                    addedFields[id].focus();
+                }
+            },
             show: async () => {
                 if (historyState !== null) {
                     pushLocationState({
@@ -948,6 +997,7 @@
                 }
                 await hideVisibleScreen();
                 container.setAttribute('x-visible', '1');
+                //container.setAttribute('aria-hidden', 'false');
             },
             element: container
         };
@@ -994,30 +1044,18 @@
 
         var privateUsersIDs = await x.currentUser.getPrivateUsers();
         if (privateUsersIDs.length > 0) {
-            var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
-            button.innerHTML = 'Continue with a private profile';
-            button.addEventListener('click', async () => {
+            screen.addButton('Continue with a private profile', async () => {
                 await showContinuePrivateUserScreen();
-            });
-            screen.addHTML(button);
+            }, '3');
         }
 
-        var button = document.createElement('a');
-        button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
-        button.innerHTML = 'Create new profile';
-        button.addEventListener('click', async () => {
+        screen.addButton('Create new profile', async () => {
             await showSignupScreen();
-        });
-        screen.addHTML(button);
+        }, '3');
 
-        var button = document.createElement('a');
-        button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
-        button.innerHTML = 'Sign in';
-        button.addEventListener('click', async () => {
+        screen.addButton('Sign in', async () => {
             await showLoginScreen();
-        });
-        screen.addHTML(button);
+        }, '3');
 
         var host = location.host;
         if (host === 'dotsmesh.com') {
@@ -1051,19 +1089,22 @@
         screen.addText('\nEnter your ID and password to\nlog in to your profile.');
         screen.addTextbox('id', 'ID');
         screen.addPassword('password', 'Password');
-        screen.addButton('Log in', async () => {
+        screen.addSubmitButton('Log in', async () => {
             var id = screen.getValue('id').toLowerCase();
             var password = screen.getValue('password');
             if (id.length === 0) {
                 alert('The ID is required!');
+                screen.focus('id');
                 return;
             }
             if (id.length < 3) {
                 alert('The ID is must be atleast 3 characters long!');
+                screen.focus('id');
                 return;
             }
             if (password.length === 0) {
                 alert('The password is required!');
+                screen.focus('password');
                 return;
             }
             await showLoadingScreen();
@@ -1118,26 +1159,18 @@
             screen.addTitle('Great! Let\'s make\nyou a profile!');
             screen.addText("\nChoose a profile type:");
 
-            var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
-            button.innerHTML = 'Private profile<span>Free. Following, groups, etc.</span>';
-            button.addEventListener('click', async () => {
+            screen.addButton('Private profile<span>Free. Following, groups, etc.</span>', async () => {
                 var privateUsersIDs = await x.currentUser.getPrivateUsers();
                 if (privateUsersIDs.length > 0) {
                     await showContinuePrivateUserScreen();
                 } else {
                     await showNewPrivateUserScreen();
                 }
-            });
-            screen.addHTML(button);
+            }, '3');
 
-            var button = document.createElement('a');
-            button.setAttribute('class', 'x-home-screen-button x-home-screen-button-3');
-            button.innerHTML = 'Public profile<span>Public posts, private messaging, etc.</span>';
-            button.addEventListener('click', async () => {
+            screen.addButton('Public profile<span>Public posts, private messaging, etc.</span>', async () => {
                 await showNextStep();
-            });
-            screen.addHTML(button);
+            }, '3');
 
         } else if (index === 2) {
             if (signupData.profileKey !== null) {
@@ -1155,7 +1188,7 @@
             }
             screen.addTextbox('profileKey', 'Profile key');
             screen.setValue('profileKey', signupData.profileKey);
-            screen.addButton('Next', async () => {
+            screen.addSubmitButton('Next', async () => {
                 var profileKey = screen.getValue('profileKey').toLowerCase().trim();
                 if (profileKey.length === 0) {
                     alert('The profile key cannot be empty!');
@@ -1213,7 +1246,7 @@
             } else {
                 screen.addHint('The key used is provided by ' + host + ', so this name will be appended to the ID selected.');
             }
-            screen.addButton('Next', async () => {
+            screen.addSubmitButton('Next', async () => {
                 var id = screen.getValue('id').toLowerCase().trim();
                 if (id.length === 0) {
                     alert('The ID is required!');
@@ -1274,7 +1307,7 @@
             screen.setValue('password', signupData.password);
             screen.setValue('password2', signupData.password);
             screen.addHint('Your profile and your data are highly encrypted. The password is the only way to access them. Make sure it\'s a strong one and never share it with others.');// <a>Learn more</a>.
-            screen.addButton('Next', async () => {
+            screen.addSubmitButton('Next', async () => {
                 var password = screen.getValue('password');
                 var password2 = screen.getValue('password2');
                 if (password.length === 0) {
@@ -1300,11 +1333,11 @@
             screen.addTitle('\nSet up your profile now?');
             screen.addText('\nSelect an image and enter\na name for your public profile');
             var imageField = document.createElement('div');
-            imageField.innerHTML = '<div class="x-home-screen-image-button"></div><input type="file" accept="image/*" style="display:none;"></input>';
+            imageField.innerHTML = '<div class="x-home-screen-image-button" tabindex="0" aria-label="Profile image" role="button"></div><input type="file" accept="image/*" style="display:none;"></input>';
             screen.addHTML(imageField);
             var buttonElement = imageField.firstChild;
             var fileInput = imageField.lastChild;
-            buttonElement.addEventListener('click', (e) => {
+            x.addClickToOpen(buttonElement, () => {
                 fileInput.click();
             });
             fileInput.addEventListener('change', () => {
@@ -1335,7 +1368,7 @@
             screen.setValue('name', signupData.name);
             screen.addHint('You can easily customize them later.');
 
-            screen.addButton('Next', async () => {
+            screen.addSubmitButton('Next', async () => {
                 signupData.name = screen.getValue('name');
                 signupData.image = image;
                 await showNextStep();
@@ -1504,6 +1537,8 @@
             imageElement.setAttribute('class', 'x-app-toolbar-user-image');
             var button = document.createElement('a');
             button.setAttribute('class', 'x-app-toolbar-button');
+            button.setAttribute('tabindex', '0');
+            button.setAttribute('role', 'button');
             button.appendChild(imageElement);
             buttonsContainer.appendChild(button);
             if (x.currentUser.exists()) {
@@ -1512,11 +1547,13 @@
                     args: { userID: x.currentUser.getID() },
                     preload: true
                 };
+                button.setAttribute('title', 'My profile');
             } else {
                 var clickData = async () => {
                     await closeAllWindows();
                     await showWelcomeScreen(true, { type: 'profile' });
                 }
+                button.setAttribute('title', 'Create your own profile');
             }
             x.addClickToOpen(button, clickData);
 
@@ -1524,9 +1561,11 @@
                 userApps.forEach(appID => {
                     var button = document.createElement('a');
                     button.setAttribute('class', 'x-app-toolbar-button x-app-toolbar-button-app');
+                    button.setAttribute('tabindex', '0');
+                    button.setAttribute('role', 'button');
                     button.style.backgroundImage = 'url(\'' + x.getIconDataURI(appID === 'home' ? 'notification' : appID, leftMode ? '#999' : '#aaa') + '\')';
                     var app = x.getApp(appID);
-                    button.innerText = leftMode ? app.name : '';
+                    button.setAttribute('title', app.name);
                     if (appID === 'home') {
                         button.setAttribute('x-home-app', '1');
                     }
@@ -1539,6 +1578,9 @@
                 if (!leftMode) {
                     var button = document.createElement('a');
                     button.setAttribute('class', 'x-app-toolbar-button x-app-toolbar-button-app');
+                    button.setAttribute('tabindex', '0');
+                    button.setAttribute('role', 'button');
+                    button.setAttribute('title', 'More');
                     button.style.backgroundImage = 'url(\'' + x.getIconDataURI('more', '#aaa') + '\')';
                     buttonsContainer.appendChild(button);
                     x.addClickToOpen(button, () => {

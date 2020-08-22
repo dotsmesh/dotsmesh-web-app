@@ -46,7 +46,7 @@ async (args, library) => {
     var fieldDescription = x.makeFieldTextarea('Description', { maxLength: 1000 });
     x.add(fieldDescription);
 
-    x.add(x.makeButton(args.buttonText !== undefined ? args.buttonText : 'Save Changes', async () => {
+    x.add(x.makeSubmitButton(args.buttonText !== undefined ? args.buttonText : 'Save Changes', async () => {
         x.showLoading();
         var data = {
             image: fieldImage.getValue(),
