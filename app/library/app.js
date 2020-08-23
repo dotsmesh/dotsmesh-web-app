@@ -87,6 +87,7 @@
             container.style.zIndex = 139;//hasVisibleMenu ? 129 : 139;
             container.style.opacity = 1;
             indicator.style.opacity = 0;
+            updateAppScreenAccessibility(false);
             if (allLoadeded) {
                 clearTimeout(modalBackgroundIndicatorTimeout);
             } else {
@@ -99,6 +100,7 @@
                 clearTimeout(modalBackgroundIndicatorTimeout);
                 container.style.opacity = 0;
                 indicator.style.opacity = 0;
+                updateAppScreenAccessibility(true);
                 modalBackgroundPositionTimeout = setTimeout(() => {
                     container.style.zIndex = 1;
                 }, x.modalsAnimationTime + 16);
@@ -164,10 +166,11 @@
                 var contextData = {
                     userID: x.currentUser.getID()
                 };
-                frame.srcdoc = '<html><head><meta charset="utf-8"></head><body x-type="' + (modal ? 'modal' : 'default') + '"><script>self.xc=' + JSON.stringify(contextData) + ';self.x=' + JSON.stringify({ animationTime: x.animationTime, modalsAnimationTime: x.modalsAnimationTime }) + ';' + x.library.get(['utilities', 'sandboxProxy', 'sandboxWindow'], 'self.x') + 'self.main=(args)=>{' + content + '};</script></body></html>';
+                frame.srcdoc = '<html><head><meta charset="utf-8"><title></title></head><body x-type="' + (modal ? 'modal' : 'default') + '"><script>self.xc=' + JSON.stringify(contextData) + ';self.x=' + JSON.stringify({ animationTime: x.animationTime, modalsAnimationTime: x.modalsAnimationTime }) + ';' + x.library.get(['utilities', 'sandboxProxy', 'sandboxWindow'], 'self.x') + 'self.main=(args)=>{' + content + '};</script></body></html>';
                 container.appendChild(frame);
                 container.setAttribute('class', modal ? 'x-app-modal' : 'x-app-window');
-                //container.setAttribute('aria-hidden', 'true');
+                frame.setAttribute('tabindex', '-1');
+                frame.setAttribute('aria-hidden', 'true');
             } catch (e) {
                 reject();
             }
@@ -226,6 +229,7 @@
                 }
                 var otherWindow = windows[otherWindowID];
                 if (modal && !otherWindow.modal) {
+                    otherWindow.setAccessibility(false);
                     continue;
                 }
                 if (!modal && otherWindow.modal) {
@@ -239,7 +243,6 @@
             }
             await Promise.allSettled(promisesToWait);
             container.setAttribute('x-visible', '1');
-            //container.setAttribute('aria-hidden', 'false');
             updateModalBackground();
             await initializePromise;
             var result = await window.channel.send('show');
@@ -249,11 +252,13 @@
                 replaceLocationState(historyState, modal ? '' : title, hash);
             }
             container.setAttribute('x-loaded', 'true');
+            window.setAccessibility(true);
             updateModalBackground();
             //console.log('window.show ' + windowID);
             //console.log(historyState);
         };
         window.hide = async () => {
+            window.setAccessibility(false);
             //console.log('window.hide ' + windowID);
             if (!modal) {
                 try {
@@ -271,10 +276,15 @@
             }
             try {
                 container.setAttribute('x-visible', '0');
-                //container.setAttribute('aria-hidden', 'true');
             } catch (e) {
 
             }
+        };
+        window.setAccessibility = async accessible => {
+            var frame = container.firstChild;
+            frame.setAttribute('tabindex', accessible ? '0' : '-1');
+            frame.setAttribute('aria-hidden', accessible ? 'false' : 'true');
+            window.channel.send('setAccessibility', { accessible: accessible });
         };
         window.isVisible = () => {
             if (!window.exists) {
@@ -847,7 +857,6 @@
                 if (otherScreens.length > 0) {
                     otherScreens.forEach(otherScreen => {
                         otherScreen.removeAttribute('x-visible');
-                        //otherScreen.setAttribute('aria-hidden', 'true');
                         setTimeout(() => {
                             otherScreen.parentNode.removeChild(otherScreen);
                         }, x.modalsAnimationTime + 16);
@@ -876,7 +885,6 @@
             historyState = null;
         }
         var container = document.createElement('div');
-        //container.setAttribute('aria-hidden', 'true');
         container.setAttribute('class', 'x-screen x-home-screen');
         container.innerHTML = '<div class="x-home-screen-content"></div>';
         document.body.appendChild(container);
@@ -997,7 +1005,6 @@
                 }
                 await hideVisibleScreen();
                 container.setAttribute('x-visible', '1');
-                //container.setAttribute('aria-hidden', 'false');
             },
             element: container
         };
@@ -1474,6 +1481,19 @@
         await screen.show();
     };
 
+    var lastAccessibleValue = true;
+    var updateAppScreenAccessibility = accessible => {
+        if (lastAccessibleValue !== accessible) {
+            lastAccessibleValue = accessible;
+            var elements = document.querySelectorAll('[tabindex]');
+            for (var element of elements) {
+                element.setAttribute('tabindex', accessible ? '0' : '-1');
+            }
+            document.querySelector('.x-app-toolbar-left').setAttribute('aria-hidden', accessible ? 'false' : 'true');
+            document.querySelector('.x-app-toolbar-bottom').setAttribute('aria-hidden', accessible ? 'false' : 'true');
+        }
+    };
+
     var showAppScreen = async addToHistory => {
         if (addToHistory === undefined) {
             addToHistory = true;
@@ -1568,6 +1588,7 @@
                     button.setAttribute('title', app.name);
                     if (appID === 'home') {
                         button.setAttribute('x-home-app', '1');
+                        button.setAttribute('aria-label', app.name);
                     }
                     buttonsContainer.appendChild(button);
                     x.addClickToOpen(button, {

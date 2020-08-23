@@ -38,6 +38,18 @@
         return error;
     };
 
+    var lastAccessibleValue = true;
+    var setAccessibility = accessible => {
+        if (lastAccessibleValue !== accessible) {
+            lastAccessibleValue = accessible;
+            var elements = document.querySelectorAll('[tabindex]');
+            for (var element of elements) {
+                element.setAttribute('tabindex', accessible ? '0' : '-1');
+            }
+            document.body.setAttribute('aria-hidden', accessible ? 'false' : 'true');
+        }
+    };
+
     // MESSAGING
 
     var channel = x.createMessagingChannel('iframe-window');
@@ -97,6 +109,7 @@
                 }, true);
             }
             x.windowEvents.dispatchEvent(new CustomEvent('show'));
+            setAccessibility(true);
         } catch (e) {
             var errorToThrow = showErrorMessage(e);
             if (errorToThrow !== null) {
@@ -116,12 +129,16 @@
         }
         return new Promise((resolve, reject) => {
             try {
+                setAccessibility(false);
                 document.body.removeAttribute('x-visible');
                 setTimeout(resolve, x.modalsAnimationTime + 16);
             } catch (e) {
                 reject(e);
             }
         });
+    });
+    channel.addListener('setAccessibility', args => {
+        setAccessibility(args.accessible);
     });
 
     var updateOnAnnouncedChanges = async keys => {
@@ -271,7 +288,7 @@
         css += '.x-header-button:active{background-color:#ddd;}';
         css += '.x-header-button:focus{background-color:#ddd;}';
         css += '.x-header-button:last-child{border-top-right-radius:4px;border-bottom-left-radius:4px;}';
-        css += '.x-body{flex:1 1 auto;displat:flex;padding:' + contentSpacing + ';}';
+        css += '.x-body{flex:1 1 auto;display:flex;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '.x-message > :first-child{color:#000;}';
         css += '.x-body > .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
@@ -335,6 +352,7 @@
     }
 
     document.body.insertAdjacentHTML('afterbegin', '<div><div class="x-loading"><div></div></div><div class="x-message"></div><div class="x-header"><div></div><div></div></div><div class="x-body"></div></div>');
+    document.body.setAttribute('aria-hidden', 'true');
 
     var bodyContainer = document.querySelector('.x-body');
     bodyContainer.addEventListener('scroll', () => {
@@ -485,6 +503,7 @@
         }
         container.innerText = text;
         document.body.querySelector('.x-header').firstChild.appendChild(container);
+        document.head.querySelector('title').innerHTML = text;
     };
 
     x.setHash = _hash => {
@@ -901,6 +920,7 @@
         if (options.type !== undefined) {
             input.setAttribute('type', options.type);
         }
+        input.setAttribute('aria-label', label);
         input.addEventListener('keydown', e => {
             if (e.keyCode === 13) {
                 submitForm();
@@ -993,6 +1013,7 @@
         if (typeof options.readonly !== 'undefined') {
             textarea.setAttribute('readonly', 'readonly');
         }
+        textarea.setAttribute('aria-label', label);
         if (height !== null) {
             textarea.style.height = height;
         }
