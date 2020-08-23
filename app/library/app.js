@@ -166,7 +166,7 @@
                 var contextData = {
                     userID: x.currentUser.getID()
                 };
-                frame.srcdoc = '<html><head><meta charset="utf-8"><title></title></head><body x-type="' + (modal ? 'modal' : 'default') + '"><script>self.xc=' + JSON.stringify(contextData) + ';self.x=' + JSON.stringify({ animationTime: x.animationTime, modalsAnimationTime: x.modalsAnimationTime }) + ';' + x.library.get(['utilities', 'sandboxProxy', 'sandboxWindow'], 'self.x') + 'self.main=(args)=>{' + content + '};</script></body></html>';
+                frame.srcdoc = '<html><head><meta charset="utf-8"><title></title></head><body x-type="' + (modal ? 'modal' : 'default') + '"><script>self.xc=' + JSON.stringify(contextData) + ';self.x=' + JSON.stringify({ animationTime: x.animationTime, modalsAnimationTime: x.modalsAnimationTime, version: x.version }) + ';' + x.library.get(['utilities', 'sandboxProxy', 'sandboxWindow'], 'self.x') + 'self.main=(args)=>{' + content + '};</script></body></html>';
                 container.appendChild(frame);
                 container.setAttribute('class', modal ? 'x-app-modal' : 'x-app-window');
                 frame.setAttribute('tabindex', '-1');

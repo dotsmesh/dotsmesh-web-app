@@ -42,6 +42,10 @@ async (args, library) => {
         x.alert('Done!');
     }, 'Clear cache', ''));
 
+    list.add(x.makeTextButton(async () => {
+        x.open('settings/about', {}, { modal: true, width: 300 });
+    }, 'About', ''));
+
     container.add(list);
 
     container.add(x.makeSeparator());
