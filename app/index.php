@@ -107,9 +107,20 @@ $app->routes
             $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400000'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
+            $name = $app->request->host;
+            if ($name === 'dotsmesh.com') {
+                $name = '';
+            } elseif ($name === 'dev.dotsmesh.com') {
+                $name = 'dev';
+            } elseif ($name === 'beta.dotsmesh.com') {
+                $name = 'beta';
+            } elseif (substr($name, 0, 9) === 'dotsmesh.') {
+                $name = substr($name, 9);
+            }
+            $name = 'Dots Mesh' . (strlen($name) > 0 ? ' (' . $name . ')' : '');
             $response = new App\Response\JSON(json_encode([
-                "short_name" => "Dots Mesh",
-                "name" => "Dots Mesh",
+                "short_name" => $name,
+                "name" => $name,
                 "start_url" => "/",
                 "background_color" => "#111",
                 "display" => "standalone",
