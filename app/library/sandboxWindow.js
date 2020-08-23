@@ -503,7 +503,7 @@
         }
         container.innerText = text;
         document.body.querySelector('.x-header').firstChild.appendChild(container);
-        document.head.querySelector('title').innerHTML = text;
+        document.title = text;
     };
 
     x.setHash = _hash => {
