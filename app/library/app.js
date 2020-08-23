@@ -820,7 +820,7 @@
     css += '.x-home-screen-content{font-family:' + x.fontFamily + ';max-width:480px;margin:0 auto;padding:20px;display:flex;flex-direction:column;overflow:hidden;display:flex;justify-content:center;min-height:100vh;box-sizing:border-box;}';//background-position:center 20px;background-size:20px;background-repeat:no-repeat;background-image:url(\'data:image/svg+xml;base64,' + btoa(x.logo) + '\')
     css += '.x-home-screen-content >*{max-width:360px;margin:0 auto;}';
     css += '.x-home-screen-content >*:not(:first-child){margin-top:15px;}';
-    css += '.x-welcome-screen-header{background-size:480px;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960&v=3);padding-top:200px;}';
+    css += '.x-welcome-screen-header{background-size:480px;background-position:top center;background-repeat:no-repeat;background-image:url(?app&h960);padding-top:200px;}';
 
     css += '.x-home-screen-back-button{width:50px;height:50px;cursor:pointer;position:absolute;top:0;left:0;background-size:20px;background-position:center center;background-repeat:no-repeat;background-image:url(\'' + x.getIconDataURI('back', '#999') + '\');}';
     css += '.x-home-screen-back-button>span{display:block;width:calc(100% - 10px);height:calc(100% - 10px);margin-top:5px;margin-left:5px;border-radius:50%;}';

@@ -46,18 +46,6 @@ if (!defined('DOTSMESH_WEB_APP_DEV_MODE')) {
     define('DOTSMESH_WEB_APP_DEV_MODE', false);
 }
 
-$getVersion = function () {
-    if (DOTSMESH_WEB_APP_DEV_MODE) {
-        $object = require __DIR__ . '/appjs-builder.php';
-        $content = [];
-        $content[] = $object::getJS();
-        $content[] = file_get_contents(__DIR__ . '/assets/sw.js');
-        return md5(json_encode($content));
-    } else {
-        return is_file(__DIR__ . '/version') ? file_get_contents(__DIR__ . '/version') : '';
-    }
-};
-
 $app = new App();
 
 $hasLogsDirs = defined('DOTSMESH_WEB_APP_LOGS_DIR');
@@ -68,43 +56,31 @@ if ($hasLogsDirs) {
 }
 
 $app->routes
-    ->add('/', function (App\Request $request) use ($app, $getVersion) {
+    ->add('/', function (App\Request $request) use ($app) {
         $isAppRequest = $request->query->exists('app');
         if ($isAppRequest && $request->query->exists('sw')) {
-            if (DOTSMESH_WEB_APP_DEV_MODE) {
-                $content = file_get_contents(__DIR__ . '/assets/sw.js');
-                if (!$request->query->exists('raw')) {
-                    $content = str_replace('?app&a', '?app&a&v=' . $getVersion(), $content);
-                }
-            } else {
-                $content = file_get_contents(__DIR__ . '/assets/sw.min.js');
-                $content = str_replace('?app&a', '?app&a&v=' . $getVersion(), $content);
-            }
+            $content = file_get_contents(DOTSMESH_WEB_APP_DEV_MODE ? __DIR__ . '/assets/sw.js' : __DIR__ . '/assets/sw.min.js');
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'application/javascript'));
-            $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('a')) {
             if (DOTSMESH_WEB_APP_DEV_MODE) {
                 $object = require __DIR__ . '/appjs-builder.php';
                 $content = $object::getJS();
-                if (!$request->query->exists('raw')) {
-                    $content = str_replace('?app&sw', '?app&sw&v=' . $getVersion(), $content);
-                }
             } else {
                 $isDebugEnabled = $request->query->exists('debug');
                 $content = file_get_contents(__DIR__ . '/assets/' . ($isDebugEnabled ? 'app.js' : 'app.min.js'));
-                $content = str_replace('?app&sw', '?app&sw&v=' . $getVersion(), $content);
             }
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'application/javascript'));
-            $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400000'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('h960')) {
             $content = file_get_contents(__DIR__ . '/assets/h960.jpg');
             $response = new App\Response($content);
             $response->headers->set($response->headers->make('Content-Type', 'image/jpeg'));
-            $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400000'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
             $name = $app->request->host;
@@ -133,13 +109,15 @@ $app->routes
                     ]
                 ],
             ]));
-            $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=86400'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
         } else {
             $isDebugEnabled = $request->query->exists('debug');
             $content = file_get_contents(__DIR__ . '/assets/home.html');
-            $content = str_replace('src="?app&a"', 'src="?app&a&v=' . $getVersion() . ($isDebugEnabled ? '&debug' : '') . '"', $content);
+            if ($isDebugEnabled) {
+                $content = str_replace('src="?app&a"', 'src="?app&a&debug"', $content);
+            }
             $response = new App\Response\HTML($content);
-            $response->headers->set($response->headers->make('Cache-Control', 'public, max-age=600'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', $app->request->host === 'dotsmesh.com' ? 'nofollow' : 'noindex,nofollow'));
         }
         if ($response !== null) {
