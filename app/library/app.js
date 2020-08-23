@@ -1063,10 +1063,13 @@
         screen.addButton('Sign in', async () => {
             await showLoginScreen();
         }, '3');
-
         var host = location.host;
         if (host === 'dotsmesh.com') {
             screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This is the official app.");
+        } else if (host === 'dev.dotsmesh.com') {
+            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This is the latest dev version of the official app.<br>It may not be stable. Use at your own risk.");
+        } else if (host === 'beta.dotsmesh.com') {
+            screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This is the beta version of the official app.<br>Submit a report if you find any errors.");
         } else if (host.indexOf('dotsmesh.') === 0) {
             screen.addHint("<br><br>Dots Mesh is an open social platform.<br>This app is hosted by " + host.substring(9) + ".<br><a href=\"https://" + host + "?host&admin\">Administrator panel</a>");
         } else {
