@@ -733,10 +733,7 @@
         css += '.x-text{' + textStyle + 'padding:0 ' + contentSpacing + ';max-width:400px;}';
     }
 
-    x.makeText = (text, center) => {
-        if (center === undefined) {
-            center = false;
-        }
+    x.makeText = (text, center = false) => {
         var container = document.createElement('div');
         container.setAttribute('class', 'x-text');
         container.innerText = text;
