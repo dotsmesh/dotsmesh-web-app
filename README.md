@@ -26,7 +26,7 @@ Some screenshots from the big screen version of the app:
 
 ![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-5.jpg)
 
-Learn more about all the features at [about.dotsmesh.com](https://about.dotsmesh.com/app/)
+Learn more about all the features at [about.dotsmesh.com/app](https://about.dotsmesh.com/app/)
 
 Take a look at a live profile at [dotsmesh.com#ivo](https://dotsmesh.com#ivo)
 
