@@ -30,6 +30,10 @@ Learn more about all the features at [about.dotsmesh.com](https://about.dotsmesh
 
 Take a look at a live profile at [dotsmesh.com#ivo](https://dotsmesh.com#ivo)
 
+## Try it yourself
+
+Just found out about Dots Mesh? Do you know that you can join the platform with a **free private profile** that lives on your device? Get started at [dotsmesh.com](https://dotsmesh.com/).
+
 ## How to install
 
 [The Dots Mesh installer](https://about.dotsmesh.com/self-host/) is the recommended way to create your own host and join the platform. It will guide you through all the requirements and will install everything needed. There is an auto-update option, so you'll always use the latest stable version of the software.
