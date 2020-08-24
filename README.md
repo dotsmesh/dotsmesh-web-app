@@ -2,6 +2,9 @@
 
 This is the code for the UI of the platform. There is an officially hosted version on [dotsmesh.com](https://dotsmesh.com/), and you can also easily install it on your server.
 
+## What is Dots Mesh?
+Dots Mesh is a different kind of social platform. It's open and distributed by design. You can self-host your public social profile the same way you can self-host your website and email. There are private profiles, secret groups, private messaging, and [more](https://about.dotsmesh.com/).
+
 ## Take a look
 
 Some screenshots from the big screen version of the app:
