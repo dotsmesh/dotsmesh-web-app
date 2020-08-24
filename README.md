@@ -8,23 +8,23 @@ Some screenshots from the big screen version of the app:
 
 ### Your public profile
 
-![Bear Framework](https://dotsmesh.github.io/web-app-screen-1.jpg)
+![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-1.jpg)
 
 ### A public post
 
-![Bear Framework](https://dotsmesh.github.io/web-app-screen-2.jpg)
+![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-2.jpg)
 
 ### A list of all the posts by the profiles you follow
 
-![Bear Framework](https://dotsmesh.github.io/web-app-screen-3.jpg)
+![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-3.jpg)
 
 ### A private group
 
-![Bear Framework](https://dotsmesh.github.io/web-app-screen-4.jpg)
+![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-4.jpg)
 
 ### Private messages
 
-![Bear Framework](https://dotsmesh.github.io/web-app-screen-5.jpg)
+![The Dots Mesh web app](https://dotsmesh.github.io/web-app-screen-5.jpg)
 
 Learn more about all the features at [about.dotsmesh.com](https://about.dotsmesh.com/app/)
 
@@ -37,6 +37,8 @@ Just found out about Dots Mesh? Do you know that you can join the platform with 
 ## How to install
 
 [The Dots Mesh installer](https://about.dotsmesh.com/self-host/) is the recommended way to create your own host and join the platform. It will guide you through all the requirements and will install everything needed. There is an auto-update option, so you'll always use the latest stable version of the software.
+
+![The Dots Mesh Installer](https://dotsmesh.github.io/installer-screen-1.png)
 
 ### Custom installation
 
