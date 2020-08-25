@@ -52,7 +52,7 @@ Just found out about Dots Mesh? Do you know that you can join the platform with 
 
 #### Get the code
 
-Youn can [download the latest release as a PHAR file](https://github.com/dotsmesh/dotsmesh-web-app/releases) and run the web app this way. Create the index.php with the following content:
+You can [download the latest release as a PHAR file](https://github.com/dotsmesh/dotsmesh-web-app/releases) and run the web app this way. Create the index.php with the following content:
 ```php
 <?php
 
