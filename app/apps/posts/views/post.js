@@ -46,17 +46,17 @@ async (args, library) => {
     }
 
     if (post.userID === currentUserID && canEdit) {  // observe user join
-        x.addToolbarEditButton('Edit this post', async () => {
+        x.addToolbarButton('Edit this post', async () => {
             if (propertyType === 'user') {
                 x.open('posts/form', { userID: propertyID, postID: postID }, { modal: true });
             } else {
                 x.open('posts/form', { groupID: propertyID, postID: postID }, { modal: true });
             }
-        });
+        }, 'edit');
     }
 
     if (post.userID === currentUserID && canDelete) {  // observe user join
-        x.addToolbarDeleteButton('Delete this post', async () => {
+        x.addToolbarButton('Delete this post', async () => {
             if (await x.confirm('Are you sure you want to delete this post?')) {
                 x.showLoading();
                 await library.deletePost(propertyType, propertyID, postID);
@@ -64,17 +64,17 @@ async (args, library) => {
                 //await x.backPrepare();
                 await x.back();
             }
-        });
+        }, 'delete');
     }
 
     if (propertyType === 'user') {
         if (x.currentUser.isPublic()) {
-            x.addToolbarShareButton('Share this post', () => {
+            x.addToolbarButton('Share this post', () => {
                 x.share('p', {
                     o: x.getTypedID(propertyType, propertyID),
                     p: postID
                 });
-            });
+            }, 'share');
         }
     }
     var alreadyShown = false;

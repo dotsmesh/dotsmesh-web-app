@@ -510,7 +510,7 @@
         hash = _hash;
     };
 
-    x.addToolbarButton = (title, callback, icon, position, order) => {
+    x.addToolbarButton = (title, callback, icon, position = 'right', order = null) => {
         var button = document.createElement('div');
         button.setAttribute('class', 'x-header-button');
         button.setAttribute('tabindex', '0');
@@ -522,7 +522,7 @@
         } else {
             button.setAttribute('x-info', '1');
         }
-        if (order !== undefined) {
+        if (order) {
             button.style.order = order;
         }
         var setIcon = icon => {
@@ -535,18 +535,6 @@
         return {
             setIcon: setIcon
         };
-    };
-
-    x.addToolbarDeleteButton = (title, callback) => {
-        x.addToolbarButton(title, callback, 'delete', 'right');
-    };
-
-    x.addToolbarEditButton = (title, callback) => {
-        x.addToolbarButton(title, callback, 'edit', 'right');
-    };
-
-    x.addToolbarShareButton = (title, callback) => {
-        x.addToolbarButton(title, callback, 'share', 'right');
     };
 
     x.addToolbarNotificationsButton = (notificationID, serviceDataSource, text) => {
@@ -573,7 +561,7 @@
     x.addToolbarSecretButton = text => {
         x.addToolbarButton('About', () => {
             x.open('system/message', { text: text }, { modal: true, width: 300 });
-        }, 'lock', 'right');
+        }, 'lock');
     };
 
     // TOOLTIPS
