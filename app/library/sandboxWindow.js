@@ -1043,9 +1043,15 @@
         var container = document.createElement('div');
         container.setAttribute('class', 'x-component'); // use x.makeContainer???
         var addElements = sourceResult => {
-            container.appendChild(sourceResult.element); // todo
+            if (sourceResult.element !== undefined) {
+                container.appendChild(sourceResult.element);
+            } else {
+                for (var item of sourceResult) {
+                    addElements(item);
+                }
+            }
         }
-        var args = typeof options.args !== 'undefined' ? options.args : {};
+        var args = options.args !== undefined ? options.args : {};
         var promise = new Promise(async (resolve, reject) => {
             try {
                 var result = await source(args);
@@ -1055,7 +1061,7 @@
                 reject(e);
             }
         });
-        var observedKeys = typeof options.observeChanges !== 'undefined' ? options.observeChanges : [];
+        var observedKeys = options.observeChanges !== undefined ? options.observeChanges : [];
         var component = {
             update: async args => {
                 return new Promise(async (resolve, reject) => {
