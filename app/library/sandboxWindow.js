@@ -423,7 +423,9 @@
         container.firstChild.innerText = text;
         if (modal && options.buttonText === undefined) {
             options.buttonText = 'OK';
-            options.buttonClick = x.back;
+            options.buttonClick = () => { // should be function to prevent passing on the event.
+                x.back();
+            };
         }
         if (options.buttonText !== undefined) {
             var button = x.makeButton(options.buttonText, options.buttonClick, { style: 'style2' });
