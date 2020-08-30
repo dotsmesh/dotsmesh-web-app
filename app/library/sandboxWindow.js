@@ -876,12 +876,12 @@
     };
 
     css += '.x-field{width:100%;}';
-    css += '.x-field > label{' + textStyle + 'display:block;padding-bottom:2px;margin-top:-4px;}';
+    css += '.x-field .x-field-label{' + textStyle + 'display:block;padding-bottom:2px;margin-top:-4px;}';
 
     var makeField = (label, content, className, options = {}) => {
         //var addSpacing = typeof options.addSpacing === 'undefined' ? true : options.addSpacing;
-        if (typeof label !== 'undefined' && label !== null && label.length > 0) {
-            content = '<label>' + label + '</label>' + content;
+        if (label !== undefined && label !== null && label.length > 0) {
+            content = '<label class="x-field-label">' + label + '</label>' + content;
         }
         var container = document.createElement('div');
         container.setAttribute('class', 'x-field ' + className);
@@ -1022,6 +1022,56 @@
             },
             element: container
         };
+    };
+
+    css += '.x-field-checkbox{position:relative;display:block;height:42px;padding-left:56px;width:100%;box-sizing:border-box;}';
+    css += '.x-field-checkbox input{display:none;}';
+    css += '.x-field-checkbox input+span+span{line-height:42px !important;user-select:none;padding-bottom:0 !important;margin-top:0 !important;}';
+    css += '.x-field-checkbox input+span{display:block;position:absolute;width:42px;height:42px;box-sizing:border-box;border:1px solid #ccc;background-color:rgba(0,0,0,0.04);background-size:20px;background-repeat:no-repeat;background-position:center center;border-radius:4px;margin-left:-56px;cursor:pointer;user-select:none;}';
+    css += '.x-field-checkbox input:checked+span{background-image:url(\'' + x.getIconDataURI('checkbox', '#111') + '\')}';
+    css += '.x-field-checkbox input+span:hover{background-color:rgba(0,0,0,0.08);}';
+    css += '.x-field-checkbox input+span:active{background-color:rgba(0,0,0,0.12);}';
+    css += '.x-field-checkbox input+span:focus{background-color:rgba(0,0,0,0.08);}';
+
+    x.makeFieldCheckbox = (label, options = {}) => {
+        var container = makeField(null, '<label><input type="checkbox"></input><span></span><span class="x-field-label">' + label + '</span></label>', 'x-field-checkbox');
+        var firstSpanElement = container.querySelector('span');
+        var inputElement = container.querySelector('input');
+        firstSpanElement.setAttribute('aria-label', label);
+        firstSpanElement.setAttribute('tabindex', '0');
+        firstSpanElement.setAttribute('role', 'checkbox');
+        firstSpanElement.setAttribute('aria-checked', 'false');
+        var updateAria = () => {
+            firstSpanElement.setAttribute('aria-checked', result.isChecked() ? 'true' : 'false');
+        };
+        var result = {
+            show: () => {
+                container.style.display = 'block';
+            },
+            hide: () => {
+                container.style.display = 'none';
+            },
+            focus: () => {
+                firstSpanElement.focus();
+            },
+            isChecked: () => {
+                return inputElement.checked;
+            },
+            setChecked: checked => {
+                inputElement.checked = checked;
+                updateAria();
+            },
+            element: container
+        };
+        inputElement.addEventListener('change', e => {
+            updateAria();
+        });
+        firstSpanElement.addEventListener('keypress', e => {
+            if (e.keyCode === 32) {
+                result.setChecked(!result.isChecked());
+            }
+        });
+        return result;
     };
 
     css += '.x-container{width:100%;display:flex;flex-direction:column;align-items:start;}';//flex-direction:column;display:flex;
