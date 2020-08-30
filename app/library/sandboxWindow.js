@@ -287,7 +287,8 @@
         css += '.x-header-button:hover{background-color:#eee;}';
         css += '.x-header-button:active{background-color:#ddd;}';
         css += '.x-header-button:focus{background-color:#ddd;}';
-        css += '.x-header-button:last-child{border-top-right-radius:4px;border-bottom-left-radius:4px;}';
+        css += '.x-header>:last-child>.x-header-button:first-child{border-top-right-radius:4px;border-bottom-left-radius:4px;}';
+        css += '.x-header>:last-child>.x-header-button:not(:first-child){border-bottom-right-radius:4px;border-bottom-left-radius:4px;}';
         css += '.x-body{flex:1 1 auto;display:flex;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '.x-message > :first-child{color:#000;}';
