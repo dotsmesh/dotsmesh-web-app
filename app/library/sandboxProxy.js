@@ -297,7 +297,7 @@
 
     x.services = {};
 
-    x.services.call = async (appID, action, args) => {
+    x.services.call = async (appID, action, args = {}) => {
         return await x.proxyCall('services.call', appID, action, args);
     };
 

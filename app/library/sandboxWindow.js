@@ -205,6 +205,8 @@
     var smallTitleStyle = 'font-size:15px;line-height:160%;font-family:' + x.fontFamily + ';font-weight:bold;';
     var lightTextStyle = textStyle + 'color:#fafafa;';
     var darkTextStyle = textStyle + 'color:#000;';
+    var lightThemeHintColor = '#777';
+    var darkThemeHintColor = '#999';
 
     var css = '*,*:before,*:after{margin:0;padding:0;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-overflow-scrolling:touch;}';
     css += 'html,body{height:100vh;overflow:hidden;}';
@@ -282,7 +284,7 @@
 
     if (modal) {
         css += 'body{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;overflow:auto;}';
-        css += 'body>div:first-child{border-radius:4px;background:#fff;margin:5px;max-width:100%;position:relative;min-height:250px;display:flex;flex-direction:column;}';// 250px - a space for a message
+        css += 'body>div:first-child{border-radius:4px;background:#fff;margin:5px;max-width:100%;position:relative;min-height:250px;display:flex;flex-direction:column;}';// 250px - space for a message
         css += '.x-header{height:42px;padding-left:' + contentSpacing + ';color:#000;}';
         css += '.x-header-button:hover{background-color:#eee;}';
         css += '.x-header-button:active{background-color:#ddd;}';
@@ -704,9 +706,9 @@
     };
 
     if (modal) {
-        css += '.x-hint{' + textStyle + 'width:100%;color:#777;}';
+        css += '.x-hint{' + textStyle + 'width:100%;color:' + lightThemeHintColor + ';}';
     } else {
-        css += '.x-hint{' + textStyle + 'color:#999;padding:0 ' + contentSpacing + ';max-width:400px;}';
+        css += '.x-hint{' + textStyle + 'color:' + darkThemeHintColor + ';padding:0 ' + contentSpacing + ';max-width:400px;}';
     }
 
     x.makeHint = text => {
@@ -890,7 +892,7 @@
         return container;
     };
 
-    css += '.x-field-textbox input{border:1px solid #ccc;background-color:#f5f5f5;border-radius:4px;width:100%;padding:0 13px;height:42px;box-sizing:border-box;' + textStyle + '}';
+    css += '.x-field-textbox input{border:1px solid #ccc;background-color:rgba(0,0,0,0.04);border-radius:4px;width:100%;padding:0 13px;height:42px;box-sizing:border-box;' + textStyle + '}';
     css += '.x-field-textbox input[readonly]{background-color:transparent}';
 
     x.makeFieldTextbox = (label, options = {}) => {
@@ -902,7 +904,7 @@
         if (options.placeholder !== undefined) {
             input.setAttribute('placeholder', options.placeholder);
         }
-        if (options.readonly !== undefined) {
+        if (options.readonly !== undefined && options.readonly) {
             input.setAttribute('readonly', 'readonly');
         }
         if (options.type !== undefined) {
@@ -985,20 +987,20 @@
         };
     };
 
-    css += '.x-field-textarea textarea{border:1px solid #ccc;background-color:#f5f5f5;height:42px;border-radius:4px;resize:none;width:100%;padding:8px 13px;box-sizing:border-box;height:114px;' + textStyle + '}';
+    css += '.x-field-textarea textarea{border:1px solid #ccc;background-color:rgba(0,0,0,0.04);height:42px;border-radius:4px;resize:none;width:100%;padding:8px 13px;box-sizing:border-box;height:114px;' + textStyle + '}';
     css += '.x-field-textarea textarea[readonly]{background-color:transparent}';
 
     x.makeFieldTextarea = (label, options = {}) => {
-        var height = typeof options.height !== 'undefined' ? options.height : null;
+        var height = options.height !== undefined ? options.height : null;
         var container = makeField(label, '<textarea></textarea>', 'x-field-textarea', options);
         var textarea = container.querySelector('textarea');
-        if (typeof options.maxLength !== 'undefined') {
+        if (options.maxLength !== undefined) {
             textarea.setAttribute('maxlength', options.maxLength);
         }
-        if (typeof options.placeholder !== 'undefined') {
+        if (options.placeholder !== undefined) {
             textarea.setAttribute('placeholder', options.placeholder);
         }
-        if (typeof options.readonly !== 'undefined') {
+        if (options.readonly !== undefined && options.readonly) {
             textarea.setAttribute('readonly', 'readonly');
         }
         textarea.setAttribute('aria-label', label);
@@ -1696,7 +1698,7 @@
         }
         if (hint !== null) {
             var textElement = document.createElement('div');
-            textElement.setAttribute('style', (modal ? darkTextStyle + 'color:#777;' : lightTextStyle + 'color:#999;') + 'padding-top:2px;font-size:12px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:100%;');
+            textElement.setAttribute('style', (modal ? darkTextStyle + 'color:' + lightThemeHintColor + ';' : lightTextStyle + 'color:' + darkThemeHintColor + ';') + 'padding-top:2px;font-size:12px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:100%;');
             textElement.innerText = hint;
             textsContainer.appendChild(textElement);
         }
@@ -2133,7 +2135,7 @@
                 nameElement.innerText = details.name;
                 container.firstChild.appendChild(nameElement);
                 container.style.padding = contentSpacing;
-                container.style.backgroundColor = '#f5f5f5';
+                container.style.backgroundColor = 'rgba(0,0,0,0.04)';
                 container.style.border = '1px solid #ccc';
                 container.firstChild.style.display = 'flex';
                 container.firstChild.style.alignItems = 'center';
@@ -2181,9 +2183,6 @@
             var imageElement = await getProfileImageElement(type, id, 200);
             imageElement.style.position = 'relative';
             imageElement.style.zIndex = '2';
-            // imageElement.style.border = '3px solid #111';
-            // imageElement.style.marginLeft = '-3px';
-            // imageElement.style.marginTop = '-3px';
             imageContainer.appendChild(imageElement);
 
             if (type === 'group' && options.groupUserID !== undefined) {
@@ -2230,7 +2229,7 @@
 
             container.appendChild(imageContainer);
 
-            if (options.showEditButton !== undefined) {
+            if (options.showEditButton !== undefined && options.showEditButton) {
                 var showEditButton = await Promise.resolve(typeof options.showEditButton === 'function' ? options.showEditButton() : options.showEditButton);
                 if (showEditButton) {
                     var editButton = x.makeButton('', async () => {
@@ -2269,7 +2268,7 @@
             }
             if (idText !== null) {
                 var idContainer = document.createElement('div');
-                idContainer.setAttribute('style', textStyle + 'font-size:13px;max-width:100%;color:#999;overflow:hidden;text-align:center;text-overflow:ellipsis;');
+                idContainer.setAttribute('style', textStyle + 'font-size:13px;max-width:100%;color:' + (theme === 'dark' ? darkThemeHintColor : lightThemeHintColor) + ';overflow:hidden;text-align:center;text-overflow:ellipsis;');
                 idContainer.innerText = idText;
                 container.appendChild(idContainer);
             }
