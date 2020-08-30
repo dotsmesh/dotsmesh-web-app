@@ -123,15 +123,8 @@
         //     })
         // };
 
-        var backgroundTasksInterval = null;
-
-        let onLogin = async () => {
-            x.runBackgroundTasks(); // async call
-            backgroundTasksInterval = setInterval(x.runBackgroundTasks, 60 * 2000);
-        };
-
         let logoutUser = async userID => {
-            clearInterval(backgroundTasksInterval);
+            x.stopBackgroundTasks();
             currentUserData = null;
             var emptyDB = async (name, prefix) => {
                 try {
@@ -314,7 +307,6 @@
                         a: await x.crypto.encrypt(sessionSecretKey, currentUserData.salt),
                         s: sessionKey
                     });
-                    await onLogin();
                     return true;
                 } else {
                     throw new Error();
@@ -334,7 +326,6 @@
             var userID = loggedInUsersIDs[0];
             if (x.isPrivateID(userID)) {
                 if (await x.currentUser.loginPrivateUser(userID)) {
-                    await onLogin();
                     return true;
                 } else {
                     return false;
@@ -376,7 +367,6 @@
                     publicKeys: x.keyBox.make(await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.k)),
                     salt: currentUserLocalData.a !== undefined ? await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.a) : 'x'
                 };
-                await onLogin();
                 return true;
             } else {
                 return false;
@@ -1157,7 +1147,7 @@
 
     x.services = {};
 
-    x.services.call = async (appID, action, args) => {
+    x.services.call = async (appID, action, args = {}) => {
         var app = x.getApp(appID);
         var content = app.actions[action];
         return await x.runTask(appID, content, args);
@@ -1642,33 +1632,58 @@
 
     // BACKGROUND TASKS
 
-    x.runBackgroundTasks = async () => {
+    var backgroundTasksInterval = null;
+
+    x.runBackgroundTasks = async (options = {}) => {
         //console.log('x.runBackgroundTasks');
         // todo lock
         // todo logged out while running
-        if (x.currentUser.isPublic()) {
-            try {
-                await processInbox();
-            } catch (e) {
-                if (e.name === 'networkError') {
-                    // ignore
-                } else {
-                    throw e;
+        var delay = options.delay !== undefined ? options.delay : 0; // seconds
+        var repeat = options.repeat !== undefined ? options.repeat : false; // seconds
+
+        var run = async () => {
+            if (x.currentUser.isPublic()) {
+                try {
+                    await processInbox();
+                } catch (e) {
+                    if (e.name === 'networkError') {
+                        // ignore
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+
+            if (x.currentUser.exists()) {
+                try {
+                    await checkPropertiesForChanges();
+                } catch (e) {
+                    if (e.name === 'networkError') {
+                        // ignore
+                    } else {
+                        throw e;
+                    }
                 }
             }
         }
 
-        if (x.currentUser.exists()) {
-            try {
-                await checkPropertiesForChanges();
-            } catch (e) {
-                if (e.name === 'networkError') {
-                    // ignore
-                } else {
-                    throw e;
-                }
+        var start = async () => {
+            await run();
+            if (repeat) {
+                backgroundTasksInterval = setInterval(run, 120 * 1000); // 2 minutes
             }
+        };
+
+        if (delay > 0) {
+            setTimeout(start, delay * 1000);
+        } else {
+            await start();
         }
+
+    };
+
+    x.stopBackgroundTasks = async () => {
+        clearInterval(backgroundTasksInterval);
     };
 
 

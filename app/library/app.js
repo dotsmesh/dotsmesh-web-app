@@ -1122,6 +1122,7 @@
             if (result === true) {
                 await showAppScreen(true);
                 await x.open('home/home');
+                x.runBackgroundTasks({ delay: 1, repeat: true });
             } else {
                 var text = 'An error occured. Please try again later!';
                 if (result === 'invalidAuthKey') {
@@ -1423,6 +1424,7 @@
                         screen2.addButton('Enter', async () => {
                             await showAppScreen(false);
                             await x.open('user/home', { userID: x.currentUser.getID() });
+                            x.runBackgroundTasks({ delay: 1, repeat: true });
                         });
                         await screen2.show();
                     } else {
@@ -1725,7 +1727,7 @@
     // APP STARTER
 
     x.startApp = async () => {
-        await x.currentUser.autoLogin();
+        var autoLoginResult = await x.currentUser.autoLogin();
         await processLocationState();
 
         if ('serviceWorker' in navigator) {
@@ -1733,6 +1735,10 @@
                 await navigator.serviceWorker.register('?app&sw');
             } catch (e) { }
         };
+
+        if (autoLoginResult) {
+            x.runBackgroundTasks({ delay: 1, repeat: true });
+        }
     };
 
     x.addCSS(css);
