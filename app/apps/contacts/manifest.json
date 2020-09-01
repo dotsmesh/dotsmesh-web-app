@@ -4,7 +4,13 @@
         "home",
         "form",
         "connect",
-        "connectKeyForm"
+        "connectKey",
+        "connectSettings",
+        "connectSettingsGroup",
+        "connectSettingsGroups",
+        "connectSettingsKey",
+        "connectSettingsKeys",
+        "connectSettingsOpenConnect"
     ],
     "actions": [
         "exists",
@@ -12,7 +18,8 @@
         "getList",
         "getAccessKey",
         "getProvidedAccessKeys",
-        "getIdentityKey"
+        "getIdentityKey",
+        "getRequest"
     ],
     "library": true,
     "inbox": true

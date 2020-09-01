@@ -31,12 +31,22 @@
         return contactsStorage;
     };
 
+
     var connectKeysStorage = null;
     var getConnectKeysStorage = () => {
         if (connectKeysStorage === null) {
-            connectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('k-', x.currentUser.isPublic() ? x.cache.get('contactsk-dc') : null);
+            // Old keys x.currentUser.getDataStorage('p/c/').getDetailsContext('k-') - without k/ prefix - TODO transfer
+            connectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('y-', x.currentUser.isPublic() ? x.cache.get('contactsy-dc') : null);
         }
         return connectKeysStorage;
+    };
+
+    var requestsStorage = null;
+    var getRequestsStorage = () => {
+        if (requestsStorage === null) {
+            requestsStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('p-', x.currentUser.isPublic() ? x.cache.get('contactsp-dc') : null);
+        }
+        return requestsStorage;
     };
 
     var cache = x.cache.get('contacts');
@@ -100,12 +110,14 @@
     var remove = async userID => {
         var storage = getContactsStorage();
         var contact = await get(userID);
-        if (contact.providedAccessKey !== null) {
-            var firewall = x.currentUser.getFirewall();
-            await firewall.delete(contact.providedAccessKey);
+        if (contact !== null) {
+            if (contact.providedAccessKey !== null) {
+                var firewall = x.currentUser.getFirewall();
+                await firewall.delete(contact.providedAccessKey);
+            }
+            await storage.delete(userID);
+            await x.announceChanges(['contacts', 'contacts/' + userID]);
         }
-        await storage.delete(userID);
-        await x.announceChanges(['contacts', 'contacts/' + userID]);
     };
 
     var exists = async userID => {
@@ -123,10 +135,7 @@
         return result;
     };
 
-    var setContactDetails = async (userID, details) => {
-        if (typeof details === 'undefined') {
-            details = {};
-        }
+    var setContactDetails = async (userID, details = {}) => {
         var currentUserID = x.currentUser.getID();
         if (currentUserID === userID) {
             return false;
@@ -158,17 +167,24 @@
 
     var sendRequest = async (userID, accessKey) => {
         var contact = await get(userID);
-        if (contact === null) {
-            throw new Error(); // should not get here
-        }
-        var providedAccessKey = contact.providedAccessKey !== null ? contact.providedAccessKey : x.generateRandomString(50, true);
+        var contactExists = contact !== null;
+        var providedAccessKey = contactExists && contact.providedAccessKey !== null ? contact.providedAccessKey : x.generateRandomString(50, true);
         try {
             var dataToSend = x.pack('c', providedAccessKey);
-            // Send connect request. It will fail if the key is invalid.
+            // Send connection request. It will fail if the key is invalid.
             var result = await x.user.send('cc', userID, dataToSend, {}, { accessKey: accessKey });
             if (result === true) {
-                if (contact.providedAccessKey !== providedAccessKey) {
+                var updateFirewall = false;
+                if (contactExists) {
+                    if (contact.providedAccessKey !== providedAccessKey) {
+                        await setContactDetails(userID, { providedAccessKey: providedAccessKey });
+                        updateFirewall = true;
+                    }
+                } else {
                     await setContactDetails(userID, { providedAccessKey: providedAccessKey });
+                    updateFirewall = true;
+                }
+                if (updateFirewall) {
                     var firewall = x.currentUser.getFirewall();
                     await firewall.add(providedAccessKey);
                 }
@@ -183,39 +199,96 @@
         return result;
     };
 
-    var cancelRequest = async userID => {
-        var contact = await get(userID);
-        if (contact !== null && contact.providedAccessKey !== null) {
-            var firewall = x.currentUser.getFirewall();
-            await firewall.delete(contact.providedAccessKey);
-            await setContactDetails(userID, { providedAccessKey: null });
-        }
-    };
+    // var cancelRequest = async userID => {
+    //     var contact = await get(userID);
+    //     if (contact !== null && contact.providedAccessKey !== null) {
+    //         var firewall = x.currentUser.getFirewall();
+    //         await firewall.delete(contact.providedAccessKey);
+    //         await setContactDetails(userID, { providedAccessKey: null });
+    //     }
+    // };
 
     var approveRequest = async userID => {
         var contact = await get(userID);
+        var contactSentRequestResult = false;
         if (contact !== null && contact.accessKey !== null) {
-            await sendRequest(userID, contact.accessKey);
+            var accessKey = contact.accessKey;
+            if (accessKey !== null) {
+                contactSentRequestResult = await sendRequest(userID, accessKey); // try this key
+            }
         }
-    }
+        var request = await getRequest(userID);
+        if (request !== null) {
+            var accessKey = request.accessKey;
+            await setContactDetails(userID, { accessKey: accessKey });
+            if (await sendRequest(userID, accessKey) || contactSentRequestResult) {
+                await deleteRequest(userID);
+            }
+        }
+    };
 
-    var addRequest = async (userID, accessKey, invitationSource) => {
+    var makeRequest = (userID, details) => {
+        return {
+            userID: userID,
+            accessKey: (details.a !== undefined ? details.a : null),
+            invitationSource: (details.i !== undefined ? details.i : null),
+            dateCreated: (details.d !== undefined ? details.d : null)
+        };
+    };
+
+    var getRequest = async userID => {
+        var storage = getRequestsStorage();
+        var data = await storage.get(userID);
+        return data === null ? null : makeRequest(userID, data);
+    };
+
+    var deleteRequest = async userID => {
+        var storage = getRequestsStorage();
+        await storage.delete(userID);
+        await x.announceChanges(['contactsRequests', 'contactsRequests/' + userID]);
+    };
+
+    var addRequest = async (userID, accessKey, invitationSource) => { // return TRUE if new request or new connected contact
         var currentUserID = x.currentUser.getID();
         if (currentUserID === userID) {
             return false;
         }
         var contact = await get(userID);
-        var isNewContact = contact === null;
-        var isInvitation = isNewContact || contact.accessKey === null;
-        if (contact !== null && contact.accessKey === accessKey) {
-            return false;
+        if (contact === null) {
+            var storage = getRequestsStorage();
+            var data = await storage.get(userID);
+            var isNew = false;
+            if (data === null) {
+                data = {};
+                isNew = true;
+            }
+            data.a = accessKey;
+            data.i = invitationSource;
+            data.d = x.getDateID(Date.now(), 1);
+            await storage.set(userID, data);
+            await x.announceChanges(['contactsRequests', 'contactsRequests/' + userID]);
+            return isNew;
+        } else {
+            var isNewConnection = contact.accessKey === null;
+            if (contact.accessKey === accessKey) {
+                return false;
+            }
+            await setContactDetails(userID, { accessKey: accessKey, invitationSource: invitationSource });
+            if (contact.providedAccessKey !== null) { // when the contact reconnects
+                await sendRequest(userID, accessKey);
+            }
+            return isNewConnection;
         }
-        //var isNewContact = contact === null || contact.accessKey === null;
-        await setContactDetails(userID, { accessKey: accessKey, invitationSource: invitationSource });
-        if (!isNewContact && contact.providedAccessKey !== null) { // when the contact reconnects
-            await sendRequest(userID, accessKey);
+    };
+
+    var getRequestsList = async () => {
+        var storage = getRequestsStorage();
+        var list = await storage.getList(['a', 'i', 'd']);
+        var result = [];
+        for (var userID in list) {
+            result.push(makeRequest(userID, list[userID]));
         }
-        return isInvitation;
+        return result;
     };
 
     var getAccessKey = async userID => {
@@ -247,13 +320,16 @@
         for (var contactID in list) {
             var contactDetails = list[contactID];
             if (contactDetails.r !== null) {
-                result[contactDetails.r] = { type: 'contact', id: contactID };
+                result[contactDetails.r] = { type: 'contact', id: contactID }; // todo minify data for storage
             }
         }
         var storage = getConnectKeysStorage();
         var list = await storage.getList();
         for (var key in list) {
-            result[key] = { type: 'connectKey', key: key };
+            result['k/' + key] = { type: 'connectKey', key: key }; // todo minify data for storage
+        }
+        if (await getOpenConnectStatus()) {
+            result['o/c'] = { type: 'openConnect' };
         }
         return result;
     };
@@ -261,8 +337,8 @@
     var makeConnectKey = (key, details) => {
         return {
             key: key,
-            name: (typeof details.n !== 'undefined' ? details.n : ''),
-            dateCreated: (typeof details.d !== 'undefined' ? details.d : null)
+            //name: (typeof details.n !== 'undefined' ? details.n : ''),
+            dateCreated: (details.d !== undefined ? details.d : null)
         };
     };
 
@@ -275,26 +351,24 @@
         return null;
     };
 
-    var setConnectKey = async (key, name) => {
+    var setConnectKey = async key => {
         var storage = getConnectKeysStorage();
-        if (key === null) {
-            for (var i = 0; i < 999; i++) {
-                var newKey = x.generateRandomString(10);
-                if (!(await storage.exists(newKey))) {
-                    key = newKey;
-                    break;
-                }
-            }
-            if (key === null) {
-                throw new Error();
-            }
-        }
-        if (await storage.exists(key)) {
-            await storage.set(key, { n: name });
-        } else {
-            await storage.set(key, { n: name, d: x.getDateID(Date.now(), 1) });
+        // if (key === null) {
+        //     for (var i = 0; i < 999; i++) {
+        //         var newKey = x.generateRandomString(10);
+        //         if (!(await storage.exists(newKey))) {
+        //             key = newKey;
+        //             break;
+        //         }
+        //     }
+        //     if (key === null) {
+        //         throw new Error();
+        //     }
+        // }
+        if (!await storage.exists(key)) {
+            await storage.set(key, { d: x.getDateID(Date.now(), 1) });
             var firewall = x.currentUser.getFirewall();
-            await firewall.add(key);
+            await firewall.add('k/' + key);
         }
         await x.announceChanges(['contactsConnectKeys']);
         return key;
@@ -304,7 +378,7 @@
         var storage = getConnectKeysStorage();
         await storage.delete(key);
         var firewall = x.currentUser.getFirewall();
-        await firewall.delete(key);
+        await firewall.delete('k/' + key);
         await x.announceChanges(['contactsConnectKeys']);
     };
 
@@ -318,6 +392,33 @@
         return result;
     };
 
+    var getOpenConnectStatus = async () => {
+        var storage = x.currentUser.getDataStorage('p/c/');
+        var value = await storage.get('oc');
+        if (value !== null) {
+            value = x.unpack(await x.currentUser.decrypt(value));
+            if (value.name === '') {
+                return value.value === 1;
+            } else {
+                throw new Error('')
+            };
+        }
+        return false;
+    };
+
+    var setOpenConnectStatus = async allow => {
+        var storage = x.currentUser.getDataStorage('p/c/');
+        await storage.set('oc', await x.currentUser.encrypt(x.pack('', allow ? 1 : 0)));
+        var firewall = x.currentUser.getFirewall();
+        var firewallKey = 'o/c'; // open connect
+        if (allow) {
+            await firewall.add(firewallKey);
+        } else {
+            await firewall.delete(firewallKey);
+        }
+        await x.announceChanges(['contactsOpenStatus']);
+    };
+
     return {
         add: add,
         get: get,
@@ -329,11 +430,16 @@
         getIdentityKey: getIdentityKey,
         getProvidedAccessKeys: getProvidedAccessKeys,
         sendRequest: sendRequest,
-        cancelRequest: cancelRequest,
+        //cancelRequest: cancelRequest,
         approveRequest: approveRequest,
         getConnectKeysList: getConnectKeysList,
         getConnectKey: getConnectKey,
         setConnectKey: setConnectKey,
-        deleteConnectKey: deleteConnectKey
+        deleteConnectKey: deleteConnectKey,
+        getOpenConnectStatus: getOpenConnectStatus,
+        setOpenConnectStatus: setOpenConnectStatus,
+        getRequest: getRequest,
+        getRequestsList: getRequestsList,
+        deleteRequest: deleteRequest
     };
 };

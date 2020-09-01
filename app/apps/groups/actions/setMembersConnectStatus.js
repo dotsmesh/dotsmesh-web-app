@@ -5,5 +5,5 @@
  */
 
 async (args, library) => {
-    return await library.getList(args.details !== undefined ? args.details : []);
+    return await library.setMembersConnectStatus(args.groupID, args.allow);
 };

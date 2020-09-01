@@ -243,7 +243,7 @@
         var response = await x.group.call(groupID, 'group.members.approve', {
             memberID: await x.groups.getMemberID(groupID, userID)
         }, { auth: 'auto' });
-        console.log(response);
+        //console.log(response);
         await x.announceChanges(['group/' + groupID + '/members', 'group/' + groupID + '/member/' + userID]);
     };
 
@@ -251,7 +251,7 @@
         var response = await x.group.call(groupID, 'group.members.delete', {
             memberID: await x.groups.getMemberID(groupID, userID)
         }, { auth: 'auto' });
-        console.log(response);
+        //console.log(response);
         await x.announceChanges(['group/' + groupID + '/members', 'group/' + groupID + '/member/' + userID]);
     };
 

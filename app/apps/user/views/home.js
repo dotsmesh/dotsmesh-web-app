@@ -28,7 +28,8 @@ async (args, library) => {
     }
 
     x.add(x.makeProfilePreviewComponent('user', userID, {
-        showEditButton: isCurrentUser
+        showEditButton: isCurrentUser,
+        connectKey: connectKey
     }), { template: 'column1' });
 
     if (isCurrentUser && x.currentUser.isPrivate()) {

@@ -21,6 +21,7 @@
         status: 'j',
         date: 'd',
         invitedBy: 'u',
+        allowConnectRequests: 'c',
         //providedAccessKey: 'b'
     };
 
@@ -201,13 +202,11 @@
                 result.status = 'pendingApproval';
             }
         }
+        result.allowConnectRequests = result.allowConnectRequests === 1 ? 1 : 0;
         return result;
     };
 
-    var getList = async (details) => {
-        if (typeof details === 'undefined') {
-            details = [];
-        }
+    var getList = async (details = []) => {
         var storage = getDetailsStorage();
         var list = await storage.getList(detailsToShortDetails(details));
         var result = [];
@@ -409,18 +408,46 @@
         }
     };
 
-    // var getProvidedAccessKeys = async () => {
-    //     var storage = getDetailsStorage();
-    //     var list = await storage.getList(['b']);
-    //     var result = {};
-    //     for (var groupID in list) {
-    //         var groupDetails = list[groupID];
-    //         if (groupDetails.b !== null) {
-    //             result[groupDetails.b] = { type: 'group', id: groupID };
-    //         }
-    //     }
-    //     return result;
-    // };
+    var getProvidedAccessKeys = async () => {
+        var storage = getDetailsStorage();
+        var list = await storage.getList(['s']);
+        var result = {};
+        for (var groupID in list) {
+            var groupDetails = list[groupID];
+            if (groupDetails.s !== null) {
+                var accessKey = await _getGroupConnectAccessKey(groupID, groupDetails.s);
+                result[accessKey] = { type: 'group', id: groupID };
+            }
+        }
+        return result;
+    };
+
+    var getMembersConnectAccessKey = async groupID => {
+        var data = await get(groupID, ['membersIDSalt']);
+        var membersIDSalt = data.membersIDSalt;
+        return await _getGroupConnectAccessKey(groupID, membersIDSalt);
+    };
+
+    var _getGroupConnectAccessKey = async (groupID, salt) => {
+        return 'g/' + groupID + '/' + await x.getHash('SHA-512', salt);
+    };
+
+    var setMembersConnectStatus = async (groupID, allow) => {
+        await setGroupDetails(groupID, { allowConnectRequests: allow ? 1 : 0 });
+        var firewallKey = await getMembersConnectAccessKey(groupID);
+        var firewall = x.currentUser.getFirewall();
+        if (allow) {
+            await firewall.add(firewallKey);
+        } else {
+            await firewall.delete(firewallKey);
+        }
+        await x.announceChanges(['group/' + groupID + '/membersConnectStatus', 'groups/membersConnectStatus']);
+    };
+
+    var getMembersConnectStatus = async groupID => {
+        var data = await get(groupID, ['allowConnectRequests']);
+        return data.allowConnectRequests === 1;
+    };
 
     return {
         createGroup: createGroup,
@@ -432,8 +459,11 @@
         getInvitationURL: getInvitationURL,
         addURLInvitation: addURLInvitation,
         addInvitation: addInvitation,
-        //getProvidedAccessKeys: getProvidedAccessKeys,
+        getProvidedAccessKeys: getProvidedAccessKeys,
         checkIfApproved: checkIfApproved,
-        exists: exists
+        exists: exists,
+        setMembersConnectStatus: setMembersConnectStatus,
+        getMembersConnectStatus: getMembersConnectStatus,
+        getMembersConnectAccessKey: getMembersConnectAccessKey
     };
 };

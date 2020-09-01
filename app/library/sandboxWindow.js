@@ -2174,6 +2174,9 @@
             //     throw new Error(type === 'user' ? 'The user cannot be found!' : 'The group cannot be found!');
             // }
 
+            var mode = options.mode !== undefined ? options.mode : 'full';
+            var theme = options.theme !== undefined ? options.theme : 'dark';
+
             var container = document.createElement('div');
             container.setAttribute('style', 'position:relative;display:flex;flex-direction:column;align-items:center;padding-bottom:20px;');
 
@@ -2255,7 +2258,7 @@
             }
 
             var nameContainer = document.createElement('div');
-            nameContainer.setAttribute('style', titleStyle + 'color:#fff;padding-top:15px;max-width:100%;overflow:hidden;text-align:center;text-overflow:ellipsis;');
+            nameContainer.setAttribute('style', (theme === 'dark' ? lightTextStyle : darkTextStyle) + titleStyle + 'padding-top:15px;max-width:100%;overflow:hidden;text-align:center;text-overflow:ellipsis;');
             nameContainer.innerText = details.name;
             container.appendChild(nameContainer);
 
@@ -2273,215 +2276,219 @@
                 container.appendChild(idContainer);
             }
 
-            var descriptionText = details.description !== null ? details.description.trim() : '';
-            if (type === 'groupMember') {
-                var [groupID, userID] = id.split('$');
-                var memberData = await x.services.call('group', 'getMemberData', { groupID: groupID, userID: userID })
-                if (memberData !== null) {
-                    if (memberData.status === 'pendingApproval') {
-                        if (descriptionText.length !== 0) {
-                            descriptionText += "\n\n";
-                        }
-                        if (userID === x.currentUser.getID()) {
-                            descriptionText += 'Your membership must be approved by an administrator. Although you can edit your profile (image, name, etc.).';
-                        } else {
-                            if (memberData.dateRequestedJoin !== null) {
-                                descriptionText += 'Requested to join on ' + x.getHumanDate(memberData.dateRequestedJoin);
+            if (mode === 'full') {
+                var descriptionText = details.description !== null ? details.description.trim() : '';
+                if (type === 'groupMember') {
+                    var [groupID, userID] = id.split('$');
+                    var memberData = await x.services.call('group', 'getMemberData', { groupID: groupID, userID: userID })
+                    if (memberData !== null) {
+                        if (memberData.status === 'pendingApproval') {
+                            if (descriptionText.length !== 0) {
+                                descriptionText += "\n\n";
                             }
-                        }
-                    } else if (memberData.dateJoined !== null) {
-                        if (descriptionText.length !== 0) {
-                            descriptionText += "\n\n";
-                        }
-                        if (memberData.invitedBy === null) {
-                            descriptionText += 'Founded this group on ' + x.getHumanDate(memberData.dateJoined);
-                        } else {
-                            descriptionText += 'Member since ' + x.getHumanDate(memberData.dateJoined);
-                        }
-                    }
-                }
-            }
-            if (descriptionText.length > 0) {
-                var descriptionTextContainer = document.createElement('div');
-                descriptionTextContainer.setAttribute('style', textStyle + 'color:#fff;word-break:break-word;text-align:center;font-size:13px;padding-top:10px;line-height:20px;width:100%;padding-left:' + edgeContentSpacing + ';padding-right:' + edgeContentSpacing + ';box-sizing:border-box;max-width:300px;');
-                descriptionTextContainer.innerText = descriptionText;
-                container.appendChild(descriptionTextContainer);
-            }
-
-
-            if (type === 'group') {
-                var dataStorage = await x.group.getSharedDataStorage(id); // todo move in groups
-                var list = await dataStorage.getList({ keyStartWith: 'm/a/', keyEndWith: '/a', limit: 101, sliceProperties: ['key'] });
-                var membersCount = list.length;
-                var text = '';
-                if (membersCount > 100) {
-                    text = '100+ members';
-                } else if (membersCount === 1) {
-                    text = '1 member';
-                } else {
-                    text = membersCount + ' members';
-                }
-
-                var membersContainer = document.createElement('div');
-                membersContainer.setAttribute('style', 'padding-top:10px;margin-bottom:-15px;')
-                var button = x.makeButton(text, async () => {
-                    x.open('group/members', { id: id });
-                });
-                membersContainer.appendChild(button.element);
-                container.appendChild(membersContainer);
-                component.observeChanges(['group/' + id + '/members']);
-            }
-
-            var getFollowButton = async () => {
-                var currentUserExists = x.currentUser.exists();
-                var isFollowing = currentUserExists ? await x.services.call('explore', 'isFollowing', { type: type, id: id }) : false;
-                var button = x.makeButton(isFollowing ? 'Following' : 'Follow', async () => {
-                    if (currentUserExists) {
-                        x.open('explore/followForm', { id: x.getTypedID(type, id) }, { modal: true, width: 300 });
-                    } else {
-                        x.requireUser({ type: 'follow', id: id }); // todo group maybe
-                    }
-                }, { style: 'style2' });
-                component.observeChanges(['explore/following/' + type + '/' + id]);
-                return button;
-            };
-
-            var getConnectButtons = async publicUserID => {
-                var result = [];
-                if (x.currentUser.exists()) {
-
-                    // var connectKey = typeof options.connectKey !== 'undefined' ? options.connectKey : null;
-                    // if (connectKey !== null) {
-                    //     showNotificationBadge = true;
-                    // }
-                    var connectKey = null;
-                    var showNotificationBadge = false;
-
-                    var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
-                    var connected = false;
-                    var text = null;
-                    if (contact !== null) {
-                        if (contact.providedAccessKey !== null && contact.accessKey !== null) {
-                            text = 'Connected';
-                            connected = true;
-                        } else if (contact.providedAccessKey !== null) {
-                            text = 'Connect request sent';
-                        } else if (contact.accessKey !== null) {
-                            text = 'Approve connect request';
-                            showNotificationBadge = true;
-                        } else {
-                            text = 'Added to contacts';
-                        }
-                    } else {
-                        if (x.currentUser.isPublic()) {
-                            text = 'Connect';
-                        } else {
-                            text = 'Add to contacts';
-                        }
-                    }
-                    var button = x.makeButton('', async () => {
-                        x.open('contacts/connect', { id: publicUserID, connectKey: connectKey }, { modal: true, width: 300 });
-                    }, { style: 'style2', icon: contact !== null ? 'contacts-tick' : 'contacts-plus' });
-                    if (showNotificationBadge) {
-                        button.element.setAttribute('x-notification-badge', '');
-                    }
-                    result.push(button);
-                    component.observeChanges(['contacts/' + publicUserID]);
-
-                    if (x.currentUser.isPublic() && connected) {
-                        var button = x.makeButton('', async () => {
-                            var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
-                            if (contact !== null && contact.providedAccessKey !== null && contact.accessKey !== null) {
-                                x.open('messages/thread', { userID: publicUserID });
+                            if (userID === x.currentUser.getID()) {
+                                descriptionText += 'Your membership must be approved by an administrator. Although you can edit your profile (image, name, etc.).';
                             } else {
-                                x.alert('Not connected yet!');
+                                if (memberData.dateRequestedJoin !== null) {
+                                    descriptionText += 'Requested to join on ' + x.getHumanDate(memberData.dateRequestedJoin);
+                                }
                             }
-                        }, { style: 'style2', icon: 'messages' });
-                        result.push(button);
-                    }
-
-                }
-                return result;
-            };
-
-            var buttonsContainer = document.createElement('div');
-            buttonsContainer.setAttribute('class', 'x-profile-buttons')
-
-            if (type === 'user') {
-                if (id !== x.currentUser.getID() && x.isPublicID(id)) {
-                    var button = await getFollowButton();
-                    buttonsContainer.appendChild(button.element);
-
-                    var buttons = await getConnectButtons(id);
-                    for (var button of buttons) {
-                        buttonsContainer.appendChild(button.element);
-                    }
-                }
-            } else if (type === 'groupMember') {
-                var [groupID, userID] = id.split('$');
-                if (userID === x.currentUser.getID()) {
-                    var button = x.makeButton('Leave group', async () => {
-                        var result = await x.open('group/membership', { id: groupID }, { modal: true, width: 300 });
-                        if (result === 'left') {
-                            x.showMessage('You\'ve successfully left the group!');
+                        } else if (memberData.dateJoined !== null) {
+                            if (descriptionText.length !== 0) {
+                                descriptionText += "\n\n";
+                            }
+                            if (memberData.invitedBy === null) {
+                                descriptionText += 'Founded this group on ' + x.getHumanDate(memberData.dateJoined);
+                            } else {
+                                descriptionText += 'Member since ' + x.getHumanDate(memberData.dateJoined);
+                            }
                         }
+                    }
+                }
+                if (descriptionText.length > 0) {
+                    var descriptionTextContainer = document.createElement('div');
+                    descriptionTextContainer.setAttribute('style', textStyle + 'color:#fff;word-break:break-word;text-align:center;font-size:13px;padding-top:10px;line-height:20px;width:100%;padding-left:' + edgeContentSpacing + ';padding-right:' + edgeContentSpacing + ';box-sizing:border-box;max-width:300px;');
+                    descriptionTextContainer.innerText = descriptionText;
+                    container.appendChild(descriptionTextContainer);
+                }
+
+
+                if (type === 'group') {
+                    var dataStorage = await x.group.getSharedDataStorage(id); // todo move in groups
+                    var list = await dataStorage.getList({ keyStartWith: 'm/a/', keyEndWith: '/a', limit: 101, sliceProperties: ['key'] });
+                    var membersCount = list.length;
+                    var text = '';
+                    if (membersCount > 100) {
+                        text = '100+ members';
+                    } else if (membersCount === 1) {
+                        text = '1 member';
+                    } else {
+                        text = membersCount + ' members';
+                    }
+
+                    var membersContainer = document.createElement('div');
+                    membersContainer.setAttribute('style', 'padding-top:10px;margin-bottom:-15px;')
+                    var button = x.makeButton(text, async () => {
+                        x.open('group/members', { id: id });
                     });
-                    buttonsContainer.appendChild(button.element);
-                } else {
-                    if (userID !== x.currentUser.getID() && x.isPublicID(userID)) {
-                        var button = x.makeButton('Visit', async () => {
-                            x.open('user/home', { userID: userID });
-                        }, { style: 'style2' });
+                    membersContainer.appendChild(button.element);
+                    container.appendChild(membersContainer);
+                    component.observeChanges(['group/' + id + '/members']);
+                }
+
+                var getFollowButton = async () => {
+                    var currentUserExists = x.currentUser.exists();
+                    var isFollowing = currentUserExists ? await x.services.call('explore', 'isFollowing', { type: type, id: id }) : false;
+                    var button = x.makeButton(isFollowing ? 'Following' : 'Follow', async () => {
+                        if (currentUserExists) {
+                            x.open('explore/followForm', { id: x.getTypedID(type, id) }, { modal: true, width: 300 });
+                        } else {
+                            x.requireUser({ type: 'follow', id: id }); // todo group maybe
+                        }
+                    }, { style: 'style2' });
+                    component.observeChanges(['explore/following/' + type + '/' + id]);
+                    return button;
+                };
+
+                var getConnectButtons = async publicUserID => {
+                    var result = [];
+                    if (x.currentUser.exists()) {
+
+                        var connectKey = options.connectKey !== undefined ? options.connectKey : null;
+                        var showNotificationBadge = connectKey !== null;
+
+                        var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
+                        var request = await x.services.call('contacts', 'getRequest', { userID: publicUserID });
+                        var connected = false;
+                        var text = null;
+                        var icon = 'contacts-plus';
+                        if (contact !== null || request !== null) {
+                            if (contact !== null && contact.providedAccessKey !== null && contact.accessKey !== null) {
+                                text = 'Connected';
+                                connected = true;
+                                icon = 'contacts-tick';
+                                showNotificationBadge = false;
+                            } else if (contact !== null && contact.providedAccessKey !== null) {
+                                text = 'Connection request sent';
+                                icon = 'contacts-clock';
+                            } else if ((contact !== null && contact.accessKey !== null) || request !== null) {
+                                text = 'Approve connection request';
+                                icon = 'contacts-clock';
+                            } else if (contact !== null) {
+                                text = 'Added to contacts';
+                                icon = 'contacts-tick';
+                            }
+                        } else {
+                            if (x.currentUser.isPublic()) {
+                                text = 'Connect';
+                            } else {
+                                text = 'Add to contacts';
+                            }
+                        }
+                        var button = x.makeButton('', async () => {
+                            x.open('contacts/connect', { id: publicUserID, connectKey: connectKey }, { modal: true, width: 300 });
+                        }, { style: 'style2', icon: icon });
+                        if (showNotificationBadge) {
+                            button.element.setAttribute('x-notification-badge', '');
+                        }
+                        result.push(button);
+                        component.observeChanges(['contacts/' + publicUserID, 'contactsRequests/' + publicUserID]);
+
+                        if (x.currentUser.isPublic() && connected) {
+                            var button = x.makeButton('', async () => {
+                                var contact = await x.services.call('contacts', 'get', { userID: publicUserID });
+                                if (contact !== null && contact.providedAccessKey !== null && contact.accessKey !== null) {
+                                    x.open('messages/thread', { userID: publicUserID });
+                                } else {
+                                    x.alert('Not connected yet!');
+                                }
+                            }, { style: 'style2', icon: 'messages' });
+                            result.push(button);
+                        }
+
+                    }
+                    return result;
+                };
+
+                var buttonsContainer = document.createElement('div');
+                buttonsContainer.setAttribute('class', 'x-profile-buttons')
+
+                if (type === 'user') {
+                    if (id !== x.currentUser.getID() && x.isPublicID(id)) {
+                        var button = await getFollowButton();
                         buttonsContainer.appendChild(button.element);
 
-                        var buttons = await getConnectButtons(userID);
+                        var buttons = await getConnectButtons(id);
                         for (var button of buttons) {
                             buttonsContainer.appendChild(button.element);
                         }
                     }
-                }
-            } else if (type === 'group') {
-                component.observeChanges(['group/' + id + '/member/' + x.currentUser.getID()]);
-                var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
-                if (memberGroupDetails !== null) {
-                    var status = memberGroupDetails.status;
-                    var isJoined = status === 'joined';
-
-                    // FOLLOW BUTTON
-                    if (isJoined) {
-                        var button = await getFollowButton();
-                        buttonsContainer.appendChild(button.element);
-                    }
-
-                    if (!isJoined) {
-                        // JOIN BUTTONs
-                        var text = null;
-                        if (status === 'pendingApproval') {
-                            text = 'Pending approval';
-                        } else if (status === null) {
-                            text = 'Join/Leave';
-                        }
-                        var button = x.makeButton(text, async () => {
-                            var result = await x.open('group/membership', { id: id }, { modal: true, width: 300 });
+                } else if (type === 'groupMember') {
+                    var [groupID, userID] = id.split('$');
+                    if (userID === x.currentUser.getID()) {
+                        var button = x.makeButton('Leave group', async () => {
+                            var result = await x.open('group/membership', { id: groupID }, { modal: true, width: 300 });
                             if (result === 'left') {
                                 x.showMessage('You\'ve successfully left the group!');
                             }
-                        }, { style: status === null ? 'style1' : 'style2' });
+                        });
                         buttonsContainer.appendChild(button.element);
+                    } else {
+                        if (userID !== x.currentUser.getID() && x.isPublicID(userID)) {
+                            var button = x.makeButton('Visit', async () => {
+                                x.open('user/home', { userID: userID });
+                            }, { style: 'style2' });
+                            buttonsContainer.appendChild(button.element);
+
+                            var buttons = await getConnectButtons(userID);
+                            for (var button of buttons) {
+                                buttonsContainer.appendChild(button.element);
+                            }
+                        }
+                    }
+                } else if (type === 'group') {
+                    component.observeChanges(['group/' + id + '/member/' + x.currentUser.getID()]);
+                    var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
+                    if (memberGroupDetails !== null) {
+                        var status = memberGroupDetails.status;
+                        var isJoined = status === 'joined';
+
+                        // FOLLOW BUTTON
+                        if (isJoined) {
+                            var button = await getFollowButton();
+                            buttonsContainer.appendChild(button.element);
+                        }
+
+                        if (!isJoined) {
+                            // JOIN BUTTONs
+                            var text = null;
+                            if (status === 'pendingApproval') {
+                                text = 'Pending approval';
+                            } else if (status === null) {
+                                text = 'Join/Leave';
+                            }
+                            var button = x.makeButton(text, async () => {
+                                var result = await x.open('group/membership', { id: id }, { modal: true, width: 300 });
+                                if (result === 'left') {
+                                    x.showMessage('You\'ve successfully left the group!');
+                                }
+                            }, { style: status === null ? 'style1' : 'style2' });
+                            buttonsContainer.appendChild(button.element);
+                        }
+
+                        if (isJoined) {
+                            // INVITE BUTTON
+                            var button = x.makeButton('', () => {
+                                x.open('group/invite', { id: id }, { modal: true, width: 300 });
+                            }, { style: 'style2', icon: 'group-plus' });
+                            buttonsContainer.appendChild(button.element);
+                        }
                     }
 
-                    if (isJoined) {
-                        // INVITE BUTTON
-                        var button = x.makeButton('', () => {
-                            x.open('group/invite', { id: id }, { modal: true, width: 300 });
-                        }, { style: 'style2', icon: 'group-plus' });
-                        buttonsContainer.appendChild(button.element);
-                    }
                 }
-
-            }
-            if (buttonsContainer.childNodes.length > 0) {
-                container.appendChild(buttonsContainer);
+                if (buttonsContainer.childNodes.length > 0) {
+                    container.appendChild(buttonsContainer);
+                }
             }
 
             return {

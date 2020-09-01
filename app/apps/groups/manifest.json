@@ -12,7 +12,11 @@
         "leave",
         "getInvitationURL",
         "addURLInvitation",
-        "exists"
+        "exists",
+        "getMembersConnectStatus",
+        "setMembersConnectStatus",
+        "getMembersConnectAccessKey",
+        "getProvidedAccessKeys"
     ],
     "library": true,
     "inbox": true,

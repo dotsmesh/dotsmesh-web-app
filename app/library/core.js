@@ -884,11 +884,12 @@
         x.user.send = async (type, userID, data, resources = {}, options = {}) => {
 
             // todo cache
-            var identityKey = await x.services.call('contacts', 'getIdentityKey', { userID: userID });
-            if (identityKey === null) {
-                // todo
-                return;
-            }
+            // Not needed when trying to send connect request to user that is not a contact
+            // var identityKey = await x.services.call('contacts', 'getIdentityKey', { userID: userID });
+            // if (identityKey === null) {
+            //     // todo
+            //     return;
+            // }
             // todo cache
             var publicKeys = await x.user.getPublicKeys(userID); // todo check signature
             if (publicKeys === null) {
@@ -1038,8 +1039,6 @@
                         resources[resourceID] = itemKey.replace('/d/', '/r/') + '-' + resourceID;
                     }
 
-                    // todo if !connected only type = cc
-
                     var getUsedAccessKeyDetails = async (accessKey, accessKeys) => {
                         for (var accessKeyToCheck in accessKeys) {
                             if (accessKey === await x.getHash('SHA-512', await x.getHash('SHA-512', accessKeyToCheck))) {
@@ -1048,23 +1047,44 @@
                         }
                         return null;
                     };
-                    // todo check user id if matches the access key
+                    var requiredTypes = null;
+                    var requiredUserID = null;
                     var accessKeys = await x.services.call('contacts', 'getProvidedAccessKeys');
                     var usedAccessKeyDetails = await getUsedAccessKeyDetails(usedAccessKey, accessKeys);
-                    // if (usedAccessKeyDetails === null) {
-                    //     var accessKeys = await x.services.call('groups', 'getProvidedAccessKeys');
-                    //     usedAccessKeyDetails = await getUsedAccessKeyDetails(usedAccessKey, accessKeys);
-                    // }
+                    if (usedAccessKeyDetails !== null) {
+                        if (usedAccessKeyDetails.type === 'contact') {
+                            requiredUserID = usedAccessKeyDetails.id; // Require items only from this user ID
+                        } else if (usedAccessKeyDetails.type === 'connectKey') {
+                            requiredTypes = ['cc']; // Contacts connect
+                        } else if (usedAccessKeyDetails.type === 'openConnect') {
+                            requiredTypes = ['cc']; // Contacts connect
+                        }
+                    } else {
+                        var accessKeys = await x.services.call('groups', 'getProvidedAccessKeys');
+                        usedAccessKeyDetails = await getUsedAccessKeyDetails(usedAccessKey, accessKeys);
+                        if (usedAccessKeyDetails !== null) {
+                            requiredTypes = ['cc']; // Contacts connect
+                        }
+                    }
                     // console.log('processInbox', {
                     //     itemKey: itemKey,
+                    //     requiredTypes: requiredTypes,
+                    //     requiredUserID: requiredUserID,
                     //     usedAccessKey: usedAccessKey,
-                    //     userID: userID,
-                    //     appID: appID,
+                    //     type: type,
+                    //     sender: userID,
                     //     data: data2,
                     //     resources: resources,
-                    //     usedAccessKeyDetails: usedAccessKeyDetails
+                    //     context: usedAccessKeyDetails
                     // });
-                    if (usedAccessKeyDetails !== null) {
+                    var ignore = false;
+                    if (requiredTypes !== null && requiredTypes.indexOf(type) === -1) {
+                        ignore = true;
+                    }
+                    if (!ignore && requiredUserID !== null && requiredUserID !== userID) {
+                        ignore = true;
+                    }
+                    if (!ignore && usedAccessKeyDetails !== null) {
                         var appsIDs = x.getAppsIDs();
                         for (var i = 0; i < appsIDs.length; i++) {
                             var appID = appsIDs[i];

@@ -564,14 +564,16 @@
             await x.open('posts/post', { userID: propertyID, postID: postID }, { addToHistory: false });
             return true;
         },
-        '': async (type, propertyID, path, secret) => {
+        '': async (type, propertyID, value, secret) => {
             if (type === 'user') {
-                // var connectKey = value.substr(2).toLowerCase(); // todo validate key
-                // showAppScreen(false, () => {
-                //     x.open('user/home', { userID: propertyID, connectKey: connectKey }, { addToHistory: false });
-                // });
-                await showAppScreen(false);
-                await x.open('user/home', { userID: propertyID }, { addToHistory: false });
+                if (value.substr(0, 2) === 'c/') {
+                    var connectKey = value.substr(2).toLowerCase(); // todo validate key
+                    await showAppScreen(false);
+                    x.open('user/home', { userID: propertyID, connectKey: connectKey }, { addToHistory: false });
+                } else {
+                    await showAppScreen(false);
+                    await x.open('user/home', { userID: propertyID }, { addToHistory: false });
+                }
                 return true;
             } else if (type === 'group') {
                 if (secret.length > 0) {
@@ -911,7 +913,7 @@
                 div.innerHTML = '<span></span>'
                 x.addClickToOpen(div, async () => {
                     await historyBack();
-                    console.log(history.state);
+                    //console.log(history.state);
                 });
                 container.appendChild(div);
             },

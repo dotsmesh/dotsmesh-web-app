@@ -9,32 +9,40 @@
 /**
 
 User data structure
-p/?/e/ - sessions/
-p/?/a/ - auth/
-p/?/x - property information
- ****p/i/ - private/inbox/
- ****p/n/ - private/notifications/
- ****p/o/ - private/observer/
- ****p/f/ - private/firewall/
- ****p/c/ - private/contacts/
- ****p/e/ - private/explore/
- ****p/g/ - private/groups/
- ****p/m/ - private/messages/
- ****p/p/ - private/profile/
- ****s/a/ - shared/posts/
- ****s/p/ - shared/profile/
- ****s/keys - public keys
+p/[id]/a/* - auth/
+p/[id]/d/* - data storage
+p/[id]/d/p/c/* - private/contacts/
+p/[id]/d/p/e/* - private/explore/
+p/[id]/d/p/f/* - private/firewall/
+p/[id]/d/p/g/* - private/groups/
+p/[id]/d/p/i/* - private/inbox/
+p/[id]/d/p/m/* - private/messages/
+p/[id]/d/p/n/* - private/notifications/
+p/[id]/d/p/o/* - private/observer/
+p/[id]/d/p/p/* - private/profile/
+p/[id]/d/s/a/* - shared/posts/
+p/[id]/d/s/p/* - shared/profile/
+p/[id]/d/s/keys - public keys
+p/[id]/e/* - sessions/
+p/[id]/x - property information
 
 Group data structure
-p/?/f/ - firewall/
-p/?/x - property information
- ****p/i/ - private/invitations/
- ****p/l/ - private/logs/
- ****p/p/ - private/profile/
- ****s/m/ - shared/members/
- ****s/a/ - shared/posts/
- ****s/p/ - shared/profile/
- ****s/l/ - shared/logs/
+p/[id]/d/* - data storage
+p/[id]/d/s/a/* - shared/posts/
+p/[id]/d/p/i/* - private/invitations/
+p/[id]/d/p/l/* - private/logs/
+p/[id]/d/p/p/* - private/profile/
+p/[id]/d/s/l/* - shared/logs/
+p/[id]/d/s/m/* - shared/members/
+p/[id]/d/s/p/* - shared/profile/
+p/[id]/f/* - firewall/
+p/[id]/x - property information
+
+User firewall keys
+[a-zA-Z0-9]{50} - contact access key
+k/[a-z0-9]* - contact connection key (user specified)
+o/c - Opened for connection requests
+g/[groupid]/[hash(salt)] - group members access key
 
  */
 
