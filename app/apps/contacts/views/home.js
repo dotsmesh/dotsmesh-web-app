@@ -52,7 +52,7 @@ async (args, library) => {
                 itemsCount++;
             }
             if (itemsCount === 0) {
-                return x.makeHint('No pending contact requests.');
+                return x.makeHint('No pending connection requests.');
             }
             return list;
         }, { observeChanges: ['contactsRequests'] }));
