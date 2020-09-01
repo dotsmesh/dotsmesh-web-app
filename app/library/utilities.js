@@ -1311,7 +1311,7 @@
         'notification': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.257" stroke-linecap="round" stroke-linejoin="round"><path d="M19.092 9.985v5.642c0 2.257.753 3.76 2.257 4.514H3.294c1.504-.753 2.257-2.257 2.257-4.514V9.985c0-3.74 3.03-6.77 6.77-6.77h0a6.77 6.77 0 0 1 6.771 6.771z"/><path d="M10.065 20.14a2.26 2.26 0 0 0 2.257 2.257 2.26 2.26 0 0 0 2.257-2.257"/></svg>',
         'notification-tick': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g stroke-width="2.249"><path d="M18.986 10.05v5.62c0 2.25.75 3.747 2.25 4.497h-18c1.5-.75 2.25-2.25 2.25-4.497v-5.62a6.75 6.75 0 0 1 6.746-6.746h0c1.79 0 3.505.71 4.77 1.976s1.976 2.98 1.976 4.77z"/><path d="M9.992 20.17a2.25 2.25 0 0 0 3.387 1.987 2.25 2.25 0 0 0 1.11-1.987"/></g><path d="M8.986 12.6l2.114 2.114 4.648-4.648" fill="#fff" stroke-width="2.247"/></svg>',
         'lock': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5z"/><path d="M12 3h0a5 5 0 0 1 5 5v3H7V8a5 5 0 0 1 5-5z"/><circle r="1" cy="16" cx="12"/></svg>',
-        'checkbox':'<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>'
+        'checkbox': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>'
     };
 
     x.getIconDataURI = (name, color) => {
@@ -1913,12 +1913,22 @@
     //     return div.innerHTML;
     // };
 
-    x.getHumanDate = milliseconds => {
+    x.getHumanDate = (milliseconds, prefix = '') => {
         var date = new Date(milliseconds);
-        //return date.toLocaleDateString(navigator.language, { month: 'long', day: 'numeric', timeStyle: 'short', hour: 'numeric', 'minute': 'numeric' });
-
-        var options = { year: 'numeric', month: 'long', day: 'numeric' };//weekday: 'long', 
-        return new Intl.DateTimeFormat('en-US', options).format(date);
+        var todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        var options = { timeStyle: 'short' };
+        if (date.getTime() > todayStart.getTime()) {
+            prefix += (prefix !== '' ? ' today at ' : 'Today at ');
+        } else if (date.getTime() > todayStart.getTime() - 86400000) {
+            prefix += (prefix !== '' ? ' yesterday at ' : 'Yesterday at ');
+        } else {
+            if (prefix !== '') {
+                prefix += ' on ';
+            }
+            options = { year: 'numeric', month: 'long', day: 'numeric', dateStyle: 'long', timeStyle: 'short' };
+        }
+        return prefix + (new Intl.DateTimeFormat('en', options).format(date));
     };
 
     x.arrayBufferToString = buffer => {

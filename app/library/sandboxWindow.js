@@ -1301,8 +1301,7 @@
             // container.appendChild(separator);
             var dateElement = document.createElement('div');
             dateElement.setAttribute('class', 'x-post-date');
-            var dateText = x.getHumanDate(post.date);
-            dateElement.innerText = 'Published on ' + dateText;
+            dateElement.innerText = x.getHumanDate(post.date, 'Published');
             dateElement.style.paddingLeft = edgeContentSpacing;
             dateElement.style.paddingRight = edgeContentSpacing;
             container.appendChild(dateElement);
