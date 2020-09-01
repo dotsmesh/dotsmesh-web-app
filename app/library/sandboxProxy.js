@@ -634,8 +634,10 @@
                 var data = await getData('d');
             }
 
+            var exists = true;
             if (data === null) {
                 data = {};
+                exists = false;
             } else {
                 if (type === 'user') {
                     data = x.unpack(data);
@@ -700,6 +702,7 @@
             }
 
             return {
+                exists: exists,
                 name: name,
                 description: description,
                 //links: [],

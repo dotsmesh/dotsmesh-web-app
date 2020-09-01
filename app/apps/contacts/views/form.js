@@ -7,26 +7,27 @@
 async (args, library) => {
     x.setTitle('Add contact');
 
-    var fieldID = x.makeFieldTextbox('ID or connect key');
+    x.add(x.makeText('Every public profile has a unique ID. Enter the ID of the profile you are looking for.'));
+
+    var fieldID = x.makeFieldTextbox('', { placeholder: 'ID' });
     x.add(fieldID);
     fieldID.focus();
 
     x.add(x.makeButton('Search', async () => {
         x.showLoading();
         var value = fieldID.getValue().toLowerCase();
-        var parts = value.split('/');
-        if (parts.length === 2) {
-            var id = x.getFullID(parts[0]);
-            var connectKey = parts[1]; // todo validate
-        } else {
-            var id = x.getFullID(value);
-            var connectKey = null;
-        }
+        var id = x.getFullID(value);
         if (!x.isPublicID(id)) {
             x.hideLoading();
-            x.alert('The ID provided is not valid!');
+            x.showMessage('The ID provided is not valid!');
             return;
         }
-        x.open('user/home', { userID: id, connectKey: connectKey });
+        var userProfile = await x.user.getProfile(id);
+        if (!userProfile.exists) {
+            x.hideLoading();
+            x.showMessage('There is now such profile!');
+            return;
+        }
+        x.open('user/home', { userID: id });
     }));
 };
