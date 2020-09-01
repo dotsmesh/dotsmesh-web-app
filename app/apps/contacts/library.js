@@ -208,6 +208,10 @@
     //     }
     // };
 
+    var removeConnectNotification = async userID => {
+        await x.notifications.delete('c$' + userID);
+    };
+
     var approveRequest = async userID => {
         var contact = await get(userID);
         var contactSentRequestResult = false;
@@ -245,6 +249,7 @@
     var deleteRequest = async userID => {
         var storage = getRequestsStorage();
         await storage.delete(userID);
+        await removeConnectNotification(userID);
         await x.announceChanges(['contactsRequests', 'contactsRequests/' + userID]);
     };
 
