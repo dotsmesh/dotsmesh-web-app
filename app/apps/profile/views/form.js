@@ -5,11 +5,11 @@
  */
 
 async (args, library) => {
-    x.setTitle(args.title !== undefined ? args.title : 'Edit profile');
 
     var propertyType = null;
     var propertyID = null;
     var defaultImage = null;
+    var defaultTitle = 'Edit profile';
     if (args.userID !== undefined) { // USER
         propertyType = 'user';
         propertyID = args.userID;
@@ -21,11 +21,14 @@ async (args, library) => {
         propertyType = 'group';
         propertyID = args.groupID;
         defaultImage = x.getDefaultGroupImage()
+        defaultTitle = 'Customize group';
     } else if (args.groupUserID !== undefined) { // GROUP MEMBER
         propertyType = 'groupMember';
         propertyID = args.groupUserID;
         defaultImage = x.getDefaultUserImage(propertyID);
     }
+
+    x.setTitle(args.title !== undefined ? args.title : defaultTitle);
 
     if (propertyType === null || propertyID === null) {
         throw new Error();
