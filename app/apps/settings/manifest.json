@@ -2,6 +2,7 @@
     "name": "Settings",
     "views": [
         "home",
-        "about"
+        "about",
+        "feedback"
     ]
 }
