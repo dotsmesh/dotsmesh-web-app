@@ -706,7 +706,7 @@
     };
 
     if (modal) {
-        css += '.x-hint{' + textStyle + 'width:100%;color:' + lightThemeHintColor + ';}';
+        css += '.x-hint{' + textStyle + 'font-size:13px;width:100%;color:' + lightThemeHintColor + ';}';
     } else {
         css += '.x-hint{' + textStyle + 'color:' + darkThemeHintColor + ';padding:0 ' + contentSpacing + ';max-width:400px;}';
     }
