@@ -1926,7 +1926,7 @@
             if (prefix !== '') {
                 prefix += ' on ';
             }
-            options = { year: 'numeric', month: 'long', day: 'numeric', dateStyle: 'long', timeStyle: 'short' };
+            options = { dateStyle: 'long', timeStyle: 'short' }; //year: 'numeric', month: 'long', day: 'numeric', 
         }
         return prefix + (new Intl.DateTimeFormat('en', options).format(date));
     };
