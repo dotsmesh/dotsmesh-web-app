@@ -43,7 +43,7 @@ async (args, library) => {
     }, 'Clear cache', ''));
 
     list.add(x.makeTextButton(async () => {
-        x.open('settings/feedback', {}, { modal: true, width: 300 });
+        x.open('settings/feedback', {}, { modal: true, width: 400 });
     }, 'Feedback', ''));
 
     list.add(x.makeTextButton(async () => {
