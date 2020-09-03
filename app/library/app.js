@@ -91,13 +91,12 @@
                 container.style.opacity = 1;
                 indicator.style.opacity = 0;
                 updateAppScreenAccessibility(false);
-                if (allLoadeded) {
-                    clearTimeout(modalBackgroundIndicatorTimeout);
-                } else {
-                    modalBackgroundIndicatorTimeout = setTimeout(() => {
-                        indicator.style.opacity = 1;
-                    }, 1000);
-                }
+            }
+            clearTimeout(modalBackgroundIndicatorTimeout);
+            if (!allLoadeded) {
+                modalBackgroundIndicatorTimeout = setTimeout(() => {
+                    indicator.style.opacity = 1;
+                }, 1000);
             }
         } else {
             if (!hasOtherModals) {
