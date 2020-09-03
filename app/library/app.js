@@ -60,6 +60,7 @@
 
     var modalBackgroundPositionTimeout = null;
     var modalBackgroundIndicatorTimeout = null;
+    var lastModalBackgroundState = null;
     var updateModalBackground = () => {
         var container = document.querySelector('.x-app-modals-background');
         if (!container) {
@@ -83,27 +84,33 @@
         }
         var indicator = container.firstChild;
         if (hasVisibleModals) {// || hasVisibleMenu
-            clearTimeout(modalBackgroundPositionTimeout);
-            container.style.zIndex = 139;//hasVisibleMenu ? 129 : 139;
-            container.style.opacity = 1;
-            indicator.style.opacity = 0;
-            updateAppScreenAccessibility(false);
-            if (allLoadeded) {
-                clearTimeout(modalBackgroundIndicatorTimeout);
-            } else {
-                modalBackgroundIndicatorTimeout = setTimeout(() => {
-                    indicator.style.opacity = 1;
-                }, 1000);
+            if (lastModalBackgroundState !== 1) {
+                lastModalBackgroundState = 1;
+                clearTimeout(modalBackgroundPositionTimeout);
+                container.style.zIndex = 139;//hasVisibleMenu ? 129 : 139;
+                container.style.opacity = 1;
+                indicator.style.opacity = 0;
+                updateAppScreenAccessibility(false);
+                if (allLoadeded) {
+                    clearTimeout(modalBackgroundIndicatorTimeout);
+                } else {
+                    modalBackgroundIndicatorTimeout = setTimeout(() => {
+                        indicator.style.opacity = 1;
+                    }, 1000);
+                }
             }
         } else {
             if (!hasOtherModals) {
-                clearTimeout(modalBackgroundIndicatorTimeout);
-                container.style.opacity = 0;
-                indicator.style.opacity = 0;
-                updateAppScreenAccessibility(true);
-                modalBackgroundPositionTimeout = setTimeout(() => {
-                    container.style.zIndex = 1;
-                }, x.modalsAnimationTime + 16);
+                if (lastModalBackgroundState !== 0) {
+                    lastModalBackgroundState = 0;
+                    clearTimeout(modalBackgroundIndicatorTimeout);
+                    container.style.opacity = 0;
+                    indicator.style.opacity = 0;
+                    updateAppScreenAccessibility(true);
+                    modalBackgroundPositionTimeout = setTimeout(() => {
+                        container.style.zIndex = 1;
+                    }, x.modalsAnimationTime + 16);
+                }
             }
         }
     };
@@ -1740,6 +1747,7 @@
 
         if (autoLoginResult) {
             x.runBackgroundTasks({ delay: 1, repeat: true });
+            x.open('posts/form', { userID: x.currentUser.getID() }, { modal: true });
         }
     };
 
