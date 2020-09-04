@@ -1131,6 +1131,7 @@
                 await showAppScreen(true);
                 await x.open('home/home');
                 x.runBackgroundTasks({ delay: 1, repeat: true });
+                x.runUpdateTasks(); // async call // todo optimize call
             } else {
                 var text = 'An error occured. Please try again later!';
                 if (result === 'invalidAuthKey') {
@@ -1746,6 +1747,7 @@
 
         if (autoLoginResult) {
             x.runBackgroundTasks({ delay: 1, repeat: true });
+            x.runUpdateTasks(); // async call // todo optimize call
         }
     };
 

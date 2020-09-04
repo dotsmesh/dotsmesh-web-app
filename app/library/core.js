@@ -1706,6 +1706,18 @@
         clearInterval(backgroundTasksInterval);
     };
 
+    x.runUpdateTasks = async () => {
+        // Convert old connection keys
+        // The new format is added in v1.1. Todo run this code in the future to convert old keys
+        // var oldStorage = getCurrentUserDataStorage('p/c/').getDetailsContext('k-');
+        // var oldKeysList = await oldStorage.getList();
+        // for (var oldKey in oldKeysList) {
+        //     await x.services.call('contacts', 'setConnectKey', { key: oldKey });
+        //     await modifyCurrentUserFirewall([{ type: 'delete', accessKey: oldKey }]);
+        //     await oldStorage.delete(oldKey);
+        // }
+    };
+
 
 
     // CACHE
