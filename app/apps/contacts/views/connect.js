@@ -93,6 +93,14 @@ async (args, library) => {
                         if (result) {
                             success = true;
                         }
+
+                        // Try old format
+                        if (!success) {
+                            var result = await library.sendRequest(userID, connectKey);
+                            if (result) {
+                                success = true;
+                            }
+                        }
                     }
 
                     // Try open connect

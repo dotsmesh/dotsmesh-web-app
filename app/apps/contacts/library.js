@@ -31,11 +31,17 @@
         return contactsStorage;
     };
 
+    var oldConnectKeysStorage = null;
+    var getOldConnectKeysStorage = () => {
+        if (oldConnectKeysStorage === null) {
+            oldConnectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('k-', x.currentUser.isPublic() ? x.cache.get('contactsk-dc') : null);
+        }
+        return oldConnectKeysStorage;
+    };
 
     var connectKeysStorage = null;
     var getConnectKeysStorage = () => {
         if (connectKeysStorage === null) {
-            // Old keys x.currentUser.getDataStorage('p/c/').getDetailsContext('k-') - without k/ prefix - TODO transfer
             connectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('y-', x.currentUser.isPublic() ? x.cache.get('contactsy-dc') : null);
         }
         return connectKeysStorage;
@@ -320,22 +326,32 @@
 
     var getProvidedAccessKeys = async () => {
         var result = {};
+
         var storage = getContactsStorage();
         var list = await storage.getList(['r']);
         for (var contactID in list) {
             var contactDetails = list[contactID];
             if (contactDetails.r !== null) {
-                result[contactDetails.r] = { type: 'contact', id: contactID }; // todo minify data for storage
+                result[contactDetails.r] = { type: 'contact', id: contactID };
             }
         }
+
         var storage = getConnectKeysStorage();
         var list = await storage.getList();
         for (var key in list) {
-            result['k/' + key] = { type: 'connectKey', key: key }; // todo minify data for storage
+            result['k/' + key] = { type: 'connectKey', key: key };
         }
+
         if (await getOpenConnectStatus()) {
             result['o/c'] = { type: 'openConnect' };
         }
+
+        var storage = getOldConnectKeysStorage();
+        var list = await storage.getList();
+        for (var key in list) {
+            result[key] = { type: 'connectKey', key: key };
+        }
+
         return result;
     };
 
@@ -353,6 +369,13 @@
         if (details !== null) {
             return makeConnectKey(key, details);
         }
+
+        var storage = getOldConnectKeysStorage();
+        var details = await storage.get(key);
+        if (details !== null) {
+            return makeConnectKey(key, details);
+        }
+
         return null;
     };
 
@@ -374,6 +397,7 @@
             await storage.set(key, { d: x.getDateID(Date.now(), 1) });
             var firewall = x.currentUser.getFirewall();
             await firewall.add('k/' + key);
+            await firewall.add(key); // old format
         }
         await x.announceChanges(['contactsConnectKeys']);
         return key;
@@ -388,12 +412,24 @@
     };
 
     var getConnectKeysList = async () => {
-        var storage = getConnectKeysStorage();
-        var list = await storage.getList(['n', 'd']);
         var result = [];
+
+        var storage = getConnectKeysStorage();
+        var list = await storage.getList(['d']);
+        var addedKeys = [];
         for (var key in list) {
+            addedKeys.push(key);
             result.push(makeConnectKey(key, list[key]));
         }
+
+        var storage = getOldConnectKeysStorage();
+        var list = await storage.getList(['d']);
+        for (var key in list) {
+            if (addedKeys.indexOf(key) === -1) {
+                result.push(makeConnectKey(key, list[key]));
+            }
+        }
+
         return result;
     };
 

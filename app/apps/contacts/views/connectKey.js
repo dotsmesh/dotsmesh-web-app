@@ -16,7 +16,11 @@ async (args, library) => {
 
     x.add(x.makeButton('Send connection request', async () => {
         x.showLoading();
-        var result = await library.sendRequest(userID, fieldKey.getValue());
+        var key = fieldKey.getValue();
+        var result = await library.sendRequest(userID, 'k/' + key);
+        if (!result) {
+            result = await library.sendRequest(userID, key);
+        }
         x.hideLoading();
         if (result === true) {
             x.showMessage('Connection request sent!');
