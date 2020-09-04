@@ -1746,7 +1746,6 @@
 
         if (autoLoginResult) {
             x.runBackgroundTasks({ delay: 1, repeat: true });
-            x.open('posts/form', { userID: x.currentUser.getID() }, { modal: true });
         }
     };
 
