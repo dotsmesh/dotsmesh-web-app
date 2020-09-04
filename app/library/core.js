@@ -1863,6 +1863,45 @@
     };
 
 
+
+    var modifyCurrentUserFirewall = async modifications => {
+        var dataStorage = getCurrentUserDataStorage('p/f/'); // firewall
+        var accessKeys = await dataStorage.get('d');
+        if (accessKeys !== null) {
+            accessKeys = x.unpack(await x.currentUser.decrypt(accessKeys));
+            if (accessKeys.name === '') {
+                accessKeys = accessKeys.value;
+            } else {
+                throw new Error();
+            }
+        } else {
+            var accessKeys = {};
+        }
+        // todo check if realy changed
+        for (var i = 0; i < modifications.length; i++) {
+            var modification = modifications[i];
+            var type = modification.type;
+            var accessKey = modification.accessKey;
+            if (type === 'add') {
+                accessKeys[accessKey] = await x.getHash('SHA-512', await x.getHash('SHA-512', accessKey));
+            } else if (type === 'delete') {
+                if (typeof accessKeys[accessKey] !== 'undefined') {
+                    delete accessKeys[accessKey];
+                }
+            }
+        }
+        var hostResult = Object.values(accessKeys);
+        if (hostResult.length === 0) {
+            await dataStorage.delete('d');
+            await dataStorage.delete('h');
+        } else {
+            await dataStorage.set('d', await x.currentUser.encrypt(x.pack('', accessKeys)));
+            await dataStorage.set('h', x.pack('', hostResult));
+        }
+        return true;
+    };
+
+
     x.addProxyCallHandler(options => {
         //var appID = typeof options.appID !== 'undefined' ? options.appID : null;
         var source = typeof options.source !== 'undefined' ? options.source : null;
@@ -1875,42 +1914,7 @@
             'currentUser.encrypt': x.currentUser.encrypt,
             'currentUser.decrypt': x.currentUser.decrypt,
             'currentUser.sign': x.currentUser.sign,
-            'currentUser.firewall.modify': async modifications => {
-                var dataStorage = getCurrentUserDataStorage('p/f/'); // firewall
-                var accessKeys = await dataStorage.get('d');
-                if (accessKeys !== null) {
-                    accessKeys = x.unpack(await x.currentUser.decrypt(accessKeys));
-                    if (accessKeys.name === '') {
-                        accessKeys = accessKeys.value;
-                    } else {
-                        throw new Error();
-                    }
-                } else {
-                    var accessKeys = {};
-                }
-                // todo check if realy changed
-                for (var i = 0; i < modifications.length; i++) {
-                    var modification = modifications[i];
-                    var type = modification.type;
-                    var accessKey = modification.accessKey;
-                    if (type === 'add') {
-                        accessKeys[accessKey] = await x.getHash('SHA-512', await x.getHash('SHA-512', accessKey));
-                    } else if (type === 'delete') {
-                        if (typeof accessKeys[accessKey] !== 'undefined') {
-                            delete accessKeys[accessKey];
-                        }
-                    }
-                }
-                var hostResult = Object.values(accessKeys);
-                if (hostResult.length === 0) {
-                    await dataStorage.delete('d');
-                    await dataStorage.delete('h');
-                } else {
-                    await dataStorage.set('d', await x.currentUser.encrypt(x.pack('', accessKeys)));
-                    await dataStorage.set('h', x.pack('', hostResult));
-                }
-                return true;
-            },
+            'currentUser.firewall.modify': modifyCurrentUserFirewall,
             'currentUser.announceChanges': x.currentUser.announceChanges,
             'currentUser.getPrivateProfileDetail': x.currentUser.getPrivateProfileDetail,
             'user.call': x.user.call,
