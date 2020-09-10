@@ -9,60 +9,68 @@ async (args, library) => {
 
     x.add(x.makeTitle('Explore'));
 
-    var following = await library.getFollowing();
+    var component = x.makeComponent(async () => {
+        var following = await library.getFollowing();
 
-    var followingCount = following.length;
-    if (followingCount > 0) {
-        var profilesCount = 0;
-        var groupsCount = 0;
-        for (var typedPropertyID of following) {
-            var propertyData = x.parseTypedID(typedPropertyID);
-            if (propertyData.type === 'group') {
-                groupsCount++;
-            } else {
-                profilesCount++;
+        var container = x.makeContainer(true);
+
+        var followingCount = following.length;
+        if (followingCount > 0) {
+            var profilesCount = 0;
+            var groupsCount = 0;
+            for (var typedPropertyID of following) {
+                var propertyData = x.parseTypedID(typedPropertyID);
+                if (propertyData.type === 'group') {
+                    groupsCount++;
+                } else {
+                    profilesCount++;
+                }
             }
-        }
 
-        var text = null;
-        if (profilesCount > 1) {
-            if (groupsCount > 1) {
-                text = 'Following ' + profilesCount + ' profiles and ' + groupsCount + ' groups';
+            var text = null;
+            if (profilesCount > 1) {
+                if (groupsCount > 1) {
+                    text = 'Following ' + profilesCount + ' profiles and ' + groupsCount + ' groups';
+                } else if (groupsCount === 1) {
+                    text = 'Following ' + profilesCount + ' profiles and 1 group';
+                } else {
+                    text = 'Following ' + profilesCount + ' profiles';
+                }
+            } else if (profilesCount === 1) {
+                if (groupsCount > 1) {
+                    text = 'Following 1 profile and ' + groupsCount + ' groups';
+                } else if (groupsCount === 1) {
+                    text = 'Following 1 profile and 1 group';
+                } else {
+                    text = 'Following 1 profile';
+                }
+            } else if (groupsCount > 1) {
+                text = 'Following ' + groupsCount + ' groups';
             } else if (groupsCount === 1) {
-                text = 'Following ' + profilesCount + ' profiles and 1 group';
-            } else {
-                text = 'Following ' + profilesCount + ' profiles';
+                text = 'Following 1 group';
             }
-        } else if (profilesCount === 1) {
-            if (groupsCount > 1) {
-                text = 'Following 1 profile and ' + groupsCount + ' groups';
-            } else if (groupsCount === 1) {
-                text = 'Following 1 profile and 1 group';
-            } else {
-                text = 'Following 1 profile';
+
+            if (text !== null) {
+                container.add(x.makeButton(text, () => {
+                    x.open('explore/following');
+                }, { style: 'style4' }));
             }
-        } else if (groupsCount > 1) {
-            text = 'Following ' + groupsCount + ' groups';
-        } else if (groupsCount === 1) {
-            text = 'Following 1 group';
         }
 
-        if (text !== null) {
-            x.add(x.makeButton(text, () => {
-                x.open('explore/following');
-            }, { style: 'style4' }));
-        }
-    }
-
-    var component = x.makePostsListComponent(async () => {
-        var posts = await library.getPropertiesPosts(following, { order: 'desc', limit: 20 });
-        library.updateAllProperties(5 * 60);
-        return posts;
-    }, {
-        showGroup: true,
-        emptyText: 'This is a place where the posts of all the people and groups you follow are listed. You can easily dive into a specific post to share and discuss.'
+        var postsList = x.makePostsListComponent(async () => {
+            var posts = await library.getPropertiesPosts(following, { order: 'desc', limit: 20 });
+            library.updateAllProperties(5 * 60);
+            return posts;
+        }, {
+            showGroup: true,
+            emptyText: 'This is a place where the posts of all the people and groups you follow are listed. You can easily dive into a specific post to share and discuss.'
+        });
+        await postsList.promise;
+        container.add(postsList);
+        return container;
     });
-    component.observeChanges(['temp_explore']);
+    component.observeChanges(['temp_explore', 'explore/following']);
+
     x.add(component);
 
     x.add(x.makeSmallTitle('Suggestions'));
