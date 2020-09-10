@@ -13,7 +13,45 @@ async (args, library) => {
 
     var followingCount = following.length;
     if (followingCount > 0) {
-        x.add(x.makeHint(followingCount === 1 ? 'Following 1 profile' : 'Following ' + followingCount + ' profiles'));
+        var profilesCount = 0;
+        var groupsCount = 0;
+        for (var typedPropertyID of following) {
+            var propertyData = x.parseTypedID(typedPropertyID);
+            if (propertyData.type === 'group') {
+                groupsCount++;
+            } else {
+                profilesCount++;
+            }
+        }
+
+        var text = null;
+        if (profilesCount > 1) {
+            if (groupsCount > 1) {
+                text = 'Following ' + profilesCount + ' profiles and ' + groupsCount + ' groups';
+            } else if (groupsCount === 1) {
+                text = 'Following ' + profilesCount + ' profiles and 1 group';
+            } else {
+                text = 'Following ' + profilesCount + ' profiles';
+            }
+        } else if (profilesCount === 1) {
+            if (groupsCount > 1) {
+                text = 'Following 1 profile and ' + groupsCount + ' groups';
+            } else if (groupsCount === 1) {
+                text = 'Following 1 profile and 1 group';
+            } else {
+                text = 'Following 1 profile';
+            }
+        } else if (groupsCount > 1) {
+            text = 'Following ' + groupsCount + ' groups';
+        } else if (groupsCount === 1) {
+            text = 'Following 1 group';
+        }
+
+        if (text !== null) {
+            x.add(x.makeButton(text, () => {
+                x.open('explore/following');
+            }, { style: 'style4' }));
+        }
     }
 
     var component = x.makePostsListComponent(async () => {

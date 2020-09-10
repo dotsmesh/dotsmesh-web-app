@@ -2,7 +2,8 @@
     "name": "Explore",
     "views": [
         "home",
-        "followForm"
+        "followForm",
+        "following"
     ],
     "actions": [
         "follow",

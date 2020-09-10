@@ -820,6 +820,10 @@
         css += '.x-button[x-style="style3"]:hover{background-color:rgba(255,255,255,0.04);}';
         css += '.x-button[x-style="style3"]:active{background-color:rgba(255,255,255,0.08);}';
         css += '.x-button[x-style="style3"]:focus{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style4"]{font-size:13px;height:32px;line-height:30px;border-radius:16px;padding:0 16px;}';
+        css += '.x-button[x-style="style4"]:hover{background-color:rgba(255,255,255,0.04);}';
+        css += '.x-button[x-style="style4"]:active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style4"]:focus{background-color:rgba(255,255,255,0.08);}';
     }
 
     x.makeButton = (text, callback, options = {}) => {
