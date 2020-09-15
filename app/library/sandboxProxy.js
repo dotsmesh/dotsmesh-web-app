@@ -335,6 +335,7 @@
         post.date = null;
         post.userID = null;
         post.text = '';
+        post.textType = '';
         post.data = {};
         post.resourcesIDs = [];
         post.getResource = null;
@@ -392,6 +393,9 @@
             if (post.text.length > 0) {
                 data.t = post.text;
             }
+            if (post.textType.length > 0) {
+                data.y = post.textType;
+            }
             if (!x.isEmptyObject(post.data)) {
                 data.x = post.data;
             }
@@ -429,6 +433,7 @@
             result.date = post.date;
             result.userID = post.userID;
             result.text = post.text;
+            result.textType = post.textType;
             result.data = x.deepCopyObject(post.data);
             for (var i = 0; i < attachments.length; i++) {
                 result.attachments.add(await attachments[i].clone());
@@ -473,6 +478,9 @@
         }
         if (typeof data.t !== 'undefined') {
             post.text = data.t;
+        }
+        if (typeof data.y !== 'undefined') {
+            post.textType = data.y;
         }
         if (typeof data.r !== 'undefined') {
             post.resourcesIDs = data.r;

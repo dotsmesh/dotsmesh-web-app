@@ -34,7 +34,7 @@ async (args, library) => {
             }
         }
         var options = {};
-        options.placeholder = 'What will you share today?'; // todo random texts
+        //options.placeholder = 'What will you share today?'; // todo random texts
         if (propertyType === 'group') {
             options.profilePropertyType = 'groupMember';
             options.profilePropertyID = propertyID + '$' + x.currentUser.getID();

@@ -5,6 +5,8 @@
         "share",
         "reportError",
         "manageNotification",
-        "message"
+        "message",
+        "richTextareaURL",
+        "openURL"
     ]
 }

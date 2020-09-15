@@ -486,6 +486,10 @@
         return x.proxyCall('downloadFile', dataURI, name);
     };
 
+    x.openURL = async url => {
+        return x.proxyCall('openURL', url);
+    };
+
     // SHARE
 
     x.share = async (type, value) => {
@@ -933,7 +937,7 @@
             getValue: () => {
                 return input.value.trim();
             },
-            setValue: (value) => {
+            setValue: value => {
                 input.value = value;
             },
             element: container
@@ -960,7 +964,7 @@
                 var tooltip = x.makeTooltip(document.body);
                 tooltip.addButton('Select another', () => { fileInput.click(); });
                 tooltip.addButton('Remove selected', () => { setValue(null) });
-                tooltip.show(e);
+                tooltip.show(e.target);
             }
         });
         fileInput.addEventListener('change', () => {
@@ -984,14 +988,14 @@
             getValue: () => {
                 return fieldValue;
             },
-            setValue: (value) => {
+            setValue: value => {
                 setValue(value);
             },
             element: container
         };
     };
 
-    css += '.x-field-textarea textarea{border:1px solid #ccc;background-color:rgba(0,0,0,0.04);height:42px;border-radius:4px;resize:none;width:100%;padding:8px 13px;box-sizing:border-box;height:114px;' + textStyle + '}';
+    css += '.x-field-textarea textarea{border:1px solid #ccc;background-color:rgba(0,0,0,0.04);border-radius:4px;resize:none;width:100%;padding:8px 13px;box-sizing:border-box;height:114px;' + textStyle + '}';
     css += '.x-field-textarea textarea[readonly]{background-color:transparent}';
 
     x.makeFieldTextarea = (label, options = {}) => {
@@ -1024,8 +1028,233 @@
             getValue: () => {
                 return textarea.value.trim();
             },
-            setValue: (value) => {
+            setValue: value => {
                 textarea.value = value;
+            },
+            element: container
+        };
+    };
+
+    css += '.x-field-rich-textarea > :nth-child(2){border-bottom-left-radius:4px;border-bottom-right-radius:4px;width:100%;box-sizing:border-box;height:42px;display:flex;flex-direction:row;}';
+    css += '.x-field-rich-textarea-light > :nth-child(2){border:1px solid #ccc;background-color:rgba(0,0,0,0.04);border-top:0;}';
+    css += '.x-field-rich-textarea > :nth-child(2)>div{width:42px;height:41px;cursor:pointer;background-size:16px;background-repeat:no-repeat;background-position:center;}';
+    css += '.x-field-rich-textarea > :nth-child(2)>div:hover{background-color:rgba(0,0,0,0.04);}';
+    css += '.x-field-rich-textarea > :nth-child(2)>div:active{background-color:rgba(0,0,0,0.08);}';
+    css += '.x-field-rich-textarea > :nth-child(1){border-top-left-radius:4px;border-top-right-radius:4px;width:100%;padding:8px 13px;box-sizing:border-box;height:114px;overflow:auto;}';
+    css += '.x-field-rich-textarea-light > :nth-child(1){border:1px solid #ccc;background-color:rgba(0,0,0,0.04);' + darkTextStyle + '}';
+    css += '.x-field-rich-textarea-dark > :nth-child(1){' + lightTextStyle + '}';
+    css += '.x-field-rich-textarea-light > :nth-child(1) *{' + darkTextStyle + '}';
+    css += '.x-field-rich-textarea-dark > :nth-child(1) *{' + lightTextStyle + '}';
+    css += '.x-field-rich-textarea > :nth-child(1) a{text-decoration:underline;color:#24a4f2;}';
+
+    x.makeFieldRichTextarea = (label, options = {}) => {
+        var height = options.height !== undefined ? options.height : null;
+        var theme = options.theme !== undefined ? options.theme : 'link';
+        var container = makeField(label, '<div></div><div></div>', 'x-field-rich-textarea x-field-rich-textarea-' + theme, options);
+        var buttonsElement = container.childNodes[1];
+        var contentElement = container.childNodes[0];
+
+        var getSelectedElement = () => {
+            if (contentElement.contains(document.activeElement)) {
+                var selection = document.getSelection();
+                if (selection.rangeCount > 0) {
+                    var selectionRange = selection.getRangeAt(0);
+                    if (selectionRange !== null) {
+                        var container = selectionRange["startContainer"];
+                        var element = container.nodeType === 3 ? container.parentNode : container;
+                        if (contentElement.contains(element)) {
+                            return element;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        var selectionRange = null;
+        var saveSelection = () => {
+            var selection = document.getSelection();
+            if (selection.rangeCount > 0) {
+                selectionRange = selection.getRangeAt(0);
+                return true;
+            }
+            return false;
+        };
+        var loadSelection = () => {
+            if (selectionRange !== null) {
+                //contentElement.focus();
+                var selection = document.getSelection();
+                if (selection.rangeCount > 0) {
+                    for (var i = 0; i < selection.rangeCount; i++) {
+                        selection.removeRange(selection.getRangeAt(i));
+                    }
+                }
+                selection.addRange(selectionRange);
+            }
+        };
+
+        var getLinkElement = (childOrLinkElement, container) => {
+            var element = childOrLinkElement;
+            for (var i = 0; i < 1000; i++) {
+                if (element.tagName.toLowerCase() === 'a') {
+                    return element;
+                }
+                element = element.parentNode;
+                if (element === container) {
+                    break;
+                }
+            }
+            return null;
+        };
+
+        var lastSelectedLink = null;
+        var updateLink = (linkElement, url = '', title = '') => {
+            if (url.length === 0) {
+                if (linkElement !== null) {
+                    linkElement.outerHTML = linkElement.innerHTML;
+                }
+            } else {
+                if (linkElement === null) {
+                    var oldLinks = contentElement.querySelectorAll('a');
+                    document.execCommand('createLink', false, url);
+                    var newLinks = contentElement.querySelectorAll('a');
+                    for (var newLink of newLinks) {
+                        var found = false;
+                        for (var oldLink of oldLinks) {
+                            if (oldLink === newLink) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            newLink.setAttribute('title', title);
+                            break;
+                        }
+                    }
+                } else {
+                    linkElement.setAttribute('href', url);
+                    linkElement.setAttribute('title', title);
+                }
+            }
+        };
+        var openLinkWindow = async selectedElement => {
+            lastSelectedLink = null;
+            if (selectedElement !== null) {
+                if (contentElement !== selectedElement) {
+                    lastSelectedLink = getLinkElement(selectedElement, contentElement);
+                }
+                if (saveSelection()) {
+                    var result = await x.open('system/richTextareaURL', {
+                        url: lastSelectedLink !== null ? lastSelectedLink.getAttribute('href') : '',
+                        title: lastSelectedLink !== null ? lastSelectedLink.getAttribute('title') : '',
+                    }, { modal: true, width: 300 });
+                    loadSelection();
+                    if (result !== null) {
+                        updateLink(lastSelectedLink, result.url, result.title);
+                    }
+                }
+            }
+        };
+
+        var buttons = [
+            {
+                t: 'Bold', i: 'rich-editor-bold', c: () => {
+                    document.execCommand('bold');
+                }
+            },
+            {
+                t: 'Italic', i: 'rich-editor-italic', c: () => {
+                    document.execCommand('italic');
+                }
+            },
+            {
+                t: 'Link', i: 'rich-editor-link', c: () => {
+                    openLinkWindow(getSelectedElement());
+                }
+            }
+        ];
+
+        var linkTooltip = null;
+        var lastSelectedLinkElement = null;
+        var checkAndHideTimeout = null;
+        var updateLinkTooltip = () => {
+            var hide = () => {
+                if (linkTooltip !== null) {
+                    linkTooltip.hide();
+                }
+            };
+            var checkAndHide = () => {
+                if (linkTooltip !== null) {
+                    if (linkTooltip.element.contains(document.activeElement)) {
+                        clearTimeout(checkAndHideTimeout);
+                    } else {
+                        checkAndHideTimeout = setTimeout(hide, 50); // Todo improve
+                    }
+                }
+            };
+            var selectedElement = getSelectedElement();
+            if (selectedElement !== null && contentElement !== selectedElement) {
+                lastSelectedLinkElement = getLinkElement(selectedElement, contentElement);
+                if (lastSelectedLinkElement !== null) {
+                    clearTimeout(checkAndHideTimeout);
+                    if (linkTooltip === null) {
+                        linkTooltip = x.makeTooltip(document.body, { floating: true, destroyOnHide: false });
+                        linkTooltip.addButton('Modify link', () => { openLinkWindow(lastSelectedLinkElement); });
+                        linkTooltip.addButton('Remove', () => { updateLink(lastSelectedLinkElement) });
+                        document.addEventListener('focusin', checkAndHide, true);
+                        document.addEventListener('blur', checkAndHide, true);
+                    }
+                    linkTooltip.show(lastSelectedLinkElement);
+                } else {
+                    hide();
+                }
+            } else {
+                hide();
+            }
+        };
+
+        for (var button of buttons) {
+            var buttonElement = document.createElement('div');
+            buttonElement.style.backgroundImage = 'url(' + x.getIconDataURI(button.i, theme === 'light' ? '#333' : '#777') + ')';
+            buttonElement.addEventListener('mousedown', e => {
+                e.preventDefault()
+                e.stopPropagation();
+            });
+            buttonElement.setAttribute('title', button.t);
+            buttonElement.addEventListener('click', button.c);
+            buttonsElement.appendChild(buttonElement);
+        }
+        contentElement.setAttribute('aria-label', label);
+        contentElement.setAttribute('tabindex', '0');
+        contentElement.setAttribute('contenteditable', 'true');
+        if (height !== null) {
+            contentElement.style.height = height;
+        }
+        contentElement.addEventListener("keyup", updateLinkTooltip);
+        contentElement.addEventListener("mouseup", updateLinkTooltip);
+        contentElement.addEventListener("dragend", updateLinkTooltip);
+        return {
+            show: () => {
+                container.style.display = 'block';
+            },
+            hide: () => {
+                container.style.display = 'none';
+            },
+            focus: () => {
+                contentElement.focus();
+            },
+            getValue: () => {
+                //console.log(x.htmlToRichText(contentElement.innerHTML));
+                return x.htmlToRichText(contentElement.innerHTML);
+            },
+            setValue: (value, type = 'text') => {
+                if (type === 'richText') {
+                    var html = x.richTextToHTML(value, 'html');
+                } else if (type === 'text') {
+                    var html = x.textToHTML(value, 'html');
+                } else {
+                    throw new Error();
+                }
+                contentElement.innerHTML = html;
             },
             element: container
         };
@@ -1214,6 +1443,12 @@
     css += '.x-post[x-content*="s"]:not([x-content*="t"]):not([x-content*="u"])>.x-post-attachment{margin-top:-' + contentSpacing + ';}';
     css += '.x-post[x-content*="m"]>.x-post-attachment{border-radius:4px;}';
     css += '.x-post[x-content*="f"]>.x-post-attachment{border-radius:8px;}';
+    css += '.x-post[x-content*="f"]>.x-post-text a{text-decoration:underline;cursor:pointer;color:#5ac1ff;' + textStyle + '}';
+    css += '.x-post[x-content*="s"]>.x-post-text a{text-decoration:underline;color:#24a4f2;' + textStyle + '}';
+    css += '.x-post[x-content*="f"]>.x-post-text p+br{display:none;}';
+    css += '.x-post[x-content*="f"]>.x-post-text br+br{margin-top:15px;content:"";display:block;}';
+    css += '.x-post[x-content*="s"]>.x-post-text p+br{display:none;}';
+    css += '.x-post[x-content*="s"]>.x-post-text br+br{margin-top:10px;content:"";display:block;}';
 
     var makePostElement = async (post, options = {}) => {
         var mode = options.mode !== undefined ? options.mode : 'full'; // summary, attachment
@@ -1271,7 +1506,11 @@
             var textElement = document.createElement('div');
             textElement.setAttribute('class', 'x-post-text');
             textElement.style.color = theme === 'light' ? '#000' : '#fff';
-            textElement.innerText = post.text;
+            if (post.textType === 'r') { // rich
+                textElement.innerHTML = x.richTextToHTML(post.text, mode === 'full' ? 'default' : 'preview');
+            } else {
+                textElement.innerHTML = x.textToHTML(post.text);
+            }
             if (mode === 'full') {
                 textElement.style.paddingTop = 0;
                 textElement.style.paddingLeft = edgeContentSpacing;
@@ -1384,6 +1623,9 @@
     css += '.x-discussion-container .x-dpost > *{' + textStyle + 'box-sizing:border-box;cursor:default;color:#fff;padding:7px 12px;border-radius:5px;display:inline-block;line-height:160%;max-width:100%;word-break:break-word;position:relative;}';
     css += '.x-discussion-container .x-dpost > *:hover{background-color:#222222;}';
     css += '.x-discussion-container .x-dpost > [x-notification-badge]{background-color:#222222;}';
+    css += '.x-discussion-container .x-dpost > * p+br{display:none;}';
+    css += '.x-discussion-container .x-dpost > * br+br{margin-top:10px;content:"";display:block;}';
+    css += '.x-discussion-container .x-dpost > * a{text-decoration:underline;cursor:pointer;color:#5ac1ff;' + textStyle + '}';
     css += '.x-discussion-container .x-user-container{margin-top:-4px;position:relative;min-height:30px;padding-left:' + edgeContentSpacing + ';}';
     css += '.x-discussion-container .x-user-container:not(:first-child){margin-top:' + contentSpacing + ';}';
     css += '.x-discussion-container .x-user-container > :first-child{margin-top:4px;position:absolute;}';
@@ -1497,7 +1739,13 @@
             } else {
                 postElement.firstChild.removeAttribute('x-notification-badge');
             }
-            contentElement.innerText = hasText ? post.text : '';
+            if (hasText) {
+                if (post.textType === 'r') { // rich
+                    contentElement.innerHTML = x.richTextToHTML(post.text);
+                } else {
+                    contentElement.innerHTML = x.textToHTML(post.text);
+                }
+            }
 
             if (hasAttachments) {
                 // todo improve for updates
@@ -1821,7 +2069,6 @@
     css += '.x-small-post-form .x-button:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-small-post-form .x-button:active{background-color:rgba(255,255,255,0.08);}';
     css += '.x-small-post-form .x-button:focus{background-color:rgba(255,255,255,0.08);}';
-    css += '.x-small-post-form .x-field-textarea textarea{border:0;background:transparent;color:#fff;padding-top:12px;}';//shape-outside
     css += '.x-small-post-form .x-add-button{border-radius:0;border-bottom-right-radius:8px;border-top-left-radius:4px;}';
     css += '.x-small-post-form .x-add-button:hover{background-color:rgba(255,255,255,0.04);}';
     css += '.x-small-post-form .x-add-button:active{background-color:rgba(255,255,255,0.08);}';
@@ -1880,10 +2127,11 @@
         var formContainer = document.createElement('div');
         formContainer.setAttribute('style', (type === 'small' ? 'margin-left:50px;background-color:rgba(255,255,255,0.08);border-radius:8px;' : 'padding-top:10px;'));
 
-        var fieldText = x.makeFieldTextarea(null, {
-            placeholder: (typeof options.placeholder !== 'undefined' ? options.placeholder : ''),
+        var fieldText = x.makeFieldRichTextarea(null, {
+            //placeholder: (typeof options.placeholder !== 'undefined' ? options.placeholder : ''),
             maxLength: 2000,
-            height: type === 'block' ? '200px' : '86px'
+            height: type === 'block' ? '200px' : '86px',
+            theme: theme
         });
         // if (type === 'small') {
         //     fieldText.element.style.marginLeft = '40px';
@@ -1894,7 +2142,11 @@
             }
         });
         formContainer.appendChild(fieldText.element);
-        fieldText.setValue(post.text);
+        if (post.textType === 'r') { // rich text
+            fieldText.setValue(post.text, 'richText');
+        } else {
+            fieldText.setValue(post.text, 'text');
+        }
 
         var attachmentContainer = document.createElement('div');
         attachmentContainer.setAttribute('style', 'display:flex;' + (type === 'small' ? 'float:right;' : 'padding-top:' + contentSpacing + ';'));
@@ -1916,7 +2168,7 @@
                         post.attachments.deleteAll();
                         rebuildAttachmentUI();
                     });
-                    tooltip.show(e);
+                    tooltip.show(e.target);
                 });
                 var attachmentPreviewContainer = document.createElement('div');
                 attachmentPreviewContainer.setAttribute('style', (type === 'small' ? 'border-bottom-right-radius:8px;border-top-left-radius:4px;' : 'border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,0.1) inset;') + 'cursor:pointer;width:42px;height:42px;overflow:hidden;background-color:rgba(255,255,255,0.04);');
@@ -1956,7 +2208,7 @@
                     // tooltip.addButton('Contact', () => {
                     //     x.alert('Not implemented yet!');
                     // });
-                    tooltip.show(e);
+                    tooltip.show(e.target);
                 });
                 attachmentContainer.appendChild(attachmentButton);
             }
@@ -1981,6 +2233,7 @@
                 post.userID = userID;
             }
             post.text = fieldText.getValue().trim();
+            post.textType = 'r';
             if (post.text.length === 0 && post.attachments.getCount() === 0) {
                 fieldText.focus();
                 return;

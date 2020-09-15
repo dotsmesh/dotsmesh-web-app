@@ -1311,7 +1311,10 @@
         'notification': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.257" stroke-linecap="round" stroke-linejoin="round"><path d="M19.092 9.985v5.642c0 2.257.753 3.76 2.257 4.514H3.294c1.504-.753 2.257-2.257 2.257-4.514V9.985c0-3.74 3.03-6.77 6.77-6.77h0a6.77 6.77 0 0 1 6.771 6.771z"/><path d="M10.065 20.14a2.26 2.26 0 0 0 2.257 2.257 2.26 2.26 0 0 0 2.257-2.257"/></svg>',
         'notification-tick': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g stroke-width="2.249"><path d="M18.986 10.05v5.62c0 2.25.75 3.747 2.25 4.497h-18c1.5-.75 2.25-2.25 2.25-4.497v-5.62a6.75 6.75 0 0 1 6.746-6.746h0c1.79 0 3.505.71 4.77 1.976s1.976 2.98 1.976 4.77z"/><path d="M9.992 20.17a2.25 2.25 0 0 0 3.387 1.987 2.25 2.25 0 0 0 1.11-1.987"/></g><path d="M8.986 12.6l2.114 2.114 4.648-4.648" fill="#fff" stroke-width="2.247"/></svg>',
         'lock': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5z"/><path d="M12 3h0a5 5 0 0 1 5 5v3H7V8a5 5 0 0 1 5-5z"/><circle r="1" cy="16" cx="12"/></svg>',
-        'checkbox': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>'
+        'checkbox': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>',
+        'rich-editor-bold': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M353.94 242.33C372.7 220.05 384 191.33 384 160c0-70.58-57.42-128-128-128H96v448h192c70.58 0 128-57.42 128-128 0-46.48-24.9-87.25-62.06-109.67zM192 96h50.75c27.98 0 50.75 28.7 50.75 64s-22.77 64-50.75 64H192V96zm79.5 320H192V288h79.5c29.23 0 53 28.7 53 64s-23.77 64-53 64z"/></svg>',
+        'rich-editor-italic': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M448 32v32h-64L224 448h64v32H64v-32h64L288 64h-64V32z"/></svg>',
+        'rich-editor-link': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M160 352c8.8 8.8 23.64 8.36 32.97-.97l158.06-158.06c9.33-9.33 9.77-24.17.97-32.97s-23.64-8.36-32.97.97L160.97 319.03c-9.33 9.33-9.77 24.17-.97 32.97zm78.44-14.44c2.28 4.52 3.5 9.58 3.5 14.84 0 8.8-3.37 17.03-9.5 23.16l-81.7 81.7c-6.1 6.1-14.34 9.5-23.14 9.5s-17.03-3.4-23.16-9.5l-49.7-49.7c-6.1-6.13-9.48-14.35-9.48-23.16s3.37-17.03 9.5-23.15l81.68-81.7c6.13-6.12 14.35-9.5 23.16-9.5 5.27 0 10.32 1.23 14.85 3.5l32.67-32.66c-13.94-10.72-30.72-16.1-47.52-16.1-20 0-40 7.6-55.16 22.76l-81.7 81.7c-30.32 30.33-30.32 79.96 0 110.3l49.7 49.7C87.6 504.4 107.6 512 127.6 512s39.98-7.58 55.15-22.75l81.7-81.7c27.9-27.9 30.1-72.14 6.66-102.66l-32.66 32.66zm250.8-265.12l-49.68-49.7C424.4 7.6 404.4 0 384.4 0s-39.98 7.58-55.15 22.75l-81.7 81.7c-27.9 27.9-30.1 72.14-6.66 102.66l32.66-32.66c-2.28-4.52-3.5-9.58-3.5-14.84 0-8.8 3.37-17.03 9.5-23.16l81.7-81.7c6.1-6.1 14.34-9.5 23.14-9.5s17.03 3.4 23.16 9.5l49.7 49.7c6.1 6.13 9.5 14.35 9.5 23.16s-3.4 17.03-9.5 23.15l-81.7 81.7c-6.13 6.1-14.35 9.5-23.16 9.5-5.26 0-10.32-1.23-14.84-3.5L304.9 271.1c13.92 10.72 30.7 16.1 47.5 16.1 20 0 40-7.6 55.16-22.76l81.7-81.7c30.32-30.32 30.32-79.96 0-110.3z"/></svg>'
     };
 
     x.getIconDataURI = (name, color) => {
@@ -2029,18 +2032,31 @@
 
     // TOOLTIPS
 
-    x.makeTooltip = container => {
+    x.makeTooltip = (container, options = {}) => {
+        var floating = options.floating !== undefined ? options.floating : false;
+        var destroyOnHide = options.destroyOnHide !== undefined ? options.destroyOnHide : true;
         var element = document.createElement('div');
-        element.setAttribute('class', 'x-tooltip');
+        element.setAttribute('class', 'x-tooltip'); // invisible container that captures the click and prevents access to the elements below
         element.innerHTML = '<div></div>';
-        element.style.top = '-1000px';
+        element.style.top = '-100000px';
+        if (floating) {
+            element.style.pointerEvents = 'none';
+            element.firstChild.style.pointerEvents = 'all';
+        }
         container.appendChild(element);
         var hideOnResize = () => {
             hide();
         };
-        var hide = () => {
+        var destroy = () => {
             element.parentNode.removeChild(element);
             window.removeEventListener('resize', hideOnResize);
+        };
+        var hide = () => {
+            if (destroyOnHide) {
+                destroy();
+            } else {
+                element.style.top = '-100000px';
+            }
         };
         element.addEventListener('click', hide);
         return {
@@ -2057,13 +2073,12 @@
                 });
                 element.firstChild.appendChild(button);
             },
-            show: mouseEvent => {
+            show: target => {
                 window.addEventListener('resize', hideOnResize);
                 var maxWidth = window.innerWidth;
                 var maxHeight = window.innerHeight;
                 var contentWidth = element.firstChild.offsetWidth;
                 var contentHeight = element.firstChild.offsetHeight;
-                var target = mouseEvent.target;
                 var rect = target.getBoundingClientRect();
                 var targetCenterLeft = rect.left + rect.width * 2 / 3;
                 var targetCenterTop = rect.top + rect.height * 2 / 3;
@@ -2082,7 +2097,10 @@
                 element.style.top = '0';
                 element.firstChild.style.left = targetCenterLeft + 'px';
                 element.firstChild.style.top = targetCenterTop + 'px';
-            }
+            },
+            hide: hide,
+            destroy: destroy,
+            element: element.firstChild
         };
     };
 
@@ -2149,6 +2167,215 @@
                 run(false, e);
             }
         });
+    };
+
+    x.htmlToRichText = html => {
+        html = html.split('%').join(encodeURI('%'));
+        html = html.split('[').join(encodeURI('['));
+        html = html.split(']').join(encodeURI(']'));
+        html = html.split('<b><br></b>').join('<br>');
+        html = html.split('<i><br></i>').join('<br>');
+        html = html.split('<em><br></em>').join('<br>');
+        html = html.split('&nbsp;').join(' ');
+
+        // html = html.split('<p>').join('<div>');
+        // html = html.split('<p ').join('<div ');
+        // html = html.split('</p>').join('</div>');
+
+        let fragment = new DocumentFragment();
+        var main = document.createElement('main');
+        main.innerHTML = html;
+        fragment.appendChild(main);
+
+        // Flattens div trees. Wrap text nodes into divs.
+        var updateChildren = element => {
+            var pendingNodes = [];
+            var addPending = child => {
+                pendingNodes.push(child);
+            };
+            var update = () => {
+                if (pendingNodes.length > 0) {
+                    var index = 0;
+                    var children = element.childNodes;
+                    for (var i = 0; i < children.length; i++) {
+                        if (children[i] === pendingNodes[0]) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    var newElement = document.createElement('div');
+                    var nodesCount = pendingNodes.length;
+                    for (var i = 0; i < nodesCount; i++) {
+                        newElement.appendChild(pendingNodes[i]);
+                    }
+                    if (children[index] !== undefined) {
+                        element.insertBefore(newElement, children[index]);
+                    } else {
+                        element.appendChild(newElement);
+                    }
+                    pendingNodes = [];
+                    return newElement;
+                }
+                return null;
+            };
+            var elementsToRemove = [];
+            for (var child of element.childNodes) {
+                if (child.nodeType === 3) {
+                    addPending(child);
+                } else if (child.nodeType === 1) {
+                    var tagName = child.tagName.toLowerCase();
+                    if (tagName === 'br') {
+                        if (update() !== null) {
+                            elementsToRemove.push(child);
+                        }
+                    } else if (tagName === 'div') {
+                        update();
+                        if (child.innerText !== child.innerHTML) { // Has HTML inside
+                            updateChildren(child);
+                            child.outerHTML = child.innerHTML;
+                        }
+                    } else {
+                        addPending(child);
+                    }
+                }
+            }
+            update();
+            for (var elementToRemove of elementsToRemove) {
+                element.removeChild(elementToRemove);
+            }
+        };
+        updateChildren(fragment.firstChild);
+
+        // Replace div tags
+        fragment.querySelectorAll('div').forEach(element => {
+            element.outerHTML = element.innerHTML + (element.nextSibling !== null ? "\n" : '');
+        });
+
+        // Replace br tags
+        fragment.querySelectorAll('br').forEach(element => {
+            element.outerHTML = "\n";
+        });
+
+        // Replace b tags
+        fragment.querySelectorAll('b').forEach(element => {
+            if (element.innerHTML.trim().length > 0) {
+                element.outerHTML = '[b]' + element.innerHTML + '[/b]';
+            }
+        });
+
+        // Replace italic tags
+        fragment.querySelectorAll('em,i').forEach(element => {
+            if (element.innerHTML.trim().length > 0) {
+                element.outerHTML = '[i]' + element.innerHTML + '[/i]';
+            }
+        });
+
+        var convertQuotes = text => {
+            return text.split('"').join(encodeURI('"'));
+        };
+
+
+        // Must be before updating <a>, because there may be "<div>" in the title
+        var elementsToRemove = [];
+
+        fragment.firstChild.querySelectorAll('*').forEach(element => {
+            if (element.tagName.toLowerCase() === 'a' && element.innerHTML.trim().length > 0) {
+                var url = element.getAttribute('href');
+                var title = element.getAttribute('title');
+                if (url !== null && url.length > 0) {
+                    element.insertAdjacentText('beforebegin', '[a href="' + convertQuotes(url) + '"' + (title !== null && title.length > 0 ? ' title="' + convertQuotes(title) + '"' : '') + ']');
+                    element.insertAdjacentHTML('beforebegin', element.innerHTML);
+                    element.insertAdjacentText('beforebegin', '[/a]');
+                    element.parentNode.removeChild(element);
+                } else {
+                    element.outerHTML = element.innerHTML;
+                }
+                return;
+            }
+            elementsToRemove.push(element);
+        });
+        for (var elementToRemove of elementsToRemove) {
+            try {
+                elementToRemove.parentNode.removeChild(elementToRemove);
+            } catch (e) {
+
+            }
+        }
+
+        return fragment.firstChild.innerText.trim();
+    };
+
+    x.richTextToHTML = (text, mode = 'default') => {
+        var convertBackQuotes = text => {
+            return text.split(encodeURI('"')).join('"');
+        };
+        var htmlEncode = text => {
+            text = text.split('&').join('&amp;');
+            text = text.split('<').join('&lt;');
+            text = text.split('>').join('&gt;');
+            text = text.split('"').join('&quot;');
+            text = text.split('  ').join('&nbsp; '); // Todo fix for space in the beginning of a line
+            return text;
+        };
+        var htmlDecode = text => {
+            text = text.split('&lt;').join('<');
+            text = text.split('&gt;').join('>');
+            text = text.split('&quot;').join('"');
+            text = text.split('&nbsp;').join(' ');
+            text = text.split('&amp;').join('&'); // Must be last
+            return text;
+        };
+        text = htmlEncode(text);
+        text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "<$1>");
+        var matches = text.matchAll(/\[a.*?\]/g);
+        for (var match of matches) {
+            if (match[0] !== undefined) {
+                var tag = match[0];
+                var decodedTag = htmlDecode(tag);
+                var attributeValue = decodedTag.match(/href="(.*?)"/);
+                var url = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
+                var attributeValue = decodedTag.match(/title="(.*?)"/);
+                var title = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
+                if (mode === 'preview') {
+                    var value = '<a>';
+                } else if (mode === 'html') {
+                    var value = '<a' + (url.length > 0 ? ' href="' + htmlEncode(url) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
+                } else {
+                    var onClick = 'x.open("system/openURL",' + JSON.stringify({ url, title }) + ',{modal:true,width:400});';
+                    var value = '<a' + (url.length > 0 ? ' onclick="' + htmlEncode(onClick) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
+                }
+                text = text.replace(tag, value);
+            }
+        };
+        if (mode === 'html') {
+            text = text.replace(/\n/g, "<br>");
+        } else {
+            text = '<p>' + text.split("\n").join('</p><br><p>') + '</p>';
+            text = text.split('<p></p>').join('');
+        }
+        text = text.split(encodeURI('[')).join('[');
+        text = text.split(encodeURI(']')).join(']');
+        text = text.split(encodeURI('%')).join('%');
+        return text;
+    };
+
+    x.textToHTML = (text, mode = 'default') => {
+        var htmlEncode = text => {
+            text = text.split('&').join('&amp;');
+            text = text.split('<').join('&lt;');
+            text = text.split('>').join('&gt;');
+            text = text.split('"').join('&quot;');
+            text = text.split('  ').join('&nbsp; '); // Todo fix for space in the beginning of a line
+            return text;
+        };
+        text = htmlEncode(text);
+        if (mode === 'html') {
+            text = text.replace(/\n/g, "<br>");
+        } else {
+            text = '<p>' + text.split("\n").join('</p><br><p>') + '</p>';
+            text = text.split('<p></p>').join('');
+        }
+        return text;
     };
 
 }

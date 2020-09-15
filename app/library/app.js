@@ -418,6 +418,14 @@
         a.click();
     };
 
+    x.openURL = async url => {
+        try {
+            window.open(url, '_blank', 'noopener');
+        } catch (e) {
+            // todo friendly error message maybe
+        }
+    };
+
     x.addProxyCallHandler(options => {
         //var appID = typeof options.appID !== 'undefined' ? options.appID : null;
         var windowID = typeof options.windowID !== 'undefined' ? options.windowID : null;
@@ -465,6 +473,7 @@
             alert: x.alert,
             confirm: x.confirm,
             downloadFile: x.downloadFile,
+            openURL: x.openURL,
             error: e => {
                 handleError(JSON.parse(e));
             },
