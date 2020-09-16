@@ -1046,6 +1046,7 @@
     css += '.x-field-rich-textarea-light > :nth-child(1) *{' + darkTextStyle + '}';
     css += '.x-field-rich-textarea-dark > :nth-child(1) *{' + lightTextStyle + '}';
     css += '.x-field-rich-textarea > :nth-child(1) a{text-decoration:underline;color:#24a4f2;}';
+    css += '.x-field-rich-textarea > :nth-child(1) a *{color:#24a4f2;}';
 
     x.makeFieldRichTextarea = (label, options = {}) => {
         var height = options.height !== undefined ? options.height : null;
