@@ -19,8 +19,8 @@ async (args, library) => {
         url = 'https://' + url;
     }
     x.add(x.makeText('URL:' + "\n" + url));
-    x.add(x.makeButton('Open', () => {
-        x.openURL(url);
-        x.back();
+    x.add(x.makeButton('Open', async () => {
+        await x.openURL(url);
+        await x.back();
     }));
 };
