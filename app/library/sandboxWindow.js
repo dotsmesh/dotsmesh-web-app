@@ -1253,9 +1253,9 @@
             },
             setValue: (value, type = 'text') => {
                 if (type === 'richText') {
-                    var html = x.richTextToHTML(value, 'html');
+                    var html = x.convertRichText(value, 'html');
                 } else if (type === 'text') {
-                    var html = x.textToHTML(value, 'html');
+                    var html = x.convertText(value, 'html');
                 } else {
                     throw new Error();
                 }
@@ -1512,9 +1512,9 @@
             textElement.setAttribute('class', 'x-post-text');
             textElement.style.color = theme === 'light' ? '#000' : '#fff';
             if (post.textType === 'r') { // rich
-                textElement.innerHTML = x.richTextToHTML(post.text, mode === 'full' ? 'default' : 'preview');
+                textElement.innerHTML = x.convertRichText(post.text, mode === 'full' ? 'default' : 'preview');
             } else {
-                textElement.innerHTML = x.textToHTML(post.text);
+                textElement.innerHTML = x.convertText(post.text);
             }
             if (mode === 'full') {
                 textElement.style.paddingTop = 0;
@@ -1746,9 +1746,9 @@
             }
             if (hasText) {
                 if (post.textType === 'r') { // rich
-                    contentElement.innerHTML = x.richTextToHTML(post.text);
+                    contentElement.innerHTML = x.convertRichText(post.text);
                 } else {
-                    contentElement.innerHTML = x.textToHTML(post.text);
+                    contentElement.innerHTML = x.convertText(post.text);
                 }
             }
 

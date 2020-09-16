@@ -2305,7 +2305,7 @@
         return fragment.firstChild.innerText.trim();
     };
 
-    x.richTextToHTML = (text, mode = 'default') => {
+    x.convertRichText = (text, format = 'default') => {
         var convertBackQuotes = text => {
             return text.split(encodeURI('"')).join('"');
         };
@@ -2325,33 +2325,38 @@
             text = text.split('&amp;').join('&'); // Must be last
             return text;
         };
-        text = htmlEncode(text);
-        text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "<$1>");
-        var matches = text.matchAll(/\[a.*?\]/g);
-        for (var match of matches) {
-            if (match[0] !== undefined) {
-                var tag = match[0];
-                var decodedTag = htmlDecode(tag);
-                var attributeValue = decodedTag.match(/href="(.*?)"/);
-                var url = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
-                var attributeValue = decodedTag.match(/title="(.*?)"/);
-                var title = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
-                if (mode === 'preview') {
-                    var value = '<a>';
-                } else if (mode === 'html') {
-                    var value = '<a' + (url.length > 0 ? ' href="' + htmlEncode(url) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
-                } else {
-                    var onClick = 'x.previewURL(' + JSON.stringify(url) + ',' + JSON.stringify(title) + ');';
-                    var value = '<a' + (url.length > 0 ? ' onclick="' + htmlEncode(onClick) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
-                }
-                text = text.replace(tag, value);
-            }
-        };
-        if (mode === 'html') {
-            text = text.replace(/\n/g, "<br>");
+        if (format === 'text') {
+            text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "");
+            text = text.replace(/\[a.*?\]/g, "");
         } else {
-            text = '<p>' + text.split("\n").join('</p><br><p>') + '</p>';
-            text = text.split('<p></p>').join('');
+            text = htmlEncode(text);
+            text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "<$1>");
+            var matches = text.matchAll(/\[a.*?\]/g);
+            for (var match of matches) {
+                if (match[0] !== undefined) {
+                    var tag = match[0];
+                    var decodedTag = htmlDecode(tag);
+                    var attributeValue = decodedTag.match(/href="(.*?)"/);
+                    var url = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
+                    var attributeValue = decodedTag.match(/title="(.*?)"/);
+                    var title = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
+                    if (format === 'preview') {
+                        var value = '<a>';
+                    } else if (format === 'html') {
+                        var value = '<a' + (url.length > 0 ? ' href="' + htmlEncode(url) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
+                    } else {
+                        var onClick = 'x.previewURL(' + JSON.stringify(url) + ',' + JSON.stringify(title) + ');';
+                        var value = '<a' + (url.length > 0 ? ' onclick="' + htmlEncode(onClick) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
+                    }
+                    text = text.replace(tag, value);
+                }
+            };
+            if (format === 'html') {
+                text = text.replace(/\n/g, "<br>");
+            } else {
+                text = '<p>' + text.split("\n").join('</p><br><p>') + '</p>';
+                text = text.split('<p></p>').join('');
+            }
         }
         text = text.split(encodeURI('[')).join('[');
         text = text.split(encodeURI(']')).join(']');
@@ -2359,7 +2364,7 @@
         return text;
     };
 
-    x.textToHTML = (text, mode = 'default') => {
+    x.convertText = (text, mode = 'default') => {
         var htmlEncode = text => {
             text = text.split('&').join('&amp;');
             text = text.split('<').join('&lt;');
