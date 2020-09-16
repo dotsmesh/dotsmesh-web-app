@@ -1443,8 +1443,8 @@
     css += '.x-post[x-content*="s"]:not([x-content*="t"]):not([x-content*="u"])>.x-post-attachment{margin-top:-' + contentSpacing + ';}';
     css += '.x-post[x-content*="m"]>.x-post-attachment{border-radius:4px;}';
     css += '.x-post[x-content*="f"]>.x-post-attachment{border-radius:8px;}';
-    css += '.x-post[x-content*="f"]>.x-post-text a{text-decoration:underline;cursor:pointer;color:#5ac1ff;' + textStyle + '}';
-    css += '.x-post[x-content*="s"]>.x-post-text a{text-decoration:underline;color:#24a4f2;' + textStyle + '}';
+    css += '.x-post[x-content*="f"]>.x-post-text a{text-decoration:underline;cursor:pointer;' + lightTextStyle + '}';
+    css += '.x-post[x-content*="s"]>.x-post-text a{text-decoration:underline;' + darkTextStyle + '}';
     css += '.x-post[x-content*="f"]>.x-post-text p+br{display:none;}';
     css += '.x-post[x-content*="f"]>.x-post-text br+br{margin-top:15px;content:"";display:block;}';
     css += '.x-post[x-content*="s"]>.x-post-text p+br{display:none;}';
