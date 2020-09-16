@@ -490,6 +490,10 @@
         return x.proxyCall('openURL', url);
     };
 
+    x.previewURL = async (url, title = '') => {
+        x.open("system/previewURL", { url, title }, { modal: true, width: 400 });
+    };
+
     // SHARE
 
     x.share = async (type, value) => {

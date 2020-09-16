@@ -7,6 +7,6 @@
         "manageNotification",
         "message",
         "richTextareaURL",
-        "openURL"
+        "previewURL"
     ]
 }

@@ -11,11 +11,14 @@ async (args, library) => {
 
     x.setTitle('Open link');
 
-    x.add(x.makeText('You are about to open an external link:'));
+    x.add(x.makeText('You are about to visit the following website:'));
     if (title.length > 0) {
-        x.add(x.makeText(title));
+        x.add(x.makeText('Title:' + "\n" + title));
     }
-    x.add(x.makeText(url));
+    if (url.indexOf('://') === -1) {
+        url = 'https://' + url;
+    }
+    x.add(x.makeText('URL:' + "\n" + url));
     x.add(x.makeButton('Open', () => {
         x.openURL(url);
         x.back();
