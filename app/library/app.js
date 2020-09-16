@@ -411,9 +411,9 @@
         return confirm(text);
     };
 
-    x.downloadFile = async (dataURI, name) => {
+    x.downloadFile = async (url, name) => {
         var a = document.createElement("a");
-        a.href = dataURI;
+        a.href = url;
         a.setAttribute("download", name);
         a.click();
     };
