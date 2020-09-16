@@ -195,7 +195,11 @@
             var notification = await x.notifications.make('m$' + threadID);
             notification.visible = true;
             notification.title = 'Message from ' + profile.name;
-            notification.text = message.text;
+            if (message.textType === 'r') {
+                notification.text = x.convertRichText(message.text, 'text');
+            } else {
+                notification.text = message.text;
+            }
             notification.image = { type: 'userProfile', id: message.userID };
             notification.onClick = { location: 'messages/thread', args: { threadID: threadID } };
             notification.tags = ['m'];

@@ -39,8 +39,13 @@ async (args, library) => {
                     let otherParticipantsIDs = thread.otherParticipantsIDs;
                     var details = '';
                     if (thread.message !== null) {
-                        var senderName = (await x.user.getProfile(thread.message.userID)).name;
-                        details = senderName + ': ' + x.stringReplaceAll(thread.message.text, "\n", " ");
+                        var message = thread.message;
+                        var senderName = (await x.user.getProfile(message.userID)).name;
+                        var text = message.text;
+                        if (message.textType === 'r') {
+                            text = x.convertRichText(text, 'text');
+                        }
+                        details = senderName + ': ' + x.stringReplaceAll(text, "\n", " ");
                     }
                     let item = await x.makeProfileButton('user', otherParticipantsIDs[0], {
                         details: details,
