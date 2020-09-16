@@ -420,7 +420,7 @@
 
     x.openURL = async url => {
         try {
-            window.open(url, '_blank', 'noopener');
+            window.open(url, '_blank', 'noopener'); // Todo fix for the Firefox popup blocked
         } catch (e) {
             // todo friendly error message maybe
         }
