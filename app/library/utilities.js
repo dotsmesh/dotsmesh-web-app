@@ -1314,6 +1314,9 @@
         'checkbox': '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>',
         'rich-editor-bold': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M353.94 242.33C372.7 220.05 384 191.33 384 160c0-70.58-57.42-128-128-128H96v448h192c70.58 0 128-57.42 128-128 0-46.48-24.9-87.25-62.06-109.67zM192 96h50.75c27.98 0 50.75 28.7 50.75 64s-22.77 64-50.75 64H192V96zm79.5 320H192V288h79.5c29.23 0 53 28.7 53 64s-23.77 64-53 64z"/></svg>',
         'rich-editor-italic': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M448 32v32h-64L224 448h64v32H64v-32h64L288 64h-64V32z"/></svg>',
+        'rich-editor-strikethrough': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M512 256v32H394.75C408.5 307.25 416 329.35 416 352c0 35.44-18.33 69.5-50.3 93.48C336.04 467.74 297.08 480 256 480c-41.07 0-80.03-12.26-109.7-34.52C114.32 421.5 96 387.44 96 352h64c0 34.7 43.96 64 96 64s96-29.3 96-64-43.96-64-96-64H0v-32h149.76l-3.47-2.52C114.3 229.5 96 195.44 96 160s18.33-69.5 50.3-93.48C175.96 44.26 214.92 32 256 32c41.07 0 80.03 12.26 109.7 34.52C397.68 90.5 416 124.56 416 160h-64c0-34.7-43.96-64-96-64s-96 29.3-96 64 43.96 64 96 64c39.5 0 77.03 11.34 106.24 32H512z"/></svg>',
+        'rich-editor-orderedlist': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M192 416h320v64H192zm0-192h320v64H192zm0-192h320v64H192zM96 0v128H64V32H32V0zM64 263v25h64v32H32v-73l64-30v-25H32v-32h96v73zm64 89v160H32v-32h64v-32H32v-32h64v-32H32v-32z"/></svg>',
+        'rich-editor-unorderedlist': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M192 32h320v64H192V32zm0 192h320v64H192v-64zm0 192h320v64H192v-64zM0 64a64 64 2160 1 0 128 0A64 64 2160 1 0 0 64zm0 192a64 64 2160 1 0 128 0 64 64 2160 1 0-128 0zm0 192a64 64 2160 1 0 128 0 64 64 2160 1 0-128 0z"/></svg>',
         'rich-editor-link': '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="#fff"><path d="M160 352c8.8 8.8 23.64 8.36 32.97-.97l158.06-158.06c9.33-9.33 9.77-24.17.97-32.97s-23.64-8.36-32.97.97L160.97 319.03c-9.33 9.33-9.77 24.17-.97 32.97zm78.44-14.44c2.28 4.52 3.5 9.58 3.5 14.84 0 8.8-3.37 17.03-9.5 23.16l-81.7 81.7c-6.1 6.1-14.34 9.5-23.14 9.5s-17.03-3.4-23.16-9.5l-49.7-49.7c-6.1-6.13-9.48-14.35-9.48-23.16s3.37-17.03 9.5-23.15l81.68-81.7c6.13-6.12 14.35-9.5 23.16-9.5 5.27 0 10.32 1.23 14.85 3.5l32.67-32.66c-13.94-10.72-30.72-16.1-47.52-16.1-20 0-40 7.6-55.16 22.76l-81.7 81.7c-30.32 30.33-30.32 79.96 0 110.3l49.7 49.7C87.6 504.4 107.6 512 127.6 512s39.98-7.58 55.15-22.75l81.7-81.7c27.9-27.9 30.1-72.14 6.66-102.66l-32.66 32.66zm250.8-265.12l-49.68-49.7C424.4 7.6 404.4 0 384.4 0s-39.98 7.58-55.15 22.75l-81.7 81.7c-27.9 27.9-30.1 72.14-6.66 102.66l32.66-32.66c-2.28-4.52-3.5-9.58-3.5-14.84 0-8.8 3.37-17.03 9.5-23.16l81.7-81.7c6.1-6.1 14.34-9.5 23.14-9.5s17.03 3.4 23.16 9.5l49.7 49.7c6.1 6.13 9.5 14.35 9.5 23.16s-3.4 17.03-9.5 23.15l-81.7 81.7c-6.13 6.1-14.35 9.5-23.16 9.5-5.26 0-10.32-1.23-14.84-3.5L304.9 271.1c13.92 10.72 30.7 16.1 47.5 16.1 20 0 40-7.6 55.16-22.76l81.7-81.7c30.32-30.32 30.32-79.96 0-110.3z"/></svg>'
     };
 
@@ -2169,7 +2172,7 @@
         });
     };
 
-    x.htmlToRichText = html => {
+    x.convertHTML = (html, format = 'richText') => {
         html = html.split('%').join(encodeURI('%'));
         html = html.split('[').join(encodeURI('['));
         html = html.split(']').join(encodeURI(']'));
@@ -2256,19 +2259,25 @@
             element.outerHTML = "\n";
         });
 
-        // Replace b tags
-        fragment.querySelectorAll('b').forEach(element => {
-            if (element.innerHTML.trim().length > 0) {
-                element.outerHTML = '[b]' + element.innerHTML + '[/b]';
-            }
-        });
-
-        // Replace italic tags
-        fragment.querySelectorAll('em,i').forEach(element => {
-            if (element.innerHTML.trim().length > 0) {
-                element.outerHTML = '[i]' + element.innerHTML + '[/i]';
-            }
-        });
+        // Replace other tags
+        var tagsToReplace = {
+            'b': 'b',
+            'em': 'i',
+            'i': 'i',
+            'strike': 's',
+            's': 's',
+            'ol': 'ol',
+            'ul': 'ul',
+            'li': 'li'
+        };
+        for (var tagName in tagsToReplace) {
+            var newName = tagsToReplace[tagName];
+            fragment.querySelectorAll(tagName).forEach(element => {
+                if (element.innerHTML.trim().length > 0) {
+                    element.outerHTML = '[' + newName + ']' + element.innerHTML + '[/' + newName + ']';
+                }
+            });
+        }
 
         var convertQuotes = text => {
             return text.split('"').join(encodeURI('"'));
@@ -2326,11 +2335,13 @@
             return text;
         };
         if (format === 'text') {
-            text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "");
+            text = text.replace(/\[li\]/g, "- "); // Todo show numbers for ol
+            text = text.replace(/\[\/li\]/g, "\n");
+            text = text.replace(/\[(\/ol|ol|\/ul|ul|\/b|b|\/i|i|\/s|s|\/a)\]/g, "");
             text = text.replace(/\[a.*?\]/g, "");
         } else {
             text = htmlEncode(text);
-            text = text.replace(/\[(\/b|b|\/i|i|\/a)\]/g, "<$1>");
+            text = text.replace(/\[(\/ol|ol|\/ul|ul|\/li|li|\/b|b|\/i|i|\/s|s|\/a)\]/g, "<$1>");
             var matches = text.matchAll(/\[a.*?\]/g);
             for (var match of matches) {
                 if (match[0] !== undefined) {

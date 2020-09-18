@@ -1049,6 +1049,8 @@
     css += '.x-field-rich-textarea-dark > :nth-child(1){' + lightTextStyle + '}';
     css += '.x-field-rich-textarea-light > :nth-child(1) *{' + darkTextStyle + '}';
     css += '.x-field-rich-textarea-dark > :nth-child(1) *{' + lightTextStyle + '}';
+    css += '.x-field-rich-textarea > :nth-child(1) ul{list-style-position:inside;margin:0;padding:0;}';
+    css += '.x-field-rich-textarea > :nth-child(1) ol{list-style-position:inside;margin:0;padding:0;}';
     css += '.x-field-rich-textarea > :nth-child(1) a{text-decoration:underline;color:#24a4f2;}';
     css += '.x-field-rich-textarea > :nth-child(1) a *{color:#24a4f2;}';
 
@@ -1172,6 +1174,21 @@
                 }
             },
             {
+                t: 'Strikethrough', i: 'rich-editor-strikethrough', c: () => {
+                    document.execCommand('strikethrough');
+                }
+            },
+            {
+                t: 'Ordered list', i: 'rich-editor-orderedlist', c: () => {
+                    document.execCommand('insertOrderedList');
+                }
+            },
+            {
+                t: 'Unordered list', i: 'rich-editor-unorderedlist', c: () => {
+                    document.execCommand('insertUnorderedList');
+                }
+            },
+            {
                 t: 'Link', i: 'rich-editor-link', c: () => {
                     openLinkWindow(getSelectedElement());
                 }
@@ -1248,8 +1265,7 @@
                 contentElement.focus();
             },
             getValue: () => {
-                //console.log(x.htmlToRichText(contentElement.innerHTML));
-                return x.htmlToRichText(contentElement.innerHTML);
+                return x.convertHTML(contentElement.innerHTML);
             },
             setValue: (value, type = 'text') => {
                 if (type === 'richText') {
@@ -1454,6 +1470,10 @@
     css += '.x-post[x-content*="f"]>.x-post-text br+br{margin-top:15px;content:"";display:block;}';
     css += '.x-post[x-content*="s"]>.x-post-text p+br{display:none;}';
     css += '.x-post[x-content*="s"]>.x-post-text br+br{margin-top:10px;content:"";display:block;}';
+    css += '.x-post[x-content*="f"]>.x-post-text ul{list-style-position:inside;margin:0;padding:0;}';
+    css += '.x-post[x-content*="f"]>.x-post-text ol{list-style-position:inside;margin:0;padding:0;}';
+    css += '.x-post[x-content*="s"]>.x-post-text ul{list-style-position:inside;margin:0;padding:0;}';
+    css += '.x-post[x-content*="s"]>.x-post-text ol{list-style-position:inside;margin:0;padding:0;}';
 
     var makePostElement = async (post, options = {}) => {
         var mode = options.mode !== undefined ? options.mode : 'full'; // summary, attachment
@@ -1631,6 +1651,8 @@
     css += '.x-discussion-container .x-dpost > * p+br{display:none;}';
     css += '.x-discussion-container .x-dpost > * br+br{margin-top:10px;content:"";display:block;}';
     css += '.x-discussion-container .x-dpost > * a{text-decoration:underline;cursor:pointer;color:#5ac1ff;' + textStyle + '}';
+    css += '.x-discussion-container .x-dpost > * ul{list-style-position:inside;margin:0;padding:0;}';
+    css += '.x-discussion-container .x-dpost > * ol{list-style-position:inside;margin:0;padding:0;}';
     css += '.x-discussion-container .x-user-container{margin-top:-4px;position:relative;min-height:30px;padding-left:' + edgeContentSpacing + ';}';
     css += '.x-discussion-container .x-user-container:not(:first-child){margin-top:' + contentSpacing + ';}';
     css += '.x-discussion-container .x-user-container > :first-child{margin-top:4px;position:absolute;}';
