@@ -2336,8 +2336,9 @@
         };
         if (format === 'text') {
             text = text.replace(/\[li\]/g, "- "); // Todo show numbers for ol
-            text = text.replace(/\[\/li\]/g, "\n");
             text = text.replace(/\[(\/ol|ol|\/ul|ul|\/b|b|\/i|i|\/s|s|\/a)\]/g, "");
+            text = text.replace(/\[\/li\](.)/g, "\n$1");
+            text = text.replace(/\[\/li\]/g, "");
             text = text.replace(/\[a.*?\]/g, "");
         } else {
             text = htmlEncode(text);
