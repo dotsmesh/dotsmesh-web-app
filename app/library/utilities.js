@@ -2343,10 +2343,9 @@
         } else {
             text = htmlEncode(text);
             text = text.replace(/\[(\/ol|ol|\/ul|ul|\/li|li|\/b|b|\/i|i|\/s|s|\/a)\]/g, "<$1>");
-            var matches = text.matchAll(/\[a.*?\]/g);
-            for (var match of matches) {
-                if (match[0] !== undefined) {
-                    var tag = match[0];
+            var matches = text.match(/\[a.*?\]/g);
+            if (matches !== null) {
+                for (var tag of matches) {
                     var decodedTag = htmlDecode(tag);
                     var attributeValue = decodedTag.match(/href="(.*?)"/);
                     var url = attributeValue !== null ? convertBackQuotes(attributeValue[1]) : '';
@@ -2361,8 +2360,8 @@
                         var value = '<a' + (url.length > 0 ? ' onclick="' + htmlEncode(onClick) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
                     }
                     text = text.replace(tag, value);
-                }
-            };
+                };
+            }
             if (format === 'html') {
                 text = text.replace(/\n/g, "<br>");
             } else {
