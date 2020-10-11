@@ -90,6 +90,12 @@ $app->routes
             $response->headers->set($response->headers->make('Content-Type', 'image/jpeg'));
             $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
+        } elseif ($isAppRequest && $request->query->exists('i512')) {
+            $content = file_get_contents(__DIR__ . '/assets/i512.png');
+            $response = new App\Response($content);
+            $response->headers->set($response->headers->make('Content-Type', 'image/png'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
             $name = $app->request->host;
             if ($name === 'dotsmesh.com') {
@@ -114,6 +120,12 @@ $app->routes
                         "src" => "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3e%3ccircle cy='256' cx='256' r='256' fill='%2324a4f2' paint-order='stroke markers fill'/%3e%3cpath d='M150.7 201.4c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zM114.04 256c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S114.04 240.7627 114.04 256zM256 330.1c-41.0397 0-74.1-33.0603-74.1-74.1s33.0603-74.1 74.1-74.1 74.1 33.0603 74.1 74.1-33.0603 74.1-74.1 74.1zM150.7 412c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zm210.6 0c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zm0-210.6c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zM228.7 370.66c0 14.60162 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S228.7 355.4227 228.7 370.66zM343.36 256c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.69838-27.3-27.93492-27.3S343.36 240.7627 343.36 256zM228.7 141.34c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S228.7 126.1027 228.7 141.34z' fill='%23fff'/%3e%3c/svg%3e",
                         "type" => "image/svg+xml",
                         "sizes" => "512x512"
+                    ],
+                    [
+                        "src" => "?app&i512",
+                        "type" => "image/png",
+                        "sizes" => "512x512",
+                        "purpose" => "any maskable"
                     ]
                 ],
             ]));
