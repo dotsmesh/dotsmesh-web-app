@@ -47,6 +47,9 @@
 </head>
 
 <body>
+    <noscript>
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;">Oops!<br><br>JavaScript is required to run the Dots Mesh web app!</div>
+    </noscript>
     <script>
         if (location.href.indexOf('&debug') !== -1 || location.href.indexOf('?debug') !== -1) {
             self.addEventListener('error', e => {
