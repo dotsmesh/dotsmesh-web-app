@@ -65,6 +65,7 @@ if ($hasLogsDirs) {
 
 $app->routes
     ->add('/', function (App\Request $request) use ($app) {
+        $host = $app->request->host;
         $isAppRequest = $request->query->exists('app');
         if ($isAppRequest && $request->query->exists('sw')) {
             $content = file_get_contents(DOTSMESH_WEB_APP_DEV_MODE ? __DIR__ . '/assets/sw.js' : __DIR__ . '/assets/sw.min.js');
@@ -97,15 +98,16 @@ $app->routes
             $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
-            $name = $app->request->host;
-            if ($name === 'dotsmesh.com') {
+            if ($host === 'dotsmesh.com') {
                 $name = '';
-            } elseif ($name === 'dev.dotsmesh.com') {
+            } elseif ($host === 'dev.dotsmesh.com') {
                 $name = 'dev';
-            } elseif ($name === 'beta.dotsmesh.com') {
+            } elseif ($host === 'beta.dotsmesh.com') {
                 $name = 'beta';
-            } elseif (substr($name, 0, 9) === 'dotsmesh.') {
-                $name = substr($name, 9);
+            } elseif (substr($host, 0, 9) === 'dotsmesh.') {
+                $name = substr($host, 9);
+            } else {
+                $name = $host;
             }
             $name = 'Dots Mesh' . (strlen($name) > 0 ? ' (' . $name . ')' : '');
             $response = new App\Response\JSON(json_encode([
@@ -138,10 +140,10 @@ $app->routes
             }
             $response = new App\Response\HTML($content);
             $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
-            $response->headers->set($response->headers->make('X-Robots-Tag', $app->request->host === 'dotsmesh.com' ? 'nofollow' : 'noindex,nofollow'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', $host === 'dotsmesh.com' ? 'nofollow' : 'noindex,nofollow'));
         }
         if ($response !== null) {
-            $response->headers->set($response->headers->make('Strict-Transport-Security', 'max-age=63072000; preload'));
+            $response->headers->set($response->headers->make('Strict-Transport-Security', 'max-age=63072000; preload' . ($host === 'dotsmesh.com' ? '; includeSubDomains' : '')));
             return $response;
         }
     });
