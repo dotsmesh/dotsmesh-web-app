@@ -97,6 +97,12 @@ $app->routes
             $response->headers->set($response->headers->make('Content-Type', 'image/png'));
             $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
             $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
+        } elseif ($isAppRequest && $request->query->exists('si')) {
+            $content = file_get_contents(__DIR__ . '/assets/si1.jpg');
+            $response = new App\Response($content);
+            $response->headers->set($response->headers->make('Content-Type', 'image/jpeg'));
+            $response->headers->set($response->headers->make('Cache-Control', DOTSMESH_WEB_APP_DEV_MODE ? 'no-store, no-cache, must-revalidate, max-age=0' : 'public, max-age=600'));
+            $response->headers->set($response->headers->make('X-Robots-Tag', 'noindex,nofollow'));
         } elseif ($isAppRequest && $request->query->exists('m')) {
             if ($host === 'dotsmesh.com') {
                 $name = '';
