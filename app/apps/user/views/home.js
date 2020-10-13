@@ -33,7 +33,7 @@ async (args, library) => {
     }), { template: 'column1' });
 
     if (isCurrentUser && x.currentUser.isPrivate()) {
-        x.add(x.makeHint('You are currently signed in with a private profile. Your profile exists only on this device, but you can freely follow others, build a contacts list and join groups. More features for you are in the works.'), { template: 'column2' });
+        x.add(x.makeHint('You are currently signed in with a private profile. Your profile exists only on this device, but you can freely follow others, build a contacts list and join groups.'), { template: 'column2' });
     } else {
 
         x.add(x.makeTitle('Recently published'), { template: 'column2' });
