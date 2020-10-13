@@ -25,7 +25,7 @@ async (args, library) => {
         var userProfile = await x.user.getProfile(id);
         if (!userProfile.exists) {
             x.hideLoading();
-            x.showMessage('There is now such profile!');
+            x.showMessage('There is no such profile!');
             return;
         }
         x.open('user/home', { userID: id });
