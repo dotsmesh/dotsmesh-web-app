@@ -7,7 +7,7 @@
 async (args, library) => {
     x.setTitle('New group');
 
-    x.add(x.makeText('Just like the public profiles, a group requires a group key. It points to the place where your data will be stored.'));
+    x.add(x.makeText('Just like the public profiles, a group requires a group key. It points to the place where your data will be stored. Get one at <a onclick="x.openURL(\'https://hosting.dotsmesh.com/\');">hosting.dotsmesh.com</a>.', false, true));
 
     var fieldGroupKey = x.makeFieldTextbox('Group key', { maxLength: 200 });
     x.add(fieldGroupKey);
