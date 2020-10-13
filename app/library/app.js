@@ -1185,8 +1185,8 @@
         var screen = makeHomeScreen(addToHistory ? 'signup#' + index : null);
         screen.addBackButton();
         if (index === 1) {
-            screen.addTitle('Great! Let\'s make\nyou a profile!');
-            screen.addText("\nChoose a profile type:");
+            screen.addTitle('Let\'s make\nyou a profile!');
+            screen.addText("\nChoose a type:");
 
             screen.addButton('Private profile<span>Free. Following, groups, etc.</span>', async () => {
                 var privateUsersIDs = await x.currentUser.getPrivateUsers();
@@ -1200,6 +1200,10 @@
             screen.addButton('Public profile<span>Public posts, private messaging, etc.</span>', async () => {
                 await showNextStep();
             }, '3');
+
+            screen.addButton('Compare', async () => {
+                window.open('https://about.dotsmesh.com/profiles/', '_blank');
+            }, '2');
 
         } else if (index === 2) {
             if (signupData.profileKey !== null) {
