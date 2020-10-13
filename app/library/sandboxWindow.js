@@ -294,7 +294,7 @@
         css += '.x-body{flex:1 1 auto;display:flex;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '.x-message > :first-child{color:#000;}';
-        css += '.x-body > .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
+        //css += '.x-body > .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal // breaks the about window content
     } else {
         css += '.x-header{height:50px;position:fixed;top:0;left:0;background-color:#111;}';
         css += '.x-header-title{line-height:50px;height:50px;}';
@@ -733,11 +733,16 @@
     } else {
         css += '.x-text{' + textStyle + 'padding:0 ' + contentSpacing + ';max-width:400px;}';
     }
+    css += '.x-text a{' + textStyle + 'cursor:pointer;text-decoration:underline;}';
 
-    x.makeText = (text, center = false) => {
+    x.makeText = (text, center = false, isHTML = false) => {
         var container = document.createElement('div');
         container.setAttribute('class', 'x-text');
-        container.innerText = text;
+        if (isHTML) {
+            container.innerHTML = text;
+        } else {
+            container.innerText = text;
+        }
         if (center) {
             container.style.textAlign = 'center';
             container.style.justifyContent = 'center';// when a flexitem in modal
