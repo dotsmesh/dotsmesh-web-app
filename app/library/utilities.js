@@ -1955,8 +1955,15 @@
         for (var i = 0; i < length; i++) {
             result[i] = string.charCodeAt(i);
         }
-        return result;
+        return result.buffer;
     };
+
+    // setTimeout(() => {
+    //     (async () => {
+    //         console.log(await x.stringToArrayBuffer('test'));
+    //         console.log(await x.arrayBufferToString(await x.stringToArrayBuffer('test')));
+    //     })();
+    // }, 10);
 
     x.stringReplaceAll = (string, find, replace) => {
         return string.split(find).join(replace);
