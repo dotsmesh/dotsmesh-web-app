@@ -114,6 +114,18 @@
             });
         };
 
+        x.currentUser.enableDeviceNotifications = async () => {
+            return x.proxyCall('currentUser.enableDeviceNotifications');
+        };
+
+        x.currentUser.disableDeviceNotifications = async () => {
+            return x.proxyCall('currentUser.disableDeviceNotifications');
+        };
+
+        x.currentUser.getDeviceNotificationsStatus = async () => {
+            return x.proxyCall('currentUser.getDeviceNotificationsStatus');
+        };
+
     }
 
 

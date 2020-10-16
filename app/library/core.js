@@ -73,26 +73,26 @@
             return await x.getHash('SHA-512', hashedPassword + '$' + id);
         };
 
-        let getPushSubscription = async propertyHost => {
+        let getPushSubscription = async host => { // Returns the push notification subscription as JSON or NULL
             if ('serviceWorker' in navigator && 'PushManager' in window) {
                 var registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {
                     try {
+                        var convertToBase64 = text => {
+                            var padding = '='.repeat((4 - text.length % 4) % 4);
+                            return (text + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                        }
+                        var response = await fetch('https://dotsmesh.' + host + '/?host&pushkey', { referrerPolicy: 'no-referrer' });
+                        var pushKey = await response.text();
                         var subscription = await registration.pushManager.getSubscription();
-                        if (subscription === null) {
-                            var urlB64ToUint8Array = base64String => {
-                                var padding = '='.repeat((4 - base64String.length % 4) % 4);
-                                var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-                                var rawData = atob(base64);
-                                var outputArray = new Uint8Array(rawData.length);
-                                for (let i = 0; i < rawData.length; ++i) {
-                                    outputArray[i] = rawData.charCodeAt(i);
-                                }
-                                return outputArray;
+                        if (subscription !== null) {
+                            if (subscription.options.applicationServerKey === null || convertToBase64(pushKey) !== btoa(x.arrayBufferToString(subscription.options.applicationServerKey))) {
+                                await subscription.unsubscribe();
+                                subscription = null;
                             }
-                            var response = await fetch('https://dotsmesh.' + propertyHost + '/?host&pushkey', { referrerPolicy: 'no-referrer' });
-                            var pushKey = await response.text();
-                            var subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(pushKey) });
+                        }
+                        if (subscription === null) {
+                            subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: x.stringToArrayBuffer(atob(convertToBase64(pushKey))) });
                         }
                         return JSON.stringify(subscription);
                     } catch (e) {
@@ -100,7 +100,7 @@
                     }
                 }
             }
-            return '';
+            return null;
         };
 
         // let unregisterServiceWorker = () => {
@@ -273,12 +273,11 @@
             var authKey = await hashUserPassword(id, password);
             var sessionSecret = x.generateRandomString(50, true);
             var sessionData = x.pack('0', sessionSecret);
-            var pushSubscription = await getPushSubscription(idData.host);
             var response = await callAPI(idData.host, 'user.login', {
                 id: id,
                 authKey: authKey,
                 sessionData: sessionData,
-                pushSubscription: pushSubscription
+                pushSubscription: '' // compatibility v1.1 - remove in the future
             });
             var status = response.status;
             if (status === 'ok') {
@@ -296,7 +295,8 @@
                         identityPublicKey: authValue.i,
                         privateKeys: x.keyBox.make(authValue.ks),
                         publicKeys: x.keyBox.make(authValue.k),
-                        salt: authValue.a !== undefined ? authValue.a : 'x'
+                        salt: authValue.a !== undefined ? authValue.a : 'x',
+                        pushData: null
                     };
                     await setLoggedInUser(id);
                     await appDB.set(await getUserAppDBPrefix(id) + 's/a', { // session data
@@ -325,11 +325,7 @@
             }
             var userID = loggedInUsersIDs[0];
             if (x.isPrivateID(userID)) {
-                if (await x.currentUser.loginPrivateUser(userID)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return await x.currentUser.loginPrivateUser(userID);
             } else if (x.isPublicID(userID)) {
                 var currentUserLocalData = await appDB.get(await getUserAppDBPrefix(userID) + 's/a');
                 if (currentUserLocalData.i === undefined || currentUserLocalData.is === undefined) { // an updated data is missing, added on 24-6-2020, remove in the future
@@ -337,13 +333,8 @@
                     return false;
                 }
                 var sessionKey = currentUserLocalData.s;
-                //var id = currentUserLocalData.i;
-                var idData = x.parseID(userID);
-                var pushSubscription = await getPushSubscription(idData.host);
                 try {
-                    var response = await x.user.call(userID, 'user.autoLogin', {
-                        pushSubscription: pushSubscription
-                    }, {
+                    var response = await x.user.call(userID, 'user.autoLogin', {}, {
                         auth: 'sessionKey',
                         sessionKey: sessionKey
                     });
@@ -365,7 +356,8 @@
                     identityPublicKey: await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.i),
                     privateKeys: x.keyBox.make(await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.ks)),
                     publicKeys: x.keyBox.make(await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.k)),
-                    salt: currentUserLocalData.a !== undefined ? await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.a) : 'x'
+                    salt: currentUserLocalData.a !== undefined ? await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.a) : 'x',
+                    pushData: response.pushData !== undefined && response.pushData !== '' ? response.pushData : null
                 };
                 return true;
             } else {
@@ -452,27 +444,161 @@
                         privateKeys: x.keyBox.make(keysValue.ks),
                         publicKeys: x.keyBox.make(keysValue.k),
                         salt: keysValue.a !== undefined ? keysValue.a : 'x',
+                        pushData: null
                     };
-                    // var list = currentUserData.privateKeys.getList();
-                    // for (var key of list) {
-                    //     if (key.operation === 'sign') {
-                    //         currentUserData.identityPrivateKey = key.key;
-                    //         break;
-                    //     }
-                    // }
-                    // var list = currentUserData.publicKeys.getList();
-                    // for (var key of list) {
-                    //     if (key.operation === 'verify') {
-                    //         currentUserData.identityPublicKey = key.key;
-                    //         break;
-                    //     }
-                    // }
+                    currentUserData.pushData = await currentPrivateUserObserverService.getPushSubscription();
                     await setLoggedInUser(userID);
                     return true;
                 }
             }
             return false;
         };
+
+        var currentPrivateUserObserverService = (() => {
+
+            var getData = async () => {
+                var dataStorage = getCurrentUserDataStorage();
+                var observerServiceData = await dataStorage.get('p/o/srv');
+                var result = {
+                    host: null,
+                    sessions: {}
+                };
+                if (observerServiceData !== null) {
+                    var value = x.unpack(await x.currentUser.decrypt(observerServiceData));
+                    if (value.name === '') {
+                        var value = value.value;
+                        result.host = value.h !== undefined ? value.h : null;
+                        result.sessions = value.s !== undefined ? value.s : {};
+                    } else {
+                        throw new Error();
+                    }
+                }
+                return result;
+            };
+
+            var setData = async data => {
+                var dataStorage = getCurrentUserDataStorage();
+                var temp = {};
+                if (data.host !== null) {
+                    temp.h = data.host;
+                }
+                if (data.sessions !== null) {
+                    temp.s = data.sessions;
+                }
+                await dataStorage.set('p/o/srv', await x.currentUser.encrypt(x.pack('', temp)));
+            };
+
+            var deleteData = async () => {
+                var dataStorage = getCurrentUserDataStorage();
+                await dataStorage.delete('p/o/srv');
+            };
+
+            var callService = async (host, method, args) => {
+                return await callAPI(host, method, args, {
+                    userID: await getServiceUserID()
+                });
+            };
+
+            var getServiceUserID = async () => {
+                var salt = x.currentUser.getSalt();
+                return await x.crypto.deriveID(salt + '$o$' + x.currentUser.getID());
+            };
+
+            var signup = async () => {
+                var host = 'o1.dotsmesh.com';
+                var pushSubscription = await getPushSubscription(host);
+                if (pushSubscription !== null) {
+                    try {
+                        var response = await callAPI(host, 'user.changes.signup', {
+                            subscriptions: await getObservedPropertiesKeysPerHost(),
+                            sessionID: 'd', // default session id while there is no multidevice support for private profiles
+                            pushSubscription: pushSubscription
+                        }, {
+                            userID: await getServiceUserID()
+                        });
+                        if (response.status === 'ok') {
+                            await setData({
+                                host: host,
+                                sessions: { d: { p: pushSubscription } } // d - session id (the default one), p - push data
+                            });
+                            return {
+                                host: host,
+                                pushSubscription: pushSubscription
+                            };
+                        }
+                    } catch (e) {
+                        // todo
+                    }
+                }
+                return null;
+            };
+
+            var enable = async () => {
+                var data = await getData();
+                if (data.host === null) {
+                    var result = await signup();
+                    if (result !== null) {
+                        return { pushSubscription: result.pushSubscription };
+                    }
+                }
+                return null;
+            };
+
+            var disable = async () => {
+                var data = await getData();
+                if (data.host !== null) {
+                    try {
+                        await callService(data.host, 'user.changes.delete', {});
+                    } catch (e) {
+
+                    }
+                }
+                await deleteData();
+                return true;
+            };
+
+            var updateSubscriptions = async changes => {
+                var data = await getData();
+                if (data.host !== null) {
+                    var keysToAdd = changes.keysToAdd !== undefined ? changes.keysToAdd : {};
+                    var keysToRemove = changes.keysToRemove !== undefined ? changes.keysToRemove : {};
+                    if (!x.isEmptyObject(keysToAdd) || !x.isEmptyObject(keysToRemove)) {
+                        try {
+                            await callService(data.host, 'user.changes.updateSubscriptions', {
+                                keysToAdd: keysToAdd,
+                                keysToRemove: keysToRemove
+                            });
+                        } catch (e) {
+                            if (e.name === 'userNotFound') {
+                                await signup();
+                            } else {
+                                throw e;
+                            }
+                        }
+                    }
+                }
+            };
+
+            var getSavedPushSubscription = async () => {
+                var data = await getData();
+                if (data.sessions.d !== undefined && data.sessions.d.p !== undefined) {
+                    return data.sessions.d.p;
+                }
+                return null;
+            };
+
+            var isEnabled = async () => {
+                return await getSavedPushSubscription() !== null;
+            };
+
+            return {
+                enable,
+                disable,
+                updateSubscriptions,
+                isEnabled,
+                getPushSubscription: getSavedPushSubscription
+            }
+        })();
 
         x.currentUser.getPrivateUsers = async () => { // todo better name
             return await getPrivateUsers();
@@ -520,6 +646,56 @@
         x.currentUser.getPrivateProfileDetail = async key => {
             var dataStorage = getCurrentUserDataStorage();
             return await dataStorage.get('s/p/' + key);
+        };
+
+        var updateDeviceNotifications = async enable => {
+            if (x.currentUser.isPublic()) {
+                var userID = x.currentUser.getID();
+                var idData = x.parseID(userID);
+                var pushSubscription = enable ? await getPushSubscription(idData.host) : null;
+                try {
+                    var response = await x.user.call(userID, 'user.setPushSubscription', {
+                        pushSubscription: pushSubscription !== null ? pushSubscription : ''
+                    }, {
+                        auth: 'sessionKey',
+                        sessionKey: currentUserData.sessionKey
+                    });
+                    if (response === 'ok') {
+                        currentUserData.pushData = pushSubscription;
+                        await x.announceChanges(['deviceNotificationsStatus']);
+                        return true;
+                    }
+                } catch (e) {
+                }
+            } else { // is private
+                if (enable) {
+                    var result = await currentPrivateUserObserverService.enable();
+                    if (result !== null) {
+                        currentUserData.pushData = result.pushSubscription;
+                        await x.announceChanges(['deviceNotificationsStatus']);
+                        return true;
+                    }
+                } else {
+                    if (await currentPrivateUserObserverService.disable()) {
+                        currentUserData.pushData = null;
+                        await x.announceChanges(['deviceNotificationsStatus']);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        x.currentUser.enableDeviceNotifications = async () => {
+            return await updateDeviceNotifications(true);
+        };
+
+        x.currentUser.disableDeviceNotifications = async () => {
+            return await updateDeviceNotifications(false);
+        };
+
+        x.currentUser.getDeviceNotificationsStatus = () => {
+            return currentUserData.pushData !== null ? 'enabled' : 'disabled';
         };
 
     }
@@ -1230,6 +1406,9 @@
     };
 
     var showDeviceNotification = async (tag, args) => { // always call async
+        if (x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
+            return;
+        }
         var registration = await getNotificationsRegistration();
         if (registration === null) {
             return;
@@ -1468,7 +1647,6 @@
     }
 
     var checkPropertiesForChanges = async () => {
-        //console.log('checkPropertiesForChanges');
         var dataStorage = getObserverDataStorage();
         var lastCheckTimeData = await dataStorage.get('chkt');
         var lastCheckTime = null;
@@ -1531,7 +1709,7 @@
             var parsedID = x.parseID(keyParts[0]);
             if (parsedID !== null) {
                 var host = parsedID.host;
-                if (typeof result[host] === 'undefined') {
+                if (result[host] === undefined) {
                     result[host] = [];
                 }
                 result[host].push(keysData[key][0]);
@@ -1540,7 +1718,23 @@
         return result;
     };
 
+    var getObservedPropertiesKeysPerHost = async () => {
+        var keysData = await getPropertiesObserverKeys();
+        return getKeysPerHost(keysData);
+    };
+
     var modifyPropertyObserver = async (action, propertyID, changedKeys, observer) => {
+        var parsedPropertyID = x.parseID(propertyID);
+        if (parsedPropertyID === null) {
+            return;
+        }
+        var isPrivateUser = x.currentUser.isPrivate();
+
+        if (isPrivateUser) {
+            var observerServiceAddKeys = {};
+            var observerServiceRemoveKeys = {};
+        }
+
         var dataStorage = getObserverDataStorage();
         var keysData = await getPropertiesObserverKeys();
         // todo check if realy changed
@@ -1552,22 +1746,47 @@
                 }
                 keysData[key][1].push(observer);
                 keysData[key][1] = x.arrayUnique(keysData[key][1]);
+                if (isPrivateUser) {
+                    var propertyIDHost = parsedPropertyID.host;
+                    if (observerServiceAddKeys[propertyIDHost] === undefined) {
+                        observerServiceAddKeys[propertyIDHost] = [];
+                    }
+                    observerServiceAddKeys[propertyIDHost].push(keysData[key][0]);
+                }
             } else if (action === 'delete') {
                 if (keysData[key] !== undefined) {
                     keysData[key][1] = x.removeFromArray(keysData[key][1], observer);
                     if (keysData[key][1].length === 0) {
+                        if (isPrivateUser) {
+                            var propertyIDHost = parsedPropertyID.host;
+                            if (observerServiceRemoveKeys[propertyIDHost] === undefined) {
+                                observerServiceRemoveKeys[propertyIDHost] = [];
+                            }
+                            observerServiceRemoveKeys[propertyIDHost].push(keysData[key][0]);
+                        }
                         delete keysData[key];
                     }
                 }
             }
         }
+
         if (Object.values(keysData).length === 0) {
             await dataStorage.delete('d');
-            await dataStorage.delete('h');
+            if (!isPrivateUser) {
+                await dataStorage.delete('h');
+            }
         } else {
             var hostResult = getKeysPerHost(keysData);
             await dataStorage.set('d', await x.currentUser.encrypt(x.pack('', keysData)));
-            await dataStorage.set('h', x.pack('', hostResult));
+            if (!isPrivateUser) {
+                await dataStorage.set('h', x.pack('', hostResult));
+            }
+        }
+        if (isPrivateUser && await currentPrivateUserObserverService.isEnabled()) {
+            await currentPrivateUserObserverService.updateSubscriptions({
+                keysToAdd: observerServiceAddKeys,
+                keysToRemove: observerServiceRemoveKeys
+            });
         }
         return true;
     };
@@ -1655,7 +1874,6 @@
     var backgroundTasksInterval = null;
 
     x.runBackgroundTasks = async (options = {}) => {
-        //console.log('x.runBackgroundTasks');
         // todo lock
         // todo logged out while running
         var delay = options.delay !== undefined ? options.delay : 0; // seconds
@@ -1929,6 +2147,9 @@
             'currentUser.firewall.modify': modifyCurrentUserFirewall,
             'currentUser.announceChanges': x.currentUser.announceChanges,
             'currentUser.getPrivateProfileDetail': x.currentUser.getPrivateProfileDetail,
+            'currentUser.enableDeviceNotifications': x.currentUser.enableDeviceNotifications,
+            'currentUser.disableDeviceNotifications': x.currentUser.disableDeviceNotifications,
+            'currentUser.getDeviceNotificationsStatus': x.currentUser.getDeviceNotificationsStatus,
             'user.call': x.user.call,
             'user.send': x.user.send,
             'user.getPublicKeys': x.user.getPublicKeys,

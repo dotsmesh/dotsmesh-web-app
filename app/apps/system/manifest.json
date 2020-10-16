@@ -5,6 +5,7 @@
         "share",
         "reportError",
         "manageNotification",
+        "manageDeviceNotifications",
         "message",
         "richTextareaURL",
         "previewURL"

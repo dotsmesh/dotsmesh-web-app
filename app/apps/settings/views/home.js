@@ -32,6 +32,17 @@ async (args, library) => {
     //     }, 'logout', 'right');
     // }
 
+    container.add(x.makeSeparator());
+
+    container.add(x.makeComponent(async () => {
+        var list = x.makeList();
+
+        list.add(x.makeTextButton(async () => {
+            await x.open('system/manageDeviceNotifications', {}, { modal: true, width: 300 });
+        }, 'Device notifications', await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled'));
+
+        return list;
+    }, { observeChanges: ['deviceNotificationsStatus'] }));
 
     container.add(x.makeSeparator());
 
@@ -41,6 +52,12 @@ async (args, library) => {
         await x.cache.clear(); // announce clear local caches too
         x.alert('Done!');
     }, 'Clear cache', ''));
+
+    container.add(list);
+
+    container.add(x.makeSeparator());
+
+    var list = x.makeList();
 
     list.add(x.makeTextButton(async () => {
         x.open('settings/feedback', {}, { modal: true, width: 400 });
