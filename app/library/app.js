@@ -1139,6 +1139,7 @@
             if (result === true) {
                 await showAppScreen(true);
                 await x.open('home/home');
+                await openPushNotificationSettingsIfDisabled();
                 x.runBackgroundTasks({ delay: 1, repeat: true });
                 x.runUpdateTasks(); // async call // todo optimize call
             } else {
@@ -1446,6 +1447,7 @@
                         screen2.addButton('Enter', async () => {
                             await showAppScreen(false);
                             await x.open('user/home', { userID: x.currentUser.getID() });
+                            await openPushNotificationSettingsIfDisabled();
                             x.runBackgroundTasks({ delay: 1, repeat: true });
                         });
                         await screen2.show();
@@ -1478,6 +1480,7 @@
             if (await x.currentUser.loginPrivateUser(userID)) {
                 await showAppScreen(false);
                 await x.open('user/home');
+                await openPushNotificationSettingsIfDisabled();
             } else {
                 throw new Error();
             }
@@ -1500,6 +1503,7 @@
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
                     await showAppScreen(false);
                     await x.open('user/home');
+                    await openPushNotificationSettingsIfDisabled();
                 } else {
                     throw new Error();
                 }
@@ -1743,6 +1747,12 @@
 
         await hideVisibleScreen();
         container.setAttribute('x-visible', '1');
+    };
+
+    var openPushNotificationSettingsIfDisabled = async () => {
+        if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
+            await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+        }
     };
 
 

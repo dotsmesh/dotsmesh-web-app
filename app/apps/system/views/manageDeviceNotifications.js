@@ -6,11 +6,16 @@
 
 async (args, library) => {
 
+    var isReminderMode = args.mode === 'r';
+
     x.setTitle('Device notifications');
 
     var enabled = await x.currentUser.getDeviceNotificationsStatus() === 'enabled';
 
     x.add(x.makeText(enabled ? 'Device notifications are currently enabled!' : 'Device notifications are currently disabled!', true));
+    if(isReminderMode && !enabled){
+        x.add(x.makeText('Enable them to get the updates you\'ve subscribed to instantly, without having to manually open the app. You can disable them later from the settings.', true));
+    }
 
     if (enabled) {
         x.add(x.makeButton('Disable', async () => {
