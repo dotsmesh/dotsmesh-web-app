@@ -376,6 +376,21 @@
                     salt: currentUserLocalData.a !== undefined ? await x.crypto.decrypt(sessionSecretKey, currentUserLocalData.a) : 'x',
                     pushData: response.pushData !== undefined && response.pushData !== '' ? response.pushData : null
                 };
+                if (currentUserData.pushData !== null) {
+                    var idData = x.parseID(userID);
+                    var currentPushSubscription = await getPushSubscription(idData.host);
+                    if (currentUserData.pushData !== currentPushSubscription) {
+                        try {
+                            var response = await x.user.call(userID, 'user.setPushSubscription', {
+                                pushSubscription: currentPushSubscription !== null ? currentPushSubscription : ''
+                            }, { auth: 'auto' });
+                            if (response === 'ok') {
+                                currentUserData.pushData = currentPushSubscription;
+                            }
+                        } catch (e) {
+                        }
+                    }
+                }
                 return true;
             } else {
                 return false;
@@ -463,7 +478,7 @@
                         salt: keysValue.a !== undefined ? keysValue.a : 'x',
                         pushData: null
                     };
-                    currentUserData.pushData = await currentPrivateUserObserverService.getPushSubscription();
+                    currentUserData.pushData = await currentPrivateUserObserverService.getPushSubscription(true);
                     await setLoggedInUser(userID);
                     return true;
                 }
@@ -596,10 +611,38 @@
                 }
             };
 
-            var getSavedPushSubscription = async () => {
+            var getSavedPushSubscription = async (updateIfOld = false) => {
                 var data = await getData();
-                if (data.sessions.d !== undefined && data.sessions.d.p !== undefined) {
-                    return data.sessions.d.p;
+                var sessionID = 'd';
+                if (data.sessions[sessionID] !== undefined && data.sessions[sessionID].p !== undefined) {
+                    var savedPushSubscription = data.sessions[sessionID].p;
+                    if (updateIfOld) {
+                        var currentPushSubscription = await getPushSubscription(data.host);
+                        if (savedPushSubscription !== currentPushSubscription) {
+                            try {
+                                var response = await callService(data.host, 'user.changes.addPushSubscription', {
+                                    sessionID: sessionID,
+                                    pushSubscription: currentPushSubscription
+                                });
+                                if (response.status === 'ok') {
+                                    data.sessions[sessionID].p = currentPushSubscription;
+                                    await setData(data);
+                                    return currentPushSubscription;
+                                }
+                            } catch (e) {
+                                if (e.name === 'userNotFound') {
+                                    var result = await signup();
+                                    if (result !== null) {
+                                        return result.pushSubscription;
+                                    }
+                                } else {
+                                    throw e;
+                                }
+                            }
+                            return null;
+                        }
+                    }
+                    return savedPushSubscription;
                 }
                 return null;
             };
