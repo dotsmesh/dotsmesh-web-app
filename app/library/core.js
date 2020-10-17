@@ -78,23 +78,40 @@
                 var registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {
                     try {
-                        var convertToBase64 = text => {
-                            var padding = '='.repeat((4 - text.length % 4) % 4);
-                            return (text + padding).replace(/\-/g, '+').replace(/_/g, '/');
-                        }
-                        var response = await fetch('https://dotsmesh.' + host + '/?host&pushkey', { referrerPolicy: 'no-referrer' });
-                        var pushKey = await response.text();
-                        var subscription = await registration.pushManager.getSubscription();
-                        if (subscription !== null) {
-                            if (subscription.options.applicationServerKey === null || convertToBase64(pushKey) !== btoa(x.arrayBufferToString(subscription.options.applicationServerKey))) {
-                                await subscription.unsubscribe();
-                                subscription = null;
+                        var pushKeys = null;
+                        var pushKeysData = await appDB.get('p');
+                        if (pushKeysData !== null) {
+                            var pushKeysData = x.unpack(pushKeysData);
+                            if (pushKeysData.name === '') {
+                                pushKeys = {};
+                                pushKeys.vapidPublicKey = pushKeysData.value[0]
+                                pushKeys.vapidPrivateKey = pushKeysData.value[1]
                             }
                         }
-                        if (subscription === null) {
-                            subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: x.stringToArrayBuffer(atob(convertToBase64(pushKey))) });
+                        if (pushKeys === null) {
+                            var response = await callAPI(host, 'utilities.getPushKeys');
+                            if (response.vapidPublicKey !== undefined && response.vapidPrivateKey !== undefined) {
+                                pushKeys = response;
+                                await appDB.set('p', x.pack('', [response.vapidPublicKey, response.vapidPrivateKey]));
+                            }
                         }
-                        return JSON.stringify(subscription);
+                        if (pushKeys !== null) {
+                            var convertToBase64 = text => {
+                                var padding = '='.repeat((4 - text.length % 4) % 4);
+                                return (text + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                            }
+                            var subscription = await registration.pushManager.getSubscription();
+                            if (subscription !== null) {
+                                if (subscription.options.applicationServerKey === null || convertToBase64(pushKeys.vapidPublicKey) !== btoa(x.arrayBufferToString(subscription.options.applicationServerKey))) {
+                                    await subscription.unsubscribe();
+                                    subscription = null;
+                                }
+                            }
+                            if (subscription === null) {
+                                subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: x.stringToArrayBuffer(atob(convertToBase64(pushKeys.vapidPublicKey))) });
+                            }
+                            return x.pack('q', [subscription, pushKeys.vapidPublicKey, pushKeys.vapidPrivateKey]);
+                        }
                     } catch (e) {
                         // push denied, incognito mode, ...
                     }

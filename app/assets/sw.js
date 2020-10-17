@@ -8,6 +8,7 @@ self.x = {};
 self.importScripts('?app&a');
 
 self.addEventListener('push', async event => {
+    //var payload = event.data ? event.data.text() : null;
     x.library.load(['utilities', 'core']);
     if (await x.currentUser.autoLogin()) {
         await x.runBackgroundTasks();
