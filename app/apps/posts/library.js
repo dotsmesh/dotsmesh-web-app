@@ -296,7 +296,6 @@
             var reactionToSave = await reaction.clone();
             reactionToSave.id = null; // make sure the ID is null
             var serializedReaction = await reactionToSave.pack();
-            console.log(serializedReaction);
             var resourcesToSave = {};
             for (var resourceID in serializedReaction.resourcesToSave) {
                 var resourceValue = serializedReaction.resourcesToSave[resourceID];
