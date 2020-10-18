@@ -1731,6 +1731,7 @@
                 });
                 changes = changes.concat(Object.keys(result));
             } catch (e) {
+                // todo chkt for each host, because if a host fails one time changes may ne missed
                 if (e.name === 'networkError') {
                     // may be invalid host
                 } else {

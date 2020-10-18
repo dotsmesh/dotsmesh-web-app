@@ -389,11 +389,11 @@
             //     var firewall = x.currentUser.getFirewall();
             //     await firewall.delete(group.providedAccessKey);
             // }
+            var memberID = await x.groups.getMemberID(groupID, x.currentUser.getID()); // Must be before the deletion
             var storage = getDetailsStorage();
             await storage.delete(groupID);
             try {
                 await x.property.unobserveChanges(groupID, ['gp', 'gp/*', 'gm', 'gma', 'gmp', 'gi'], 'g');
-                var memberID = await x.groups.getMemberID(groupID, x.currentUser.getID());
                 if (memberID !== null) {
                     await x.property.unobserveChanges(groupID, ['gm/' + memberID + '/s'], 'g');
                 }
