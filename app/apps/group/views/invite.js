@@ -8,6 +8,7 @@ async (args, library) => {
     var groupID = args.id;
     x.setTitle('Invite');
 
+    x.setTemplate('modal-text');
     x.add(x.makeText('Invite new members to this group.', true));
 
     var container = x.makeContainer();

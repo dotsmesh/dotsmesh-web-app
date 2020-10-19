@@ -8,6 +8,8 @@ async (args, library) => {
 
     var isReminderMode = args.mode === 'r';
 
+    x.setTemplate('modal-text');
+
     x.setTitle('Device notifications');
 
     var enabled = await x.currentUser.getDeviceNotificationsStatus() === 'enabled';

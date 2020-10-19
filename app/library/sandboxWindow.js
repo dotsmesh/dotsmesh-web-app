@@ -294,7 +294,7 @@
         css += '.x-body{flex:1 1 auto;display:flex;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '.x-message > :first-child{color:#000;}';
-        //css += '.x-body > .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal // breaks the about window content
+        css += '[x-template="modal-text"] .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
     } else {
         css += '.x-header{height:50px;position:fixed;top:0;left:0;background-color:#111;}';
         css += '.x-header-title{line-height:50px;height:50px;}';

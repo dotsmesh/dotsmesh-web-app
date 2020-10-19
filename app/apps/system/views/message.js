@@ -7,6 +7,7 @@
 async (args, library) => {
     var text = args.text;
 
+    x.setTemplate('modal-text');
     x.add(x.makeText(text, true));
 
     x.add(x.makeButton('OK', async () => {

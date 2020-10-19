@@ -8,6 +8,8 @@ async (args, library) => {
     var action = args.action;
     var serviceData = args.serviceData;
 
+    x.setTemplate('modal-text');
+    x.setTitle('Notifications');
 
     x.add(x.makeText(args.text, true));
 

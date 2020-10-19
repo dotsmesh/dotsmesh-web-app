@@ -8,6 +8,7 @@ async (args, library) => {
     var groupID = args.groupID;
     var userID = args.userID;
     x.setTitle('Approve or deny membership');
+    x.setTemplate('modal-text');
 
     x.add(x.makeText(''));
 

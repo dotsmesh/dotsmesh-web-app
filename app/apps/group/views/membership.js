@@ -6,6 +6,9 @@
 
 async (args, library) => {
     var groupID = args.id;
+
+    x.setTemplate('modal-text');
+
     x.setTitle('Group membership');
 
     var showJoinButton = false;

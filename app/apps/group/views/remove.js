@@ -7,6 +7,9 @@
 async (args, library) => {
     var groupID = args.groupID;
     var userID = args.userID;
+
+    x.setTemplate('modal-text');
+
     x.setTitle('Remove a member?');
 
     x.add(x.makeText('Are you sure, you want to remove this member from the group?', true));

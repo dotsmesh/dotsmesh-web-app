@@ -5,6 +5,8 @@
  */
 
 async (args, library) => {
+    x.setTemplate('modal-text');
+    
     x.setTitle('Follow posts');
 
     var typedID = args.id;
