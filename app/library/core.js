@@ -345,7 +345,7 @@
                 return await x.currentUser.loginPrivateUser(userID);
             } else if (x.isPublicID(userID)) {
                 var currentUserLocalData = await appDB.get(await getUserAppDBPrefix(userID) + 's/a');
-                if (currentUserLocalData.i === undefined || currentUserLocalData.is === undefined) { // an updated data is missing, added on 24-6-2020, remove in the future
+                if (currentUserLocalData === null || currentUserLocalData.i === undefined || currentUserLocalData.is === undefined) { // an updated data is missing, added on 24-6-2020, remove in the future
                     await logoutUser(userID);
                     return false;
                 }
@@ -500,11 +500,20 @@
                     if (value.name === '') {
                         var value = value.value;
                         result.host = value.h !== undefined ? value.h : null;
-                        result.sessions = value.s !== undefined ? value.s : {};
                     } else {
                         throw new Error();
                     }
                 }
+                var sessionData = await appDB.get(await getUserAppDBPrefix(x.currentUser.getID()) + 's/all');
+                if (sessionData !== null) {
+                    var value = x.unpack(await x.currentUser.decrypt(sessionData));
+                    if (value.name === '') {
+                        result.sessions = value.value;
+                    } else {
+                        throw new Error();
+                    }
+                }
+
                 return result;
             };
 
@@ -514,10 +523,13 @@
                 if (data.host !== null) {
                     temp.h = data.host;
                 }
-                if (data.sessions !== null) {
-                    temp.s = data.sessions;
-                }
                 await dataStorage.set('p/o/srv', await x.currentUser.encrypt(x.pack('', temp)));
+                var dataKey = await getUserAppDBPrefix(x.currentUser.getID()) + 's/all';
+                if (data.sessions !== null) {
+                    await appDB.set(dataKey, await x.currentUser.encrypt(x.pack('', data.sessions)));
+                } else {
+                    await appDB.delete(dataKey);
+                }
             };
 
             var deleteData = async () => {
@@ -566,12 +578,13 @@
             };
 
             var enable = async () => {
-                var data = await getData();
-                if (data.host === null) {
-                    var result = await signup();
-                    if (result !== null) {
-                        return { pushSubscription: result.pushSubscription };
-                    }
+                var pushSubscription = await getSavedPushSubscription();
+                if (pushSubscription !== null) {
+                    return pushSubscription;
+                }
+                var result = await signup();
+                if (result !== null) {
+                    return { pushSubscription: result.pushSubscription };
                 }
                 return null;
             };

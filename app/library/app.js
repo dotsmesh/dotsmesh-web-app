@@ -1770,7 +1770,7 @@
         };
 
         if (autoLoginResult) {
-            await onUserLogin(false);
+            await onUserLogin(true);
         }
     };
 
