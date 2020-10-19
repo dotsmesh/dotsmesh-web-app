@@ -486,6 +486,29 @@
             return false;
         };
 
+        var setPrivateUserSessionData = async (key, data) => {
+            var dataKey = await getUserAppDBPrefix(x.currentUser.getID()) + 's/' + key;
+            await appDB.set(dataKey, await x.currentUser.encrypt(x.pack('', data)));
+        };
+
+        var getPrivateUserSessionData = async key => {
+            var sessionData = await appDB.get(await getUserAppDBPrefix(x.currentUser.getID()) + 's/' + key);
+            if (sessionData !== null) {
+                var value = x.unpack(await x.currentUser.decrypt(sessionData));
+                if (value.name === '') {
+                    return value.value;
+                } else {
+                    throw new Error();
+                }
+            }
+            return null;
+        };
+
+        var deletePrivateUserSessionData = async key => {
+            var dataKey = await getUserAppDBPrefix(x.currentUser.getID()) + 's/' + key;
+            await appDB.delete(dataKey);
+        };
+
         var currentPrivateUserObserverService = (() => {
 
             var getData = async () => {
@@ -504,16 +527,10 @@
                         throw new Error();
                     }
                 }
-                var sessionData = await appDB.get(await getUserAppDBPrefix(x.currentUser.getID()) + 's/all');
-                if (sessionData !== null) {
-                    var value = x.unpack(await x.currentUser.decrypt(sessionData));
-                    if (value.name === '') {
-                        result.sessions = value.value;
-                    } else {
-                        throw new Error();
-                    }
+                var defaultSessionData = await getPrivateUserSessionData('d');
+                if (defaultSessionData !== null) {
+                    result.sessions = { d: defaultSessionData };
                 }
-
                 return result;
             };
 
@@ -524,11 +541,10 @@
                     temp.h = data.host;
                 }
                 await dataStorage.set('p/o/srv', await x.currentUser.encrypt(x.pack('', temp)));
-                var dataKey = await getUserAppDBPrefix(x.currentUser.getID()) + 's/all';
-                if (data.sessions !== null) {
-                    await appDB.set(dataKey, await x.currentUser.encrypt(x.pack('', data.sessions)));
+                if (data.sessions !== null && data.sessions.d !== undefined) {
+                    await setPrivateUserSessionData('d', data.sessions.d);
                 } else {
-                    await appDB.delete(dataKey);
+                    await deletePrivateUserSessionData('d');
                 }
             };
 
@@ -598,6 +614,7 @@
 
                     }
                 }
+                await deletePrivateUserSessionData('d');
                 await deleteData();
                 return true;
             };
