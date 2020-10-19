@@ -1139,9 +1139,7 @@
             if (result === true) {
                 await showAppScreen(true);
                 await x.open('home/home');
-                await openPushNotificationSettingsIfDisabled();
-                x.runBackgroundTasks({ delay: 1, repeat: true });
-                x.runUpdateTasks(); // async call // todo optimize call
+                await onUserLogin();
             } else {
                 var text = 'An error occured. Please try again later!';
                 if (result === 'invalidAuthKey') {
@@ -1447,8 +1445,7 @@
                         screen2.addButton('Enter', async () => {
                             await showAppScreen(false);
                             await x.open('user/home', { userID: x.currentUser.getID() });
-                            await openPushNotificationSettingsIfDisabled();
-                            x.runBackgroundTasks({ delay: 1, repeat: true });
+                            await onUserLogin();
                         });
                         await screen2.show();
                     } else {
@@ -1480,7 +1477,7 @@
             if (await x.currentUser.loginPrivateUser(userID)) {
                 await showAppScreen(false);
                 await x.open('user/home');
-                await openPushNotificationSettingsIfDisabled();
+                await onUserLogin();
             } else {
                 throw new Error();
             }
@@ -1503,7 +1500,7 @@
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
                     await showAppScreen(false);
                     await x.open('user/home');
-                    await openPushNotificationSettingsIfDisabled();
+                    await onUserLogin();
                 } else {
                     throw new Error();
                 }
@@ -1749,10 +1746,14 @@
         container.setAttribute('x-visible', '1');
     };
 
-    var openPushNotificationSettingsIfDisabled = async () => {
-        if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
-            await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+    var onUserLogin = async (isAutoLogin = false) => {
+        if (!isAutoLogin) {
+            if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
+                await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+            }
         }
+        x.runBackgroundTasks({ delay: 1, repeat: true });
+        x.runUpdateTasks(); // async call // todo optimize call
     };
 
 
@@ -1769,8 +1770,7 @@
         };
 
         if (autoLoginResult) {
-            x.runBackgroundTasks({ delay: 1, repeat: true });
-            x.runUpdateTasks(); // async call // todo optimize call
+            await onUserLogin(false);
         }
     };
 
