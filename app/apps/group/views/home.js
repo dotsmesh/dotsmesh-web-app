@@ -83,7 +83,7 @@ async (args, library) => {
             }
             return null;
         },
-        emptyText: 'No posts have been publiblished yet.'
+        emptyText: 'No posts have been published yet.'
     });
     listComponent.observeChanges(['groups', 'group/' + groupID + '/posts']);
     x.add(listComponent, { template: 'column2' });
