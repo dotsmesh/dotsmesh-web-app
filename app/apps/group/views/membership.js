@@ -32,7 +32,6 @@ async (args, library) => {
     if (showJoinButton) {
         container.add(x.makeButton('Join', async () => {
             var userID = x.currentUser.getID();
-            var data = await x.services.call('profile', 'getData', { propertyType: 'user', propertyID: userID });
             if (x.currentUser.isPublic()) {
                 if (await x.confirm('Are you sure you want to join this group?')) {
                     x.showLoading();
@@ -40,6 +39,9 @@ async (args, library) => {
                     await x.back('joined');
                 }
             } else {
+                x.showLoading();
+                var data = await x.services.call('profile', 'getData', { propertyType: 'user', propertyID: userID });
+                x.hideLoading();
                 var result = await x.open('profile/form', {
                     groupUserID: groupID + '$' + userID,
                     image: data.image,
