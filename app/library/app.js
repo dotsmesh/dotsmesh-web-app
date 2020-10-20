@@ -1754,8 +1754,10 @@
 
     var onUserLogin = async (isAutoLogin = false) => {
         if (!isAutoLogin) {
-            if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
-                await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+            if (x.deviceHasPushManagerSupport()) {
+                if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
+                    await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+                }
             }
         }
         x.runBackgroundTasks({ delay: 1, repeat: true });
