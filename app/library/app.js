@@ -8,6 +8,8 @@
 
     // todo var => let
 
+    var appReadyState = null;
+
     var hasHandeledAnError = false;
     var handleError = async error => {
         if (hasHandeledAnError) {
@@ -15,6 +17,10 @@
         }
         hasHandeledAnError = true;
         var error = x.makeAppError(error);
+        if (appReadyState === 'loading') {
+            alert(JSON.stringify(error));
+            return;
+        }
         setTimeout(async () => {
             await backAllModals();
             error.location = location.toString();
@@ -1760,6 +1766,7 @@
     // APP STARTER
 
     x.startApp = async () => {
+        appReadyState = 'loading';
         var autoLoginResult = await x.currentUser.autoLogin();
         await processLocationState();
 
@@ -1769,9 +1776,13 @@
             } catch (e) { }
         };
 
+        appReadyState = 'loadad';
+
         if (autoLoginResult) {
             await onUserLogin(true);
         }
+
+        appReadyState = 'ready';
     };
 
     x.addCSS(css);
