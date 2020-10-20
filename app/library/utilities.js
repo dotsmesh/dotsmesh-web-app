@@ -2401,4 +2401,8 @@
         return text;
     };
 
+    x.deviceHasPushManagerSupport = () => {
+        return 'serviceWorker' in navigator && 'PushManager' in window;
+    };
+
 }

@@ -39,7 +39,7 @@ async (args, library) => {
 
         list.add(x.makeTextButton(async () => {
             await x.open('system/manageDeviceNotifications', {}, { modal: true, width: 300 });
-        }, 'Device notifications', await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled'));
+        }, 'Device notifications', x.deviceHasPushManagerSupport() && await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled'));
 
         return list;
     }, { observeChanges: ['deviceNotificationsStatus'] }));

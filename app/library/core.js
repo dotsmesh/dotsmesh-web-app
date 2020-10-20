@@ -74,7 +74,7 @@
         };
 
         let getPushSubscription = async host => { // Returns the push notification subscription as JSON or NULL
-            if ('serviceWorker' in navigator && 'PushManager' in window) {
+            if (x.deviceHasPushManagerSupport()) {
                 var registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {
                     try {
@@ -652,7 +652,7 @@
                             try {
                                 var response = await callService(data.host, 'user.changes.addPushSubscription', {
                                     sessionID: sessionID,
-                                    pushSubscription: currentPushSubscription
+                                    pushSubscription: currentPushSubscription !== null ? currentPushSubscription : ''
                                 });
                                 if (response.status === 'ok') {
                                     data.sessions[sessionID].p = currentPushSubscription;
