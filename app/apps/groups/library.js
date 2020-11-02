@@ -27,8 +27,9 @@
 
     var createGroup = async (groupKey) => {
 
+        var fullGroupKey = x.getPropertyFullKey(groupKey);
         // todo
-        var host = x.getPropertyKeyHost(x.getPropertyFullKey(groupKey));
+        var host = x.getPropertyKeyHost(fullGroupKey);
         if (host === null) {
             throw x.makeAppError('invalidGroupKey', 'invalidGroupKey!');
         }
@@ -57,7 +58,7 @@
         // }), membersKeyBox);
 
         var groupID = await x.group.create(host, {
-            groupKey: groupKey,
+            groupKey: fullGroupKey,
             memberData: memberData,
             //sharedData: { 'g': sharedGroupAccessKey },
             memberID: memberID,

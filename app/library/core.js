@@ -238,7 +238,8 @@
         };
 
         x.currentUser.signup = async (profileKey, id, password) => { // TRUE - successfull, FALSE - error, userExists
-            var host = x.getPropertyKeyHost(profileKey);
+            var fullProfileKey = x.getPropertyFullKey(profileKey);
+            var host = x.getPropertyKeyHost(fullProfileKey);
             if (host === null) {
                 return 'invalidProfileKey';
             }
@@ -273,7 +274,7 @@
             var authData = await x.crypto.encrypt(passwordBasedKey, x.pack('0', privateData));
             var response = await callAPI(host, 'user.signup', {
                 id: id,
-                profileKey: profileKey,
+                profileKey: fullProfileKey,
                 authKey: authKey,
                 authData: authData,
                 publicKeys: x.pack('', publicData)
