@@ -1540,7 +1540,7 @@
 
         x.crypto.generateSymmetricKey = async type => {
             if (type === 'AES-GCM-256') {
-                var key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"])
+                var key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
                 var exportedKey = await crypto.subtle.exportKey("jwk", key);
                 delete exportedKey.alg; // "A256GCM"
                 delete exportedKey.ext; // true
@@ -1554,7 +1554,7 @@
 
         x.crypto.generateKeyPair = async type => {
             if (type === 'RSA-OAEP-4096') {
-                var keyPair = await crypto.subtle.generateKey({ name: "RSA-OAEP", modulusLength: 4096, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"])
+                var keyPair = await crypto.subtle.generateKey({ name: "RSA-OAEP", modulusLength: 4096, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"]);
                 var exportedPrivateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
                 delete exportedPrivateKey.alg; // "RSA-OAEP-256"
                 delete exportedPrivateKey.ext; // true
@@ -1585,7 +1585,7 @@
                     privateKey: x.pack('3', exportedPrivateKey),
                     publicKey: x.pack('4', exportedPublicKey)
                 }
-            } else if (type === 'ECDSA-P-521') {
+            } else if (type === 'ECDSA-P-521') { // not supported on iOS (checked on November 2, 2020)
                 var keyPair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-521" }, true, ["sign", "verify"]);
                 var exportedPrivateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
                 delete exportedPrivateKey.crv; // "P-521"

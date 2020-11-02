@@ -244,7 +244,7 @@
                 return 'invalidProfileKey';
             }
 
-            var identityKeyPair = await x.crypto.generateKeyPair('ECDSA-P-521');
+            var identityKeyPair = await x.crypto.generateKeyPair('ECDSA-P-256'); // Changed to ECDSA-P-256 from ECDSA-P-521 on November 2, 2020 because ECDSA-P-521 is not supported on iOS
 
             var privateKeys = x.keyBox.make();
             var publicKeys = x.keyBox.make();
