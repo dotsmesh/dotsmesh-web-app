@@ -1087,9 +1087,11 @@
             if (selectionRange !== null) {
                 //contentElement.focus();
                 var selection = document.getSelection();
-                if (selection.rangeCount > 0) {
-                    for (var i = 0; i < selection.rangeCount; i++) {
-                        selection.removeRange(selection.getRangeAt(i));
+                if (selection.removeRange !== undefined) { // Not supported in Safari
+                    if (selection.rangeCount > 0) {
+                        for (var i = 0; i < selection.rangeCount; i++) {
+                            selection.removeRange(selection.getRangeAt(i));
+                        }
                     }
                 }
                 selection.addRange(selectionRange);
