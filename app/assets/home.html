@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui,user-scalable=no">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3e%3ccircle cy='256' cx='256' r='256' fill='%2324a4f2' paint-order='stroke markers fill'/%3e%3cpath d='M150.7 201.4c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zM114.04 256c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S114.04 240.7627 114.04 256zM256 330.1c-41.0397 0-74.1-33.0603-74.1-74.1s33.0603-74.1 74.1-74.1 74.1 33.0603 74.1 74.1-33.0603 74.1-74.1 74.1zM150.7 412c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zm210.6 0c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zm0-210.6c-28.08 0-50.7-22.62-50.7-50.7s22.62-50.7 50.7-50.7 50.7 22.62 50.7 50.7-22.62 50.7-50.7 50.7zM228.7 370.66c0 14.60162 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S228.7 355.4227 228.7 370.66zM343.36 256c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.69838-27.3-27.93492-27.3S343.36 240.7627 343.36 256zM228.7 141.34c0 14.6016 12.0627 27.3 27.3 27.3s27.3-12.0627 27.3-27.3-12.6984-27.3-27.93492-27.3S228.7 126.1027 228.7 141.34z' fill='%23fff'/%3e%3c/svg%3e">
     <link rel="apple-touch-icon" href="?app&i512">
     <link rel="manifest" href="/?app&m">
@@ -15,7 +15,9 @@
         html,
         body {
             overscroll-behavior: none;
-            min-height: 100vh;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
         }
 
         *,
@@ -50,7 +52,7 @@
 
 <body>
     <noscript>
-        <div style="display:flex;justify-content:center;align-items:center;height:100vh;">Oops!<br><br>JavaScript is required to run the Dots Mesh web app!</div>
+        <div style="display:flex;justify-content:center;align-items:center;height:100%;padding:0 20px;color:#fff;line-height:160%;">Oops!<br><br>JavaScript is required to run the Dots Mesh web app!</div>
     </noscript>
     <script>
         if (location.href.indexOf('&debug') !== -1 || location.href.indexOf('?debug') !== -1) {
@@ -72,7 +74,7 @@
         x.modalsAnimationTime = 300;
 
         var css = '';
-        css += '.x-screen{transition:opacity ' + x.modalsAnimationTime + 'ms;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1;opacity:0;background-color:#111;overflow:auto;box-sizing:border-box;}';
+        css += '.x-screen{transition:opacity ' + x.modalsAnimationTime + 'ms;position:fixed;top:0;left:0;width:100vw;height:100%;z-index:1;opacity:0;background-color:#111;overflow:hidden;box-sizing:border-box;overscroll-behavior:none;}';
         css += '.x-screen[x-visible]{opacity:1;}';
         css += '.x-loading-screen{user-select:none;display:flex;align-items:center;justify-content:center;}';
         css += '.x-loading-screen > div{animation:x-rotate 1s infinite linear;width:20px;height:20px;background-position:center;background-size:cover;background-repeat:no-repeat;background-image:url(\'' + x.loadingImage + '\')}';
