@@ -2035,122 +2035,106 @@
     {
         x.cache = {};
 
+        var localBackupCache = {};
+
         x.cache.get = namespace => {
-            var keyPrefix = '/app.cache/' + namespace + '/';
-            var cachePromise = caches.open('dotsmesh-cache');
+            var hasCaches = typeof caches !== 'undefined'; // Not suppored on Safari (iPad)
+            if (hasCaches) {
+                var keyPrefix = '/app.cache/' + namespace + '/';
+                var cachePromise = caches.open('dotsmesh-cache');
+            } else {
+                // The service worker must clear the window local cache?
+                if (localBackupCache[namespace] === undefined) {
+                    localBackupCache[namespace] = {};
+                }
+            }
 
             var set = async (key, value) => {
-                var cache = await Promise.resolve(cachePromise);
-                await cache.put(keyPrefix + key, new Response(JSON.stringify(value)));
+                if (hasCaches) {
+                    var cache = await Promise.resolve(cachePromise);
+                    await cache.put(keyPrefix + key, new Response(JSON.stringify(value)));
+                } else {
+                    localBackupCache[namespace][key] = JSON.stringify(value);
+                }
             };
 
             var get = async key => {
-                var cache = await Promise.resolve(cachePromise);
-                var response = await cache.match(keyPrefix + key);
-                if (typeof response !== 'undefined') {
-                    return JSON.parse(await response.text());
+                if (hasCaches) {
+                    var cache = await Promise.resolve(cachePromise);
+                    var response = await cache.match(keyPrefix + key);
+                    if (typeof response !== 'undefined') {
+                        return JSON.parse(await response.text());
+                    }
+                } else {
+                    if (localBackupCache[namespace][key] !== undefined) {
+                        return JSON.parse(localBackupCache[namespace][key]);
+                    }
                 }
                 return null;
             };
 
             var _delete = async key => {
-                var cache = await Promise.resolve(cachePromise);
-                await cache.delete(keyPrefix + key);
+                if (hasCaches) {
+                    var cache = await Promise.resolve(cachePromise);
+                    await cache.delete(keyPrefix + key);
+                } else {
+                    delete localBackupCache[namespace][key];
+                }
             };
 
-            var clear = async prefix => {
-                var fullPrefix = keyPrefix + (typeof prefix !== 'undefined' ? prefix : '');
-                var cache = await Promise.resolve(cachePromise);
-                var requests = await cache.keys();
-                var promises = [];
-                requests.forEach(request => {
-                    if (request.url.indexOf(fullPrefix) !== -1) {
-                        promises.push(cache.delete(request));
+            var clear = async (prefix = '') => {
+                if (hasCaches) {
+                    var fullPrefix = keyPrefix + prefix;
+                    var cache = await Promise.resolve(cachePromise);
+                    var requests = await cache.keys();
+                    var promises = [];
+                    requests.forEach(request => {
+                        if (request.url.indexOf(fullPrefix) !== -1) {
+                            promises.push(cache.delete(request));
+                        }
+                    });
+                    await Promise.allSettled(promises);
+                } else {
+                    for (var key in localBackupCache[namespace]) {
+                        if (key.indexOf(prefix) === 0) {
+                            delete localBackupCache[namespace][key];
+                        }
                     }
-                });
-                await Promise.allSettled(promises);
+                }
             };
-
-            // var getContext = name => {
-            //     var contextSet = async (key, value) => {
-            //         var data = await get(name);
-            //         if (data === null) {
-            //             data = {};
-            //         }
-            //         data[key] = value;
-            //         await set(name, data);
-            //     };
-
-            //     var contextGet = async key => {
-            //         var data = await get(name);
-            //         if (data !== null && typeof data[key] !== 'undefined') {
-            //             return data[key];
-            //         }
-            //         return null;
-            //     };
-
-            //     var contextDelete = async key => {
-            //         var data = await get(name);
-            //         if (data !== null && typeof data[key] !== 'undefined') {
-            //             delete data[key];
-            //             await set(name, data);
-            //         }
-            //     };
-
-            //     var contextClear = async () => {
-            //         await _delete(name);
-            //     };
-
-            //     return {
-            //         set: contextSet,
-            //         get: contextGet,
-            //         delete: contextDelete,
-            //         clear: contextClear
-            //     };
-            // };
 
             return {
                 set: set,
                 get: get,
                 delete: _delete,
-                clear: clear,
-                //getContext: getContext
+                clear: clear
             };
         };
 
         x.cache.clear = async () => {
-            await caches.delete('dotsmesh-cache');
+            if (typeof caches !== 'undefined') { // Not suppored on Safari (iPad)
+                await caches.delete('dotsmesh-cache');
+            } else {
+                localBackupCache = {};
+            }
         }
     }
 
 
-    //(async () => {
-    //var cache = x.cache.get(x.currentUser.getID());
-    // console.log(await cache.get('key1'));
-    // await cache.set('key1', 'value1');
-    // console.log(await cache.get('key1'));
-    // await cache.set('key1', 'value2');
-    // console.log(await cache.get('key1'));
-    // await cache.delete('key1', 'value2');
-    // console.log(await cache.get('key1'));
-    // await cache.set('key1', 'value3');
-    // console.log(await cache.get('key1'));
-    // await cache.clear();
-    // console.log(await cache.get('key1'));
-
-    // var cacheContext1 = cache.getContext('context1');
-    // console.log(await cacheContext1.get('key1'));
-    // await cacheContext1.set('key1', 'value1');
-    // console.log(await cacheContext1.get('key1'));
-    // await cacheContext1.set('key1', 'value2');
-    // console.log(await cacheContext1.get('key1'));
-    // await cacheContext1.delete('key1', 'value2');
-    // console.log(await cacheContext1.get('key1'));
-    // await cacheContext1.set('key1', 'value3');
-    // console.log(await cacheContext1.get('key1'));
-    // await cacheContext1.clear();
-    // console.log(await cacheContext1.get('key1'));
-    //})();
+    // (async () => {
+    //     var cache = x.cache.get(x.currentUser.getID());
+    //     console.log(await cache.get('key1')); // null
+    //     await cache.set('key1', 'value1');
+    //     console.log(await cache.get('key1')); // value1
+    //     await cache.set('key1', 'value2');
+    //     console.log(await cache.get('key1')); // value2
+    //     await cache.delete('key1', 'value2');
+    //     console.log(await cache.get('key1')); // null
+    //     await cache.set('key1', 'value3');
+    //     console.log(await cache.get('key1')); // value3
+    //     await cache.clear();
+    //     console.log(await cache.get('key1')); // null
+    // })();
 
     // caches is only available in window and service worker, not in workers. Thats why a proxy is needed.
     var localCacheProxyData = [];
@@ -2169,19 +2153,6 @@
         } else if (method === 'clear') {
             return await cache.clear(args[1]);
         }
-        //  else if (method === 'contextSet') {
-        //     var context = cache.getContext(args[1]);
-        //     return await context.set(args[2], args[3]);
-        // } else if (method === 'contextGet') {
-        //     var context = cache.getContext(args[1]);
-        //     return await context.get(args[2]);
-        // } else if (method === 'contextDelete') {
-        //     var context = cache.getContext(args[1]);
-        //     return await context.delete(args[2]);
-        // } else if (method === 'contextClear') {
-        //     var context = cache.getContext(args[1]);
-        //     return await context.clear(args[2]);
-        // }
     };
 
 

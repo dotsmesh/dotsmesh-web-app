@@ -145,31 +145,9 @@
                 delete: async key => {
                     return await x.proxyCall('cache._delete', namespace, key);
                 },
-                clear: async prefix => {
-                    if (typeof prefix === 'undefined') {
-                        prefix = '';
-                    }
+                clear: async (prefix = '') => {
                     return await x.proxyCall('cache._clear', namespace, prefix);
                 }
-                // getContext: name => {
-                //     return {
-                //         set: async (key, value) => {
-                //             return await x.proxyCall('cache.contextSet', namespace, name, key, value);
-                //         },
-                //         get: async key => {
-                //             return await x.proxyCall('cache.contextGet', namespace, name, key);
-                //         },
-                //         delete: async key => {
-                //             return await x.proxyCall('cache.contextDelete', namespace, name, key);
-                //         },
-                //         clear: async prefix => {
-                //             if (typeof prefix === 'undefined') {
-                //                 prefix = '';
-                //             }
-                //             return await x.proxyCall('cache.contextClear', namespace, name, prefix);
-                //         }
-                //     };
-                // }
             };
         };
 
