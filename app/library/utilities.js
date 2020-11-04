@@ -2149,38 +2149,41 @@
                 }
             }
             if (tempData.preload) {
-                if (preload) {
+                var preparePreloadData = () => {
                     if (tempData.preloadData === undefined) {
-                        //console.time('preload ' + tempData.location);
                         tempData.preloadData = x.preload(tempData.location, tempData.args);
+                        console.log(tempData.preloadData);
                     }
-                    return;
+                };
+                if (preload) {
+                    preparePreloadData();
                 } else {
-                    //console.timeEnd('preload ' + tempData.location);
-                    if (tempData.preloadData !== undefined) {
-                        Promise.resolve(tempData.preloadData)
-                            .then(windowID => {
-                                tempData = null;
-                                x.openPreloaded(windowID);
-                            });
-                        return;
+                    if (tempData.preloadData === undefined) {
+                        preparePreloadData();
                     }
-                }
-            }
-            if (tempData.location !== null) {
-                x.open(tempData.location, tempData.args);
-            } else if (typeof data === 'function') {
-                if (!preload) {
-                    data(e);
+                    Promise.resolve(tempData.preloadData)
+                        .then(windowID => {
+                            tempData = null;
+                            x.openPreloaded(windowID);
+                        });
                 }
             } else {
-                throw new Exception('Should not get here addClickToOpen');
+                if (tempData.location !== null) {
+                    x.open(tempData.location, tempData.args);
+                } else if (typeof data === 'function') {
+                    if (!preload) {
+                        data(e);
+                    }
+                } else {
+                    throw new Exception('Should not get here addClickToOpen');
+                }
             }
         };
-        element.addEventListener('touchstart', e => { // todo detect touch scroll
-            //console.log('touchstart ' + (new Date()).getTime());
-            run(true, e);
-        });
+        // Disabled because it breaks toolbar tapping (requires double tap), and it solves the preload problem while scrolling on mobile
+        // element.addEventListener('touchstart', e => { // todo detect touch scroll
+        //     console.log('touchstart ' + (new Date()).getTime());
+        //     run(true, e);
+        // });
         element.addEventListener('mousedown', e => {
             //console.log('mousedown ' + (new Date()).getTime());
             run(true, e);
