@@ -829,10 +829,18 @@
             result.value = 'data:' + parts[parts.length - 1];
             return result;
         } else if (image.substr(0, 5) === 'data:') {
-            var imageBitmap = await createImageBitmap(await (await fetch(image)).blob());
+            if (typeof createImageBitmap === "undefined") { // createImageBitmap is not supported on iOS
+                var img = await x.loadImage(image);
+                var width = img.width;
+                var height = img.height;
+            } else {
+                var imageBitmap = await createImageBitmap(await (await fetch(image)).blob());
+                var width = imageBitmap.width;
+                var height = imageBitmap.height;
+            }
             return {
-                width: imageBitmap.width,
-                height: imageBitmap.height,
+                width: width,
+                height: height,
                 size: image.length,
                 value: image
             };
@@ -881,8 +889,12 @@
         var ratio = Math.max(widthRatio, heightRatio);
         var destinationX = (width - imageWidth * ratio) / 2;
         var destinationY = (height - imageHeight * ratio) / 2;
-        var imageBitmap = await createImageBitmap(await (await fetch(details.value)).blob());
-        ctx.drawImage(imageBitmap, 0, 0, imageWidth, imageHeight, destinationX, destinationY, imageWidth * ratio, imageHeight * ratio);
+        if (typeof createImageBitmap === "undefined") { // createImageBitmap is not supported on iOS
+            var imageToDraw = await x.loadImage(details.value);
+        } else {
+            var imageToDraw = await createImageBitmap(await (await fetch(details.value)).blob());
+        }
+        ctx.drawImage(imageToDraw, 0, 0, imageWidth, imageHeight, destinationX, destinationY, imageWidth * ratio, imageHeight * ratio);
         var result1 = ctx.canvas.toDataURL('image/png', quality / 100);
         var result2 = ctx.canvas.toDataURL('image/jpeg', quality / 100);
         var value = result1.length < result2.length ? result1 : result2;
@@ -901,7 +913,7 @@
         var height = canvas.height = details.height;
         var value = details.value;
         if (value.indexOf('data:image/svg+xml;') === 0) {
-            var p = new Promise((resolve) => {
+            var p = new Promise(resolve => {
                 var img = document.createElement('img');
                 img.src = value;
                 img.onload = () => {
@@ -910,7 +922,12 @@
             });
             ctx.drawImage(await p, 0, 0);
         } else {
-            ctx.drawImage(await createImageBitmap(await (await fetch(value)).blob()), 0, 0);
+            if (typeof createImageBitmap === "undefined") { // createImageBitmap is not supported on iOS
+                var imageToDraw = await x.loadImage(value);
+            } else {
+                var imageToDraw = await createImageBitmap(await (await fetch(value)).blob());
+            }
+            ctx.drawImage(imageToDraw, 0, 0);
         }
         ctx.globalCompositeOperation = 'destination-in';
         ctx.beginPath();
@@ -2404,5 +2421,18 @@
     x.deviceHasPushManagerSupport = () => {
         return 'serviceWorker' in navigator && 'PushManager' in window;
     };
+
+    x.loadImage = async source => {
+        return await new Promise((resolve, reject) => {
+            var img = new Image();
+            img.addEventListener('load', () => {
+                resolve(img);
+            });
+            img.addEventListener('error', e => {
+                reject(e);
+            });
+            img.src = source;
+        });
+    }
 
 }

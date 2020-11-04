@@ -958,37 +958,28 @@
     x.makeFieldImage = (label, options = {}) => {
         var emptyValue = typeof options.emptyValue !== 'undefined' ? options.emptyValue : null;
         var fieldValue = null;
-        var container = makeField(label, '<div tabindex="0" role="button"></div><input type="file" accept="image/*" style="display:none;"></input>', 'x-field-image');
+        var container = makeField(label, '<div tabindex="0" role="button"></div>', 'x-field-image');
         var buttonElement = container.querySelector('div');
         buttonElement.setAttribute('aria-label', label);
-        var fileInput = container.querySelector('input');
         var setValue = async value => {
             fieldValue = value;
             buttonElement.style.backgroundImage = fieldValue === null ? (emptyValue !== null ? 'url(' + await x.image.getURL(emptyValue) + ')' : '') : 'url(' + await x.image.getURL(fieldValue) + ')';
         };
+        var openPicker = () => {
+            x.pickFile(async file => {
+                var value = await x.image.make(file.dataURI);
+                setValue(value);
+            }, ['image/*']);
+        }
         x.addClickToOpen(buttonElement, e => {
             if (fieldValue === null) {
-                fileInput.click();
+                openPicker();
             } else {
                 var tooltip = x.makeTooltip(document.body);
-                tooltip.addButton('Select another', () => { fileInput.click(); });
+                tooltip.addButton('Select another', () => { openPicker(); });
                 tooltip.addButton('Remove selected', () => { setValue(null) });
                 tooltip.show(e.target);
             }
-        });
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                var file = fileInput.files[0];
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async () => {
-                    var value = await x.image.make(reader.result);
-                    setValue(value);
-                };
-                reader.onerror = e => {
-                    // todo
-                };
-            };
         });
         return {
             focus: () => {
@@ -2297,17 +2288,17 @@
             if (fileInput.files.length > 0) {
                 var file = fileInput.files[0];
                 var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async () => {
+                reader.addEventListener('load', () => {
                     fileInput.parentNode.removeChild(fileInput);
                     callback({
                         name: file.name,
                         dataURI: reader.result
                     });
-                };
-                reader.onerror = e => {
+                });
+                reader.addEventListener('error', e => {
                     // todo
-                };
+                });
+                reader.readAsDataURL(file);
             };
         });
         document.body.appendChild(fileInput);
