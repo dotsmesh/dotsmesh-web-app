@@ -505,22 +505,22 @@
 
 
     //css += '.x-app-screen{x-screen x-app-screen;z-index:3;}';
-    css += '.x-app-window{position:fixed;left:100vw;top:0;width:100vw;height:calc(100% - 50px);overflow:hidden;background-color:#111;z-index:2;overscroll-behavior:none;}';//transition:opacity 300ms ease;
+    css += '.x-app-window{position:fixed;left:100%;top:0;width:100%;height:calc(100% - 50px);overflow:hidden;background-color:#111;z-index:2;overscroll-behavior:none;}';//transition:opacity 300ms ease;
     css += '.x-app-window[x-visible="1"]{left:0;}';//opacity:1;
-    css += '.x-app-window[x-visible="0"]{left:100vw;}';//opacity:0;
+    css += '.x-app-window[x-visible="0"]{left:100%;}';//opacity:0;
     css += '.x-app-window>iframe{position:relative;border:0;width:100%;height:100%;z-index:2;}';
 
     css += '.x-app-modals-background{background:rgba(0,0,0,0.8);user-select:none;transition:opacity ' + x.modalsAnimationTime + 'ms;opacity:0;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;display:flex;align-items:center;justify-content:center;}';
     css += '.x-app-modals-background > div{transition:opacity ' + x.modalsAnimationTime + 'ms;opacity:0;animation:x-rotate 1s infinite linear;width:20px;height:20px;background-position:center;background-size:cover;background-repeat:no-repeat;background-image:url(\'' + x.loadingImage + '\')}';
-    css += '.x-app-modal{position:fixed;top:100vh;left:0;width:100vw;height:100vh;overflow:hidden;z-index:150;transition:top ' + x.modalsAnimationTime + 'ms ease, left ' + x.modalsAnimationTime + 'ms ease;}';
+    css += '.x-app-modal{position:fixed;top:100%;left:0;width:100%;height:100%;overflow:hidden;z-index:150;transition:top ' + x.modalsAnimationTime + 'ms ease, left ' + x.modalsAnimationTime + 'ms ease;}';
     css += '.x-app-modal>iframe{position:relative;border:0;width:100%;height:100%;z-index:151;}';
     css += '.x-app-modal[x-visible="1"]:not([x-closed])[x-loaded]{top:0;left:0;}';
-    css += '.x-app-modal[x-visible="0"]:not([x-closed]){top:0;left:-100vw;}';
-    css += '.x-app-modal[x-visible="1"][x-closed]{top:100vh;left:0;}';
-    css += '.x-app-modal[x-visible="0"][x-closed]{top:100vh;left:-100vw;}';
+    css += '.x-app-modal[x-visible="0"]:not([x-closed]){top:0;left:-100%;}';
+    css += '.x-app-modal[x-visible="1"][x-closed]{top:100%;left:0;}';
+    css += '.x-app-modal[x-visible="0"][x-closed]{top:100%;left:-100%;}';
 
     css += '.x-app-toolbar-left{display:none;}';
-    css += '.x-app-toolbar-bottom{z-index:100;position:fixed;box-sizing:border-box;display:flex;background-color:#222;box-shadow:0 0 5px 0 #111;flex-direction:row;bottom:0;left:0;width:100vw;height:50px;justify-content:center;}';
+    css += '.x-app-toolbar-bottom{z-index:100;position:fixed;box-sizing:border-box;display:flex;background-color:#222;box-shadow:0 0 5px 0 #111;flex-direction:row;bottom:0;left:0;width:100%;height:50px;justify-content:center;}';
     css += '.x-app-toolbar-bottom>.x-app-toolbar-button{max-width:100px;}';
     css += '.x-app-toolbar-bottom > *{flex:1 1 auto;}';
 
@@ -551,10 +551,10 @@
     css += '@media only screen and (min-width:600px){';
     // css += '.x-app-menu-button{display:none !important;}';
     // css += '.x-app-menu{display:none !important;}';
-    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;border-right:1px solid #222;flex-direction:column;top:0;left:0;width:50px;height:100vh;}';
+    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;border-right:1px solid #222;flex-direction:column;top:0;left:0;width:50px;height:100%;}';
     css += '.x-app-toolbar-bottom{display:none;}';
     //css += '.x-app-toolbar-left>div{display:flex;flex-direction:row;}';
-    css += '.x-app-window{max-width:calc(100vw - 50px);height:100vh;}';//240px
+    css += '.x-app-window{max-width:calc(100% - 50px);height:100%;}';//240px
     css += '.x-app-window[x-visible="1"]{left:50px;}';//240px
     css += '*{scrollbar-width:thin;scrollbar-color:#666 transparent;}';
     css += '*::-webkit-scrollbar{width:6px;}';

@@ -209,7 +209,7 @@
     var darkThemeHintColor = '#999';
 
     var css = '*,*:before,*:after{margin:0;padding:0;outline:none;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-overflow-scrolling:touch;}';
-    css += 'html,body{height:100vh;overflow:hidden;}';
+    css += 'html,body{height:100%;overflow:hidden;}';
     css += 'body,textarea,input{font-family:Helvetica,Arial,sans-serif;font-size:15px;}';
     css += '@media only screen and (min-width:800px){';
     css += '*{scrollbar-width:thin;scrollbar-color:' + (modal ? '#aaa' : '#666') + ' transparent;}';
@@ -296,6 +296,7 @@
         css += '.x-message > :first-child{color:#000;}';
         css += '[x-template="modal-text"] .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
     } else {
+        css += 'body>div:first-child{height:100%;}';
         css += '.x-header{height:50px;position:fixed;top:0;left:0;background-color:#111;}';
         css += '.x-header-title{line-height:50px;height:50px;}';
         css += '.x-header-button{width:50px;height:50px;background-size:20px;}';
@@ -306,7 +307,7 @@
         css += 'body[x-has-scroll] .x-header-title{opacity:1;}';
         css += '.x-header-title:first-child{padding-left:' + contentSpacing + '}';
         css += '[x-template*="message"] .x-header-title{display:block;}';
-        css += '.x-body{overscroll-behavior:contain;margin-top:50px;overflow:auto;height:calc(100vh - 50px);padding:0 ' + smallEdgeSpacing + ' ' + contentSpacing + ' ' + smallEdgeSpacing + ';}';
+        css += '.x-body{overscroll-behavior:contain;margin-top:50px;overflow:auto;height:calc(100% - 50px);padding:0 ' + smallEdgeSpacing + ' ' + contentSpacing + ' ' + smallEdgeSpacing + ';}';
         css += 'body:not([x-template]) .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '[x-template*="tiny"] .x-body > *{width:100%;max-width:400px;margin-left:auto;margin-right:auto;}';
         css += '[x-template*="big"] .x-body > *{width:100%;max-width:600px;margin-left:auto;margin-right:auto;}';

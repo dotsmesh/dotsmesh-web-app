@@ -69,7 +69,7 @@
                 debugButton.addEventListener('click', ()=>{
                     var contentElement = debugButton.querySelector('div');
                     if(contentElement === null){
-                        debugButton.innerHTML += '<div style="width:100vw;height:100vh;top:0;left:0;background:#eee;position:fixed;z-index:9998;overflow:auto;font-size:15px;color:#000;text-align:left;padding:20px;box-sizing:border-box;line-height:160%;word-break:break-word;"></div>';
+                        debugButton.innerHTML += '<div style="width:100%;height:100%;top:0;left:0;background:#eee;position:fixed;z-index:9998;overflow:auto;font-size:15px;color:#000;text-align:left;padding:20px;box-sizing:border-box;line-height:160%;word-break:break-word;"></div>';
                         debugButton.lastChild.innerText = "Logs:\n\n" + x.debug.getLogs();
                     }else{
                         contentElement.parentNode.removeChild(contentElement);
@@ -89,7 +89,7 @@
         x.modalsAnimationTime = 300;
 
         var css = '';
-        css += '.x-screen{transition:opacity ' + x.modalsAnimationTime + 'ms;position:fixed;top:0;left:0;width:100vw;height:100%;z-index:1;opacity:0;background-color:#111;overflow:hidden;box-sizing:border-box;overscroll-behavior:none;}';
+        css += '.x-screen{transition:opacity ' + x.modalsAnimationTime + 'ms;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;opacity:0;background-color:#111;overflow:hidden;box-sizing:border-box;overscroll-behavior:none;}';
         css += '.x-screen[x-visible]{opacity:1;}';
         css += '.x-loading-screen{user-select:none;display:flex;align-items:center;justify-content:center;}';
         css += '.x-loading-screen > div{animation:x-rotate 1s infinite linear;width:20px;height:20px;background-position:center;background-size:cover;background-repeat:no-repeat;background-image:url(\'' + x.loadingImage + '\')}';
