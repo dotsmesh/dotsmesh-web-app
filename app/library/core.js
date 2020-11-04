@@ -1489,7 +1489,7 @@
     // DEVICE NOTIFICATIONS
 
     let getNotificationsRegistration = async () => {
-        if (Notification !== undefined) {
+        if (typeof Notification !== "undefined") {
             if (self.serviceWorker !== undefined) {
                 return self.registration;
             }
