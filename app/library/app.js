@@ -160,7 +160,7 @@
         var initializePromise = new Promise((resolve, reject) => {
             try {
                 var frame = document.createElement('iframe');
-                frame.setAttribute('sandbox', 'allow-scripts');
+                //frame.setAttribute('sandbox', 'allow-scripts'); // the file picker does not work on iOS in sandbox
                 frame.addEventListener('load', async () => {
                     window.channel = x.createMessagingChannel('window-iframe', frame);
                     window.channel.addListener('call', async args => {
