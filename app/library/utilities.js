@@ -2152,7 +2152,6 @@
                 var preparePreloadData = () => {
                     if (tempData.preloadData === undefined) {
                         tempData.preloadData = x.preload(tempData.location, tempData.args);
-                        console.log(tempData.preloadData);
                     }
                 };
                 if (preload) {
