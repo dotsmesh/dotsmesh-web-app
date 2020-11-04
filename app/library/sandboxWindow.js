@@ -1470,9 +1470,12 @@
     css += '.x-post[x-content*="m"]>.x-post-attachment{border-radius:4px;}';
     css += '.x-post[x-content*="f"]>.x-post-attachment{border-radius:8px;}';
     css += '.x-post[x-content*="f"]>.x-post-text a{text-decoration:underline;cursor:pointer;' + lightTextStyle + '}';
+    css += '.x-post[x-content*="m"]>.x-post-text a{text-decoration:underline;}'; // todo lightTextStyle and darkTextStyle are both needed. Maybe add another selector?
     css += '.x-post[x-content*="s"]>.x-post-text a{text-decoration:underline;' + darkTextStyle + '}';
     css += '.x-post[x-content*="f"]>.x-post-text p+br{display:none;}';
     css += '.x-post[x-content*="f"]>.x-post-text br+br{margin-top:15px;content:"";display:block;}';
+    css += '.x-post[x-content*="m"]>.x-post-text p+br{display:none;}';
+    css += '.x-post[x-content*="m"]>.x-post-text br+br{margin-top:15px;content:"";display:block;}';
     css += '.x-post[x-content*="s"]>.x-post-text p+br{display:none;}';
     css += '.x-post[x-content*="s"]>.x-post-text br+br{margin-top:10px;content:"";display:block;}';
     css += '.x-post[x-content*="f"]>.x-post-text ul{list-style-position:inside;margin:0;padding:0;}';
