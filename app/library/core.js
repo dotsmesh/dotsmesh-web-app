@@ -1094,7 +1094,11 @@
         var authType = typeof options.auth !== 'undefined' ? options.auth : null;
         var callOptions = {};
         var idData = x.parseID(id);
-        // todo if(idData === null)
+        if (idData === null) {
+            var error = x.makeAppError(type === 'user' ? 'invalidUserID' : 'invalidGroupID', '');
+            error['id'] = id;
+            throw error;
+        }
         callOptions.propertyID = id;
         if (authType === 'accessKey') {
             callOptions.accessKey = await x.getHash('SHA-512', options.accessKey);

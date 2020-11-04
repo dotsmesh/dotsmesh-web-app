@@ -620,6 +620,9 @@
                     return data[key];
                 } catch (e) {
                     if (e.name === 'networkError') {
+                        // var error = x.makeAppError('propertyUnavailable', '');
+                        // error.details['reason'] = e;
+                        // throw error;
                         return null;
                     } else {
                         throw e;

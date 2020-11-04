@@ -55,7 +55,19 @@
             var cachedIDsList = cachedValue !== null ? cachedValue : null;
             if (ignoreListCache || cachedIDsList === null) {
                 var postsContext = await getDataStorage(propertyType, propertyID, 'p/');
-                var list = await postsContext.getList({ keySort: 'desc', limit: limit !== null ? limit + offset : null, sliceProperties: ['key'] });
+                var list = [];
+                try {
+                    list = await postsContext.getList({ keySort: 'desc', limit: limit !== null ? limit + offset : null, sliceProperties: ['key'] });
+                } catch (e) {
+                    cacheList = false;
+                    if (e.name === 'networkError') {
+                        var error = x.makeAppError('propertyUnavailable', '');
+                        error.details['reason'] = e;
+                        throw error;
+                    } else {
+                        throw e;
+                    }
+                }
                 list.forEach(item => {
                     idsList.push(item.key);
                 });
@@ -88,40 +100,50 @@
         }
         if (missingIDs.length > 0) {
             var postsContext = await getDataStorage(propertyType, propertyID, 'p/');
-            var list = await postsContext.getList({ keys: missingIDs, sliceProperties: ignoreValues && !cacheValues ? ['key'] : ['key', 'value'] });
-            for (var i = 0; i < list.length; i++) {
-                var item = list[i];
-                var id = item.key;
-                if (!ignoreValues || cacheValues) {
-                    if (propertyType === 'user') {
-                        var value = x.unpack(item.value);
-                        if (value.name === '') {
-                            var json = value.value[0]; // todo check signature
-                        } else {
-                            throw new Error();
-                        }
-                    } else if (propertyType === 'group') {
-                        var value = x.unpack(item.value);
-                        if (value.name === '') {
-                            var value = await x.group.decryptShared(propertyID, value.value);
-                            value = x.unpack(value);
+            try {
+                var list = await postsContext.getList({ keys: missingIDs, sliceProperties: ignoreValues && !cacheValues ? ['key'] : ['key', 'value'] });
+                for (var i = 0; i < list.length; i++) {
+                    var item = list[i];
+                    var id = item.key;
+                    if (!ignoreValues || cacheValues) {
+                        if (propertyType === 'user') {
+                            var value = x.unpack(item.value);
                             if (value.name === '') {
                                 var json = value.value[0]; // todo check signature
                             } else {
-                                throw new Error()
+                                throw new Error();
+                            }
+                        } else if (propertyType === 'group') {
+                            var value = x.unpack(item.value);
+                            if (value.name === '') {
+                                var value = await x.group.decryptShared(propertyID, value.value);
+                                value = x.unpack(value);
+                                if (value.name === '') {
+                                    var json = value.value[0]; // todo check signature
+                                } else {
+                                    throw new Error()
+                                }
+                            } else {
+                                throw new Error();
                             }
                         } else {
                             throw new Error();
                         }
-                    } else {
-                        throw new Error();
                     }
+                    if (cacheValues) {
+                        var postCacheKey = 'posts/' + propertyID + '/p/' + id;
+                        await cache.set(postCacheKey, json);
+                    }
+                    result[id] = ignoreValues ? null : json;
                 }
-                if (cacheValues) {
-                    var postCacheKey = 'posts/' + propertyID + '/p/' + id;
-                    await cache.set(postCacheKey, json);
+            } catch (e) {
+                if (e.name === 'networkError') {
+                    var error = x.makeAppError('propertyUnavailable', '');
+                    error.details['reason'] = e;
+                    throw error;
+                } else {
+                    throw e;
                 }
-                result[id] = ignoreValues ? null : json;
             }
         }
         result = order === 'asc' ? x.sortObjectKeyAsc(result) : x.sortObjectKeyDesc(result);

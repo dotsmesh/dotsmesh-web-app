@@ -270,7 +270,7 @@
     css += 'body[x-loading] .x-message{opacity:0;}';
 
     css += '.x-message{user-select:none;transition:opacity ' + x.animationTime + 'ms;position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column;}';
-    css += '.x-message > :first-child{' + textStyle + 'color:#fff;text-align:center;padding:42px 30px 0 30px;}';
+    css += '.x-message > :first-child{' + textStyle + 'color:#fff;text-align:center;padding:42px 30px 0 30px;max-width:400px;}';
     css += '.x-message > :last-child:not(:empty){padding-top:20px;}';
     css += 'body[x-message]:not([x-loading]) .x-message{opacity:1;z-index:3;}'; // must be over the body but below the header
     css += 'body[x-message] .x-header-title{opacity:0;}'; // the title may depend on the content
@@ -2323,6 +2323,15 @@
         systemPick('group', callback, options);
     };
 
+    css += '.x-unavailable{font-size:12px;padding:' + contentSpacing + '}';
+
+    var makeUnavailableContentElement = (text = 'Content is unavailable') => {
+        var element = document.createElement('div');
+        element.setAttribute('class', 'x-unavailable');
+        element.innerText = text;
+        return element;
+    };
+
     x.makeAttachmentPreviewElement = async (attachment, options = {}) => {
         var type = attachment.type !== undefined ? attachment.type : null;
         var value = attachment.value !== undefined ? attachment.value : {};
@@ -2339,7 +2348,7 @@
             }
         }
         container.setAttribute('style', (aspectRatio === null ? '' : 'width:100%;padding-top:' + (aspectRatio * 100) + '%;position:relative;') + 'user-select:none;');
-        container.innerHTML = '<div style="' + (aspectRatio === null ? '' : 'position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;') + '' + textStyle + 'color:#000;font-size:12px;"></div>';//line-height:150%;background:#eee;border:1px dotted #ccc;//border-bottom-left-radius:2px;border-bottom-right-radius:2px;
+        container.innerHTML = '<div style="' + (aspectRatio === null ? '' : 'position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;') + '' + textStyle + (isLightTheme ? '' : 'color:#fff;') + 'font-size:12px;"></div>';//line-height:150%;background:#eee;border:1px dotted #ccc;//border-bottom-left-radius:2px;border-bottom-right-radius:2px;
         var previewCallback = null;
         if (type === 'i') { // image
             var setContent = src => {
@@ -2381,7 +2390,15 @@
                 x.open('posts/post', args);
                 //x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
             };
-            var posts = await x.property.getPosts('user', propertyID, { ids: [postID], cacheValues: true });
+            try {
+                var posts = await x.property.getPosts('user', propertyID, { ids: [postID], cacheValues: true });
+            } catch (e) {
+                if (e.name === 'propertyUnavailable') {
+                    var posts = [];
+                } else {
+                    throw e;
+                }
+            }
             if (posts[0] !== undefined) {
                 var post = posts[0];
                 if (size !== null) {
@@ -2400,8 +2417,11 @@
                     var element = await getProfileImageElement(authorPropertyType, authorPropertyID, Math.floor(size / 2));
                 } else {
                     container.style.padding = contentSpacing;
-                    var element = await makePostElement(post, { mode: 'attachment', theme: theme })
+                    var element = await makePostElement(post, { mode: 'attachment', theme: theme });
                 }
+                container.firstChild.appendChild(element);
+            } else {
+                var element = makeUnavailableContentElement('Attached post by ' + x.getShortID(propertyID) + ' is unavailable');
                 container.firstChild.appendChild(element);
             }
         } else if (type === 'u') { // user

@@ -12,6 +12,19 @@ async (args, library) => {
     if (userID === null) {
         throw new Error();
     }
+
+    x.addErrorHandler(['userNotFound'], async () => {
+        x.showMessage('There is no profile named  ' + x.getShortID(userID) + '!');
+    });
+
+    x.addErrorHandler(['invalidUserID'], async () => {
+        x.showMessage('Profile not found!');
+    });
+
+    x.addErrorHandler(['propertyUnavailable'], async () => {
+        x.showMessage(x.getShortID(userID) + '\'s profile is currently unavailable!');
+    });
+
     if (x.isPublicID(userID)) {
         x.setHash(x.getShortID(userID) + (connectKey !== null ? '/c/' + connectKey : ''));
     }

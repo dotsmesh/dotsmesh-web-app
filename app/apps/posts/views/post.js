@@ -39,9 +39,21 @@ async (args, library) => {
     x.setTemplate('column-big');
 
     // todo wait
-    var post = await library.getPost(propertyType, propertyID, postID, { cache: true });
+    try {
+        var post = await library.getPost(propertyType, propertyID, postID, { cache: true });
+    } catch (e) {
+        if (e.name === 'propertyUnavailable') {
+            var post = null;
+        } else {
+            throw e;
+        }
+    }
     if (post === null) {
-        x.showMessage('The post requested cannot be found! Maybe it was deleted.');
+        if (propertyType === 'user') {
+            x.showMessage('This post by ' + x.getShortID(propertyID) + ' cannot be found! Maybe it was deleted or it\'s temporary unavailable.');
+        } else {
+            x.showMessage('The post requested cannot be found! Maybe it was deleted.');
+        }
         return;
     }
 
