@@ -10,6 +10,7 @@ async (args, library) => {
     var title = args.title !== undefined ? args.title : '';
 
     x.setTitle('Open link');
+    x.setTemplate('modal-text');
 
     x.add(x.makeText('You are about to visit the following website:'));
     if (title.length > 0) {
