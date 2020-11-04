@@ -2246,10 +2246,6 @@
             'cache._get': (...args) => { return cacheProxyCall('get', args) },
             'cache._delete': (...args) => { return cacheProxyCall('delete', args) },
             'cache._clear': (...args) => { return cacheProxyCall('clear', args) },
-            // 'cache.contextSet': (...args) => { return cacheProxyCall('contextSet', args) },
-            // 'cache.contextGet': (...args) => { return cacheProxyCall('contextGet', args) },
-            // 'cache.contextDelete': (...args) => { return cacheProxyCall('contextDelete', args) },
-            // 'cache.contextClear': (...args) => { return cacheProxyCall('contextClear', args) },
             'cache.clear': x.cache.clear,
             'notifications.get': x.notifications.get,
             'notifications.set': x.notifications.set,
@@ -2259,6 +2255,7 @@
             'notifications.make': x.notifications.make,
             'notifications.getClickData': x.notifications.getClickData,
             'notifications.onClick': x.notifications.onClick,
+            'debug.log': x.debug.log,
         };
     });
 
@@ -2269,5 +2266,28 @@
     //     image = (await x.image.getDetails(await x.image.cropCircle(image))).value;
     //     console.log(image);
     // })();
+
+
+    // DEBUG
+
+    {
+
+        var debugLog = [];
+
+        x.debug = {};
+
+        x.debug.log = text => {
+            debugLog.push(text);
+        };
+
+        x.debug.getLogs = () => {
+            var result = '';
+            for (var text of debugLog) {
+                result += "> " + text + "\n\n";
+            }
+            return result.trim();
+        };
+
+    }
 
 }

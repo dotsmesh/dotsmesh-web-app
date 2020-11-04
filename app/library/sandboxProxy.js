@@ -801,4 +801,15 @@
     //     };
     // }
 
+
+    // DEBUG
+
+    {
+        x.debug = {};
+
+        x.debug.log = async text => {
+            return await x.proxyCall('debug.log', text);
+        };
+    }
+
 }

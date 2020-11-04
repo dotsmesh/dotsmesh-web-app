@@ -62,6 +62,21 @@
             self.addEventListener('unhandledrejection', e => {
                 alert(JSON.stringify(e.reason));
             });
+            if(location.href.indexOf('&logs') !== -1){
+                var debugButton = document.createElement('div');
+                debugButton.setAttribute('style', 'width:40px;height:40px;background:red;color:#fff;position:fixed;top:20px;left:calc(50% - 20px);border-radius:50%;z-index:9999;font-size:30px;text-align:center;line-height:40px;cursor:pointer;');
+                debugButton.innerHTML = '~';
+                debugButton.addEventListener('click', ()=>{
+                    var contentElement = debugButton.querySelector('div');
+                    if(contentElement === null){
+                        debugButton.innerHTML += '<div style="width:100vw;height:100vh;top:0;left:0;background:#eee;position:fixed;z-index:9998;overflow:auto;font-size:15px;color:#000;text-align:left;padding:20px;box-sizing:border-box;line-height:160%;word-break:break-word;"></div>';
+                        debugButton.lastChild.innerText = "Logs:\n\n" + x.debug.getLogs();
+                    }else{
+                        contentElement.parentNode.removeChild(contentElement);
+                    }
+                });
+                document.body.appendChild(debugButton);
+            }
         }
 
         x = {};
