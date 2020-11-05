@@ -318,7 +318,7 @@
         css += '[x-template*="big"] .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
 
         css += '[x-template*="message"] .x-body{display:flex;}';
-        css += '[x-template*="message"] [x-template="content"]{display:flex;justify-content:flex-end;flex-direction:column;min-height:min-content;height:100%;}';
+        css += '[x-template*="message"] [x-template="content"]{display:flex;justify-content:flex-end;flex-direction:column;flex:1;}';
         css += '[x-template*="message"] [x-template="content"] > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
 
         css += '@media only screen and (min-width:800px){'; // large screens
