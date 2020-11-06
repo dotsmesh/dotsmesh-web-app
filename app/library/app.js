@@ -140,6 +140,7 @@
         var viewID = locationParts[1];
         var modal = options.modal !== undefined ? options.modal : false;
         var openerID = options.openerID !== undefined ? options.openerID : null;
+        var responseCallback = options.responseCallback !== undefined ? options.responseCallback : null;
         var windowID = x.generateID();
 
         var appScreenContainer = document.querySelector('.x-app-screen');
@@ -154,6 +155,7 @@
             id: windowID,
             modal: modal,
             openerID: openerID,
+            responseCallback: responseCallback,
             visible: false,
             visibilityIndex: null,
             announcedChanges: [],
@@ -375,17 +377,21 @@
     var preloadedWindows = {};
 
     x.open = async (location, args, options = {}) => {
-        var modal = typeof options.modal !== 'undefined' ? options.modal : false;
-        if (!modal) {
-            await backAllModals();
-        }
-        var addToHistory = typeof options.addToHistory !== 'undefined' ? options.addToHistory : true;
-        var window = makeWindow(location, args, options);
-        if (window === null) {
-            return null;
-        }
-        await window.show(addToHistory);
-        return window;
+        return new Promise(async (resolve, reject) => {
+            var modal = typeof options.modal !== 'undefined' ? options.modal : false;
+            if (!modal) {
+                await backAllModals();
+            }
+            var addToHistory = typeof options.addToHistory !== 'undefined' ? options.addToHistory : true;
+            var windowOptions = x.shallowCopyObject(options);
+            windowOptions.responseCallback = resolve;
+            var window = makeWindow(location, args, windowOptions);
+            if (window !== null) {
+                await window.show(addToHistory);
+            } else {
+                resolve();
+            }
+        })
     };
 
     x.preload = (location, args, options) => {
@@ -409,7 +415,7 @@
     };
 
     x.openPreloaded = async windowID => {
-        if(windowID === null){
+        if (windowID === null) {
             return;
         }
         var preloadData = preloadedWindows[windowID];
@@ -424,11 +430,12 @@
     };
 
     x.alert = text => {
-        alert(text);
+        x.open('system/message', { text: text }, { modal: true, width: 300 });
     };
 
-    x.confirm = text => {
-        return confirm(text);
+    x.confirm = async text => {
+        var result = await x.open('system/confirm', { text: text }, { modal: true, width: 300 });
+        return result === 'ok';
     };
 
     x.downloadFile = async (url, name) => {
@@ -470,10 +477,16 @@
             },
             back: async (result, options = {}) => {
                 var openerToSendTo = null;
+                var responseCallback = null;
                 // send result always even if its null
                 var window = getWindow(windowID);
-                if (window !== null && window.openerID !== null) {
-                    var openerToSendTo = getWindow(window.openerID);
+                if (window !== null) {
+                    if (window.openerID !== null) {
+                        openerToSendTo = getWindow(window.openerID);
+                    }
+                    if (window.responseCallback !== null) {
+                        responseCallback = window.responseCallback;
+                    }
                 }
                 if (typeof options.closeAllModals !== 'undefined' && options.closeAllModals) {
                     await backAllModals();
@@ -489,6 +502,9 @@
                         // ignore
                     }
                 }
+                if (responseCallback !== null) {
+                    responseCallback(result);
+                }
             },
             alert: x.alert,
             confirm: x.confirm,
@@ -498,7 +514,7 @@
                 handleError(JSON.parse(e));
             },
             'currentUser.logout': async () => {
-                if (x.confirm('Are you sure you want to log out your profile?')) {
+                if (await x.confirm('Are you sure you want to log out your profile?')) {
                     await showLoadingScreen();
                     await closeAllWindows();
                     var result = await x.currentUser.logout();

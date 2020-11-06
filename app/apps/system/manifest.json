@@ -1,6 +1,7 @@
 {
     "name": "System",
     "views": [
+        "confirm",
         "pick",
         "share",
         "reportError",

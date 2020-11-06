@@ -576,7 +576,7 @@
 
     x.addToolbarSecretButton = text => {
         x.addToolbarButton('About', () => {
-            x.open('system/message', { text: text }, { modal: true, width: 300 });
+            x.alert(text);
         }, 'lock');
     };
 
