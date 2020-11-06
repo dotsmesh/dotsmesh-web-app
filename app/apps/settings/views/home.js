@@ -16,12 +16,12 @@ async (args, library) => {
     var list = x.makeList();
 
     list.add(x.makeTextButton(async () => {
-        x.alert('Not implemented yet!');
+        x.alert('English is the only supported language today. Contact us and tell us which one we should add next.');
     }, 'Language', 'English'));
 
-    list.add(x.makeTextButton(async () => {
-        x.alert('Not implemented yet!');
-    }, 'Theme', 'Default'));
+    // list.add(x.makeTextButton(async () => {
+    //     x.alert('Not implemented yet!');
+    // }, 'Theme', 'Default'));
 
     container.add(list);
 
@@ -50,7 +50,7 @@ async (args, library) => {
 
     list.add(x.makeTextButton(async () => {
         await x.cache.clear(); // announce clear local caches too
-        x.alert('Done!');
+        x.alert('Cache is cleared successfully!');
     }, 'Clear cache', ''));
 
     container.add(list);
