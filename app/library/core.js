@@ -24,7 +24,7 @@
             var response = await fetch('https://dotsmesh.' + host + '/?host&api', {
                 method: 'POST',
                 cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: { 'Content-Type': 'text/plain', 'Accept': 'text/plain,application/json' },
                 referrerPolicy: 'no-referrer',
                 body: JSON.stringify(data)
             });
