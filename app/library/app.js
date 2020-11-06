@@ -142,8 +142,13 @@
         var openerID = options.openerID !== undefined ? options.openerID : null;
         var windowID = x.generateID();
 
+        var appScreenContainer = document.querySelector('.x-app-screen');
+        if (appScreenContainer === null) {
+            return null;
+        }
+
         var container = document.createElement('div');
-        document.querySelector('.x-app-screen').appendChild(container);
+        appScreenContainer.appendChild(container);
 
         var window = {
             id: windowID,
@@ -376,12 +381,18 @@
         }
         var addToHistory = typeof options.addToHistory !== 'undefined' ? options.addToHistory : true;
         var window = makeWindow(location, args, options);
+        if (window === null) {
+            return null;
+        }
         await window.show(addToHistory);
         return window;
     };
 
     x.preload = (location, args, options) => {
         var window = makeWindow(location, args, options);
+        if (window === null) {
+            return null;
+        }
         var windowID = window.id;
         preloadedWindows[windowID] = {
             location: location,
@@ -398,6 +409,9 @@
     };
 
     x.openPreloaded = async windowID => {
+        if(windowID === null){
+            return;
+        }
         var preloadData = preloadedWindows[windowID];
         clearTimeout(preloadData.expireTimeout);
         var window = getWindow(windowID);
