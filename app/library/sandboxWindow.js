@@ -239,7 +239,7 @@
     css += 'body{font-size:0;line-height:0;}';
 
     css += '@keyframes x-rotate{from{transform:rotate(0deg);}to{transform:rotate(359deg);}}';
-    css += '.x-body{transition:opacity ' + (modal ? x.modalsAnimationTime : x.animationTime) + 'ms;opacity:1;position:relative;box-sizing:border-box;display:flex;align-items:flex-start;flex-direction:column;z-index:2;}' // align-items: flex-start; prevents stretching children
+    css += '.x-body{transition:opacity ' + (modal ? x.modalsAnimationTime : x.animationTime) + 'ms;opacity:1;position:relative;box-sizing:border-box;z-index:2;}' // align-items: flex-start; prevents stretching children // flex should not be for for every window (display:flex;align-items:flex-start;flex-direction:column;)
     css += 'body:not([x-visible]):not([x-message]) .x-body{opacity:0;}';
 
     css += '.x-header-title{user-select:none;line-height:42px;font-size:13px;cursor:default;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}';
@@ -291,10 +291,10 @@
         css += '.x-header-button:focus{background-color:#ddd;}';
         css += '.x-header>:last-child>.x-header-button:first-child{border-top-right-radius:4px;border-bottom-left-radius:4px;}';
         css += '.x-header>:last-child>.x-header-button:not(:first-child){border-bottom-right-radius:4px;border-bottom-left-radius:4px;}';
-        css += '.x-body{flex:1 1 auto;display:flex;padding:' + contentSpacing + ';}';
+        css += '.x-body{flex:1 0 auto;display:flex;align-items:flex-start;flex-direction:column;padding:' + contentSpacing + ';}';
         css += '.x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '.x-message > :first-child{color:#000;}';
-        css += '[x-template="modal-text"] .x-text:first-child{flex:1 1 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
+        css += '[x-template="modal-text"] .x-text:first-child{flex:1 0 auto;display:flex;align-items:center;box-sizing:border-box;}';// message in a modal
     } else {
         css += 'body>div:first-child{height:100%;}';
         css += '.x-header{height:50px;position:fixed;top:0;left:0;background-color:#111;}';
@@ -313,18 +313,18 @@
         css += '[x-template*="big"] .x-body > *{width:100%;max-width:600px;margin-left:auto;margin-right:auto;}';
         css += '[x-template*="columns"] [x-templatec="column1"]{width:100%;}'; // large because of separators (to look the same)
         css += '[x-template*="columns"] [x-templatec="column2"]{width:100%;padding-top:' + largeEdgeSpacing + ';}';
-        css += '[x-template*="columns"] [x-templatec*="column"] > div  > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
+        css += '[x-template*="columns"] [x-templatec*="column"] > div > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '[x-template*="tiny"] .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
         css += '[x-template*="big"] .x-body > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
 
-        css += '[x-template*="message"] .x-body{display:flex;}';
-        css += '[x-template*="message"] [x-template="content"]{display:flex;justify-content:flex-end;flex-direction:column;flex:1;}';
+        css += '[x-template*="message"] .x-body{display:flex;align-items:flex-start;flex-direction:column;}';
+        css += '[x-template*="message"] [x-template="content"]{display:flex;justify-content:flex-end;flex-direction:column;flex:1 0 auto;}';
         css += '[x-template*="message"] [x-template="content"] > *:not(:first-child){margin-top:' + contentSpacing + ';}'; // spacing between elements
 
         css += '@media only screen and (min-width:800px){'; // large screens
         css += '.x-header-title:first-child{padding-left:calc(' + contentSpacing + ' + ' + largeEdgeSpacing + ')}';
         css += '.x-body{padding:0 ' + largeEdgeSpacing + ' ' + largeEdgeSpacing + ' ' + largeEdgeSpacing + ';}';
-        css += '[x-template*="columns"] .x-body{display:flex;flex-direction:row;}';
+        css += '[x-template*="columns"] .x-body{display:flex;flex-direction:row;align-items:flex-start;}';
         css += '[x-template*="columns"] [x-templatec="column1"]{min-height:100%;flex:0 0 auto;border-right:1px solid #222;padding-right:' + contentSpacing + ';}';
         css += '[x-template*="columns"] [x-templatec="column2"]{flex:1 1 auto;padding-top:0;padding-left:' + largeEdgeSpacing + ';}';
         css += '[x-template*="profile"] [x-templatec="column1"]{width:280px;}';
