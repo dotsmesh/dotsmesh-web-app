@@ -6,10 +6,7 @@
 
 () => {
 
-    var getDataStorage = async (propertyType, propertyID, prefix) => {
-        if (typeof prefix === 'undefined') {
-            prefix = '';
-        }
+    var getDataStorage = async (propertyType, propertyID, prefix = '') => {
         if (propertyType === 'user') {
             return x.user.getSharedDataStorage(propertyID).getContext('a/' + prefix);
         } else if (propertyType === 'group') {

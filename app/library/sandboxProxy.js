@@ -151,10 +151,7 @@
             };
         };
 
-        x.cache.clear = async prefix => {
-            if (typeof prefix === 'undefined') {
-                prefix = '';
-            }
+        x.cache.clear = async (prefix = '') => {
             await x.proxyCall('cache.clear', prefix);
         };
     }

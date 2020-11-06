@@ -2115,7 +2115,7 @@
             };
         };
 
-        x.cache.clear = async () => {
+        x.cache.clear = async (prefix = '') => { // todo prefix
             if (typeof caches !== 'undefined') { // Not suppored on Safari (iPad)
                 await caches.delete('dotsmesh-cache');
             } else {
