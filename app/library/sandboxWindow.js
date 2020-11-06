@@ -425,14 +425,16 @@
         var container = document.querySelector('.x-message');
         container.innerHTML = '<div></div><div></div>';
         container.firstChild.innerText = text;
-        if (modal && options.buttonText === undefined) {
-            options.buttonText = 'OK';
-            options.buttonClick = () => { // should be function to prevent passing on the event.
+        var buttonText = options.buttonText;
+        var buttonClick = options.buttonClick;
+        if (modal && buttonText === undefined) {
+            buttonText = 'OK';
+            buttonClick = () => { // must be function to prevent passing on the event.
                 x.back();
             };
         }
-        if (options.buttonText !== undefined) {
-            var button = x.makeButton(options.buttonText, options.buttonClick, { style: 'style2' });
+        if (buttonText !== undefined) {
+            var button = x.makeButton(buttonText, buttonClick, { style: 'style2' });
             container.lastChild.appendChild(button.element);
         }
     };
@@ -1581,10 +1583,10 @@
     };
 
     x.makePostsListComponent = (source, options) => {
-        options = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
-        options.mode = 'summary';
-        var addButton = typeof options.addButton !== 'undefined' ? options.addButton : null;
-        var emptyText = typeof options.emptyText !== 'undefined' ? options.emptyText : null;
+        var listOptions = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
+        listOptions.mode = 'summary';
+        var addButton = typeof listOptions.addButton !== 'undefined' ? listOptions.addButton : null;
+        var emptyText = typeof listOptions.emptyText !== 'undefined' ? listOptions.emptyText : null;
         var lastSeen = [];
         var component = x.makeComponent(async () => {
             var sourceOptions = {};
@@ -1608,7 +1610,7 @@
                 });
                 for (var i = 0; i < postsCount; i++) {
                     var post = posts[i];
-                    var element = await makePostElement(post, options);
+                    var element = await makePostElement(post, listOptions);
                     var args = { postID: post.id };
                     if (typeof post.groupID !== 'undefined') {
                         args.groupID = post.groupID;
@@ -1630,12 +1632,12 @@
     };
 
     x.makePostPreviewComponent = (postFunction, options) => {
-        options = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
-        options.mode = 'full';
+        var elementOptions = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
+        elementOptions.mode = 'full';
         return x.makeComponent(async () => {
             var post = await postFunction();
 
-            var element = await makePostElement(post, options);
+            var element = await makePostElement(post, elementOptions);
 
             var container = document.createElement('div');
             container.appendChild(element);

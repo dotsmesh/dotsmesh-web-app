@@ -367,19 +367,19 @@
         };
 
         var getList = async (options, buffer) => { // check types
-            var options = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
+            var listOptions = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
             var prefixLength = prefix.length;
             if (prefixLength > 0) {
-                options.keyStartWith = typeof options.keyStartWith !== 'undefined' ? prefix + options.keyStartWith : prefix;
-                if (typeof options.keys !== 'undefined') {
-                    options.keys.forEach((key, index) => {
-                        options.keys[index] = prefix + key;
+                listOptions.keyStartWith = typeof listOptions.keyStartWith !== 'undefined' ? prefix + listOptions.keyStartWith : prefix;
+                if (typeof listOptions.keys !== 'undefined') {
+                    listOptions.keys.forEach((key, index) => {
+                        listOptions.keys[index] = prefix + key;
                     });
                 }
             }
             return await processCommand(buffer, {
                 command: 'getList',
-                options: options
+                options: listOptions
             }, result => {
                 var temp = [];
                 result.forEach(item => {
