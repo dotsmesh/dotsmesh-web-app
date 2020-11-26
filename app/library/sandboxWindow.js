@@ -604,23 +604,37 @@
         var container = document.createElement('div');
         container.setAttribute('class', 'x-list');
         container.setAttribute('x-type', type);
-        var add = (item) => {
+        var itemsVersion = 0;
+        var add = item => {
             var itemContainer = document.createElement('div');
             itemContainer.appendChild(item.element);
             container.appendChild(itemContainer);
+            itemsVersion++;
+        };
+        var updateLayout = null;
+        var addMultiple = items => {
+            for (var item of items) {
+                add(item);
+            }
+            if (updateLayout !== null) {
+                updateLayout();
+            }
         };
         if (type === 'grid') {
             var spacing = showSpacing ? contentSpacingInt : 0; // edgeSpacingInt
             var gridItemWidth = 500;
+            var lastItemsVersion = null
             var lastUpdatedContainerWidth = null;
             var updateSize = () => {
                 var containerWidth = Math.floor(container.getBoundingClientRect().width);
                 if (containerWidth === 0) { // sometimes it happens
                     return;
                 }
-                if (containerWidth === lastUpdatedContainerWidth) {
+                if (containerWidth === lastUpdatedContainerWidth && itemsVersion === lastItemsVersion) {
                     return;
                 }
+                lastUpdatedContainerWidth = containerWidth;
+                lastItemsVersion = itemsVersion;
                 var columnsCount = Math.ceil(containerWidth / gridItemWidth);
                 var isGrid = columnsCount > 1;
                 if (isGrid) {
@@ -660,7 +674,6 @@
                         element.style.paddingTop = i > 0 ? (spacing + 'px') : '0';
                     }
                 };
-                lastUpdatedContainerWidth = containerWidth;
                 if (isGrid) {
                     container.style.height = Math.ceil(Math.max(...columnsTop) - spacing) + 'px';
                 } else {
@@ -670,6 +683,8 @@
             x.windowEvents.addEventListener('beforeShow', updateSize);
             x.windowEvents.addEventListener('update', updateSize);
             x.windowEvents.addEventListener('resize', updateSize);
+
+            updateLayout = updateSize;
 
             // var addOnResize = (element, callback) => {
             //     var rect = element.getBoundingClientRect();
@@ -712,6 +727,7 @@
         }
         return {
             add: add,
+            addMultiple: addMultiple,
             element: container
         };
     };
