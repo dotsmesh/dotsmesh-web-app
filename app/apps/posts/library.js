@@ -27,7 +27,7 @@
     };
 
     var clearListCache = async propertyID => {
-        var listCacheKey = 'posts/' + propertyID + '/l';
+        var listCacheKey = 'posts/' + propertyID + '/l2';
         await cache.delete(listCacheKey);
     };
 
@@ -42,19 +42,31 @@
         var offset = typeof options.offset !== 'undefined' ? options.offset : 0;
         var ids = typeof options.ids !== 'undefined' ? options.ids : null;
 
+        var requestLimit = limit !== null ? limit + offset : null;
         var idsList = [];
         if (ids === null) {
             if (order === 'asc') {
                 throw Error('Not supported!');
             }
-            var listCacheKey = 'posts/' + propertyID + '/l';
+            var listCacheKey = 'posts/' + propertyID + '/l2';
             var cachedValue = await cache.get(listCacheKey);
             var cachedIDsList = cachedValue !== null ? cachedValue : null;
+            if (cachedIDsList !== null) {
+                if (requestLimit !== null) {
+                    if (cachedIDsList.limit !== null && cachedIDsList.limit < requestLimit) {
+                        ignoreListCache = true;
+                    }
+                } else {
+                    if (cachedIDsList.limit !== null) {
+                        ignoreListCache = true;
+                    }
+                }
+            }
             if (ignoreListCache || cachedIDsList === null) {
                 var postsContext = await getDataStorage(propertyType, propertyID, 'p/');
                 var list = [];
                 try {
-                    list = await postsContext.getList({ keySort: 'desc', limit: limit !== null ? limit + offset : null, sliceProperties: ['key'] });
+                    list = await postsContext.getList({ keySort: 'desc', limit: requestLimit, sliceProperties: ['key'] });
                 } catch (e) {
                     cacheList = false;
                     if (e.name === 'networkError') {
@@ -69,16 +81,16 @@
                     idsList.push(item.key);
                 });
                 if (cacheList) {
-                    cache.set(listCacheKey, idsList);
+                    cache.set(listCacheKey, { ids: idsList, limit: requestLimit });
                 } else {
                     if (cachedIDsList !== null) { // delete old cache if there is a change in the noncached request
-                        if (JSON.stringify(cachedIDsList.slice(0, 1)) !== idsList.slice(0, 1)) {
+                        if (JSON.stringify(cachedIDsList.ids.slice(0, 1)) !== idsList.slice(0, 1)) {
                             await clearListCache(propertyID);
                         }
                     }
                 }
             } else {
-                idsList = cachedIDsList;
+                idsList = cachedIDsList.ids;
             }
             ids = idsList.slice(offset, limit !== null ? offset + limit : idsList.length);
         }
