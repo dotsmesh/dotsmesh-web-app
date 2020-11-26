@@ -2131,6 +2131,19 @@
         };
     };
 
+    /**
+     * 
+     * @param function|object openArgs Must be callback function or {location:'',args:{},preload:true}
+     */
+    x.executeClickToOpen = (openArgs) => {
+        if (typeof openArgs === 'object') {
+            x.open(openArgs.location, openArgs.args);
+        } else if (typeof openArgs === 'function') {
+            openArgs();
+        } else {
+            throw new Exception('Should not get here executeClickToOpen');
+        }
+    };
 
     /**
      * 
