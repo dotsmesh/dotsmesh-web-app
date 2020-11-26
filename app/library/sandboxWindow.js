@@ -812,34 +812,35 @@
     //css += ':not(.x-button)+.x-button,.x-button:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px;}';
     css += '.x-button-icon{min-width:42px;background-repeat:no-repeat;background-size:20px;background-position:center;}';
     css += '.x-button-icon:not(:empty){padding-left:38px;}';
+    css += '.x-button[disabled]{cursor:default;}';
     if (modal) {
         css += '.x-button{color:#000;width:100%;text-align:center;}';
-        css += '.x-button:hover{background-color:#eee;}';
-        css += '.x-button:active{background-color:#e8e8e8;}';
-        css += '.x-button:focus{background-color:#e8e8e8;}';
+        css += '.x-button:not([disabled]):hover{background-color:#eee;}';
+        css += '.x-button:not([disabled]):active{background-color:#e8e8e8;}';
+        css += '.x-button:not([disabled]):focus{background-color:#e8e8e8;}';
         css += '.x-button:not(:empty){padding:0 16px;}';
     } else {
         css += '.x-button{color:#fff;display:inline-block;border-radius:21px;}';//display:table;margin:0 auto;width:auto;
         css += '.x-button:not(:empty){padding:0 21px;}';
-        css += '.x-button:hover{background-color:rgba(255,255,255,0.04)}';//background-color:#2a2a2a;
-        css += '.x-button:active{background-color:rgba(255,255,255,0.08)}';
-        css += '.x-button:focus{background-color:rgba(255,255,255,0.08)}';
+        css += '.x-button:not([disabled]):hover{background-color:rgba(255,255,255,0.04)}';//background-color:#2a2a2a;
+        css += '.x-button:not([disabled]):active{background-color:rgba(255,255,255,0.08)}';
+        css += '.x-button:not([disabled]):focus{background-color:rgba(255,255,255,0.08)}';
         css += '.x-button[x-style="style1"]{background-color:#24a4f2;}';
-        css += '.x-button[x-style="style1"]:hover{background-color:#1c9be8;}';
-        css += '.x-button[x-style="style1"]:active{background-color:#188ed6;}';
-        css += '.x-button[x-style="style1"]:focus{background-color:#188ed6;}';
+        css += '.x-button[x-style="style1"]:not([disabled]):hover{background-color:#1c9be8;}';
+        css += '.x-button[x-style="style1"]:not([disabled]):active{background-color:#188ed6;}';
+        css += '.x-button[x-style="style1"]:not([disabled]):focus{background-color:#188ed6;}';
         css += '.x-button[x-style="style2"]{border:1px solid #333;}';
-        css += '.x-button[x-style="style2"]:hover{background-color:rgba(255,255,255,0.04);}';
-        css += '.x-button[x-style="style2"]:active{background-color:rgba(255,255,255,0.08);}';
-        css += '.x-button[x-style="style2"]:focus{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style2"]:not([disabled]):hover{background-color:rgba(255,255,255,0.04);}';
+        css += '.x-button[x-style="style2"]:not([disabled]):active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style2"]:not([disabled]):focus{background-color:rgba(255,255,255,0.08);}';
         css += '.x-button[x-style="style3"]{font-size:13px;height:32px;line-height:30px;border:1px solid #333;border-radius:16px;padding:0 16px;}';
-        css += '.x-button[x-style="style3"]:hover{background-color:rgba(255,255,255,0.04);}';
-        css += '.x-button[x-style="style3"]:active{background-color:rgba(255,255,255,0.08);}';
-        css += '.x-button[x-style="style3"]:focus{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style3"]:not([disabled]):hover{background-color:rgba(255,255,255,0.04);}';
+        css += '.x-button[x-style="style3"]:not([disabled]):active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style3"]:not([disabled]):focus{background-color:rgba(255,255,255,0.08);}';
         css += '.x-button[x-style="style4"]{font-size:13px;height:32px;line-height:30px;border-radius:16px;padding:0 16px;}';
-        css += '.x-button[x-style="style4"]:hover{background-color:rgba(255,255,255,0.04);}';
-        css += '.x-button[x-style="style4"]:active{background-color:rgba(255,255,255,0.08);}';
-        css += '.x-button[x-style="style4"]:focus{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style4"]:not([disabled]):hover{background-color:rgba(255,255,255,0.04);}';
+        css += '.x-button[x-style="style4"]:not([disabled]):active{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style4"]:not([disabled]):focus{background-color:rgba(255,255,255,0.08);}';
     }
 
     x.makeButton = (text, callback, options = {}) => {
@@ -853,7 +854,12 @@
         if (styleID !== null) {
             container.setAttribute('x-style', styleID);
         }
-        x.addClickToOpen(container, callback);
+        var disabled = false;
+        x.addClickToOpen(container, () => {
+            if (!disabled) {
+                x.executeClickToOpen(callback);
+            }
+        });
         if (title !== null) {
             container.setAttribute('title', title);
         }
@@ -874,6 +880,14 @@
             },
             hide: () => {
                 container.style.display = 'none';
+            },
+            disable: () => {
+                disabled = true;
+                container.setAttribute('disabled', 'true');
+            },
+            enable: () => {
+                disabled = false;
+                container.removeAttribute('disabled');
             },
             setText: text => {
                 setText(text);
