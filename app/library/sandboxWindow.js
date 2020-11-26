@@ -2471,15 +2471,7 @@
                 x.open('posts/post', args);
                 //x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
             };
-            try {
                 var posts = await x.property.getPosts('user', propertyID, { ids: [postID], cacheValues: true });
-            } catch (e) {
-                if (e.name === 'propertyUnavailable') {
-                    var posts = [];
-                } else {
-                    throw e;
-                }
-            }
             if (posts[0] !== undefined) {
                 var post = posts[0];
                 if (size !== null) {

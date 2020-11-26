@@ -154,7 +154,7 @@
         try {
             var posts = await x.services.call('posts', 'getRawPosts', { propertyType: propertyIDData.type, propertyID: propertyIDData.id, options: { order: 'desc', offset: 0, limit: 200, ignoreValues: true, cacheList: true, ignoreListCache: true } }); // todo update limit
         } catch (e) {
-            if (['invalidMemberID', 'invalidAccessKey', 'groupNotFound'].indexOf(e.name) !== -1) {
+            if (['invalidMemberID', 'invalidAccessKey', 'groupNotFound', 'propertyUnavailable'].indexOf(e.name) !== -1) {
                 posts = [];
             } else {
                 throw e;

@@ -32,9 +32,17 @@ async (args, library) => {
             await x.announceChanges(['group/' + groupID + '/posts']);
             var notificationID = 'gp$' + groupID;
             if (await x.notifications.exists(notificationID)) {
-                var posts = await x.services.call('posts', 'getRawPosts', { propertyType: 'group', propertyID: groupID, options: { order: 'desc', offset: 0, limit: 200, ignoreValues: true, cacheList: true, ignoreListCache: true } }); // todo update limit
-                var postsIDs = Object.keys(posts);
-                await library.updateGroupPostsNotification(groupID, { lastPosts: postsIDs });
+                try {
+                    var posts = await x.services.call('posts', 'getRawPosts', { propertyType: 'group', propertyID: groupID, options: { order: 'desc', offset: 0, limit: 200, ignoreValues: true, cacheList: true, ignoreListCache: true } }); // todo update limit
+                    var postsIDs = Object.keys(posts);
+                    await library.updateGroupPostsNotification(groupID, { lastPosts: postsIDs });
+                } catch (e) {
+                    if (e.name === 'propertyUnavailable') {
+                        // ignore
+                    } else {
+                        throw e;
+                    }
+                }
             }
         } else if (change.key.indexOf('gp/') === 0) {
             var groupID = change.propertyID;
@@ -42,8 +50,16 @@ async (args, library) => {
             await x.announceChanges(['group/' + groupID + '/posts/' + postID]);
             var notificationID = 'gpr$' + groupID + '$' + postID;
             if (await x.notifications.exists(notificationID)) {
-                var postReactionsIDs = await x.services.call('posts', 'getPostReactionsIDs', { propertyType: 'group', propertyID: groupID, postID: postID });
-                await library.updateGroupPostReactionsNotification(groupID, postID, { lastPostReactions: postReactionsIDs });
+                try {
+                    var postReactionsIDs = await x.services.call('posts', 'getPostReactionsIDs', { propertyType: 'group', propertyID: groupID, postID: postID });
+                    await library.updateGroupPostReactionsNotification(groupID, postID, { lastPostReactions: postReactionsIDs });
+                } catch (e) {
+                    if (e.name === 'propertyUnavailable') {
+                        // ignore
+                    } else {
+                        throw e;
+                    }
+                }
             }
         }
     }

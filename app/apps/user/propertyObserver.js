@@ -12,9 +12,17 @@ async (args, library) => {
             var userID = change.propertyID;
             var notificationID = 'up$' + userID;
             if (await x.notifications.exists(notificationID)) {
-                var posts = await x.services.call('posts', 'getRawPosts', { propertyType: 'user', propertyID: userID, options: { order: 'desc', offset: 0, limit: 200, ignoreValues: true, cacheList: true, ignoreListCache: true } }); // todo update limit
-                var postsIDs = Object.keys(posts);
-                await library.updateUserPostsNotification(userID, { lastPosts: postsIDs });
+                try {
+                    var posts = await x.services.call('posts', 'getRawPosts', { propertyType: 'user', propertyID: userID, options: { order: 'desc', offset: 0, limit: 200, ignoreValues: true, cacheList: true, ignoreListCache: true } }); // todo update limit
+                    var postsIDs = Object.keys(posts);
+                    await library.updateUserPostsNotification(userID, { lastPosts: postsIDs });
+                } catch (e) {
+                    if (e.name === 'propertyUnavailable') {
+                        // ignore
+                    } else {
+                        throw e;
+                    }
+                }
             }
         }
     }

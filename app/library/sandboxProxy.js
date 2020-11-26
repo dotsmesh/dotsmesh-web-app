@@ -295,7 +295,15 @@
 
     x.posts.makeFromRaw = async (propertyType, propertyID, id, json) => {
         var post = await x.posts.unpack(id, json, async (post, resourceID) => {
-            return await x.services.call('posts', 'getPostResource', { propertyType: propertyType, propertyID: propertyID, postID: post.id, resourceID: resourceID });
+            try {
+                return await x.services.call('posts', 'getPostResource', { propertyType: propertyType, propertyID: propertyID, postID: post.id, resourceID: resourceID });
+            } catch (e) {
+                if (e.name === 'propertyUnavailable') {
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
         });
         if (propertyType === 'group') {
             post.groupID = propertyID;
@@ -754,23 +762,39 @@
         };
 
         x.property.getPosts = async (type, id, options) => {
-            var rawList = await x.services.call('posts', 'getRawPosts', { propertyType: type, propertyID: id, options: options });
-            var temp = {}
-            for (var postID in rawList) {
-                if (rawList[postID] !== null) {
-                    temp[postID] = rawList[postID];
+            try {
+                var rawList = await x.services.call('posts', 'getRawPosts', { propertyType: type, propertyID: id, options: options });
+                var temp = {}
+                for (var postID in rawList) {
+                    if (rawList[postID] !== null) {
+                        temp[postID] = rawList[postID];
+                    }
+                }
+                return await x.posts.makeFromRawList(type, id, temp);
+            } catch (e) {
+                if (e.name === 'propertyUnavailable') {
+                    return [];
+                } else {
+                    throw e;
                 }
             }
-            return await x.posts.makeFromRawList(type, id, temp);
         };
 
         x.property.checkForNewPosts = async (type, id, lastKnownPostID) => {
-            var rawPosts = await x.services.call('posts', 'getRawPosts', { propertyType: type, propertyID: id, options: { order: 'desc', ignoreListCache: true } });
-            var postIDs = Object.keys(rawPosts);
-            var lastPostID = postIDs.length > 0 ? postIDs[0] : null;
-            if (lastKnownPostID !== lastPostID) {
-                lastKnownPostID = lastPostID;
-                x.announceChanges([type + '/' + id + '/posts']);
+            try {
+                var rawPosts = await x.services.call('posts', 'getRawPosts', { propertyType: type, propertyID: id, options: { order: 'desc', ignoreListCache: true } });
+                var postIDs = Object.keys(rawPosts);
+                var lastPostID = postIDs.length > 0 ? postIDs[0] : null;
+                if (lastKnownPostID !== lastPostID) {
+                    lastKnownPostID = lastPostID;
+                    x.announceChanges([type + '/' + id + '/posts']);
+                }
+            } catch (e) {
+                if (e.name === 'propertyUnavailable') {
+                    // ignore
+                } else {
+                    throw e;
+                }
             }
         };
 
