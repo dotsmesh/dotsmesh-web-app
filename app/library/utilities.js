@@ -2132,46 +2132,35 @@
     };
 
 
-    // 
-
-    x.addClickToOpen = (element, data) => {
-        var tempData = null;
+    /**
+     * 
+     * @param Element element 
+     * @param function|object openArgs Must be callback function or {location:'',args:{},preload:true}
+     */
+    x.addClickToOpen = (element, openArgs) => {
+        var hasLocationPreload = null;
+        var locationPreloadResult = null;
         var run = (preload, e) => {
-            if (tempData === null) {
-                tempData = {};
-                if (typeof data === 'object') {
-                    tempData.location = data.location;
-                    tempData.args = data.args !== undefined ? data.args : {};
-                    tempData.preload = data.preload !== undefined;
-                } else {
-                    tempData.location = null;
-                    tempData.preload = false;
-                }
+            if (hasLocationPreload === null) {
+                hasLocationPreload = typeof openArgs === 'object' ? openArgs.preload !== undefined : false;
             }
-            if (tempData.preload) {
-                var preparePreloadData = () => {
-                    if (tempData.preloadData === undefined) {
-                        tempData.preloadData = x.preload(tempData.location, tempData.args);
-                    }
-                };
-                if (preload) {
-                    preparePreloadData();
-                } else {
-                    if (tempData.preloadData === undefined) {
-                        preparePreloadData();
-                    }
-                    Promise.resolve(tempData.preloadData)
+            if (hasLocationPreload) {
+                if (locationPreloadResult === null) {
+                    locationPreloadResult = x.preload(openArgs.location, openArgs.args);
+                }
+                if (!preload) {
+                    Promise.resolve(locationPreloadResult)
                         .then(windowID => {
-                            tempData = null;
+                            locationPreloadResult = null;
                             x.openPreloaded(windowID);
                         });
                 }
             } else {
-                if (tempData.location !== null) {
-                    x.open(tempData.location, tempData.args);
-                } else if (typeof data === 'function') {
+                if (typeof openArgs === 'object') {
+                    x.open(openArgs.location, openArgs.args);
+                } else if (typeof openArgs === 'function') {
                     if (!preload) {
-                        data(e);
+                        openArgs(e); // TODO dont pass event maybe ???
                     }
                 } else {
                     throw new Exception('Should not get here addClickToOpen');
@@ -2185,15 +2174,15 @@
         // });
         element.addEventListener('mousedown', e => {
             //console.log('mousedown ' + (new Date()).getTime());
-            run(true, e);
+            run(true, e); // TODO dont pass event maybe ???
         });
         element.addEventListener('click', e => {
             //console.log('click ' + (new Date()).getTime());
-            run(false, e);
+            run(false, e); // TODO dont pass event maybe ???
         });
         element.addEventListener('keydown', e => {
             if (e.keyCode === 13) {
-                run(false, e);
+                run(false, e); // TODO dont pass event maybe ???
             }
         });
     };
