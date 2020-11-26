@@ -376,7 +376,7 @@
 
     var preloadedWindows = {};
 
-    x.open = async (location, args, options = {}) => {
+    x.open = async (location, args = {}, options = {}) => {
         return new Promise(async (resolve, reject) => {
             var modal = typeof options.modal !== 'undefined' ? options.modal : false;
             if (!modal) {
@@ -394,7 +394,7 @@
         })
     };
 
-    x.preload = (location, args, options) => {
+    x.preload = (location, args = {}, options = {}) => {
         var window = makeWindow(location, args, options);
         if (window === null) {
             return null;
