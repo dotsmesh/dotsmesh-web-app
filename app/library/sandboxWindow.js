@@ -1411,12 +1411,9 @@
         });
         var observedKeys = options.observeChanges !== undefined ? options.observeChanges : [];
         var component = {
-            update: async args => {
+            update: async (args = {}) => {
                 return new Promise(async (resolve, reject) => {
                     try {
-                        if (typeof args === 'undefined') {
-                            args = {};
-                        }
                         var result = await source(args);
                         container.innerHTML = '';
                         addElements(result);
@@ -1625,10 +1622,16 @@
         listOptions.mode = 'summary';
         var addButton = typeof listOptions.addButton !== 'undefined' ? listOptions.addButton : null;
         var emptyText = typeof listOptions.emptyText !== 'undefined' ? listOptions.emptyText : null;
-        var lastSeen = [];
+        var addedPosts = [];
+        var postsPerLoadedPage = 20;
+        var sourceOptions = {
+            order: 'desc',
+            offset: 0,
+            limit: postsPerLoadedPage
+        };
         var component = x.makeComponent(async () => {
-            var sourceOptions = {};
-            var posts = await source(sourceOptions);
+            // todo when x.property.checkForNewPosts triggers update dont rebuild the entire container
+            var posts = await source(x.shallowCopyObject(sourceOptions));
             var container = x.makeContainer(true);
             if (addButton !== null) {
                 var addButtonDetails = typeof addButton === 'function' ? await addButton() : addButton;
@@ -1636,8 +1639,7 @@
                     container.add(x.makeIconButton(addButtonDetails.onClick, 'plus', addButtonDetails.text));//, null, true
                 }
             }
-            var postsCount = posts.length;
-            if (postsCount === 0) {
+            if (posts.length === 0) {
                 if (emptyText !== null) {
                     container.add(x.makeHint(emptyText));
                 }
@@ -1646,25 +1648,62 @@
                     type: 'grid',
                     showSpacing: true
                 });
-                for (var i = 0; i < postsCount; i++) {
-                    var post = posts[i];
-                    var element = await makePostElement(post, listOptions);
-                    var args = { postID: post.id };
-                    if (typeof post.groupID !== 'undefined') {
-                        args.groupID = post.groupID;
-                    } else if (typeof post.userID !== 'undefined') {
-                        args.userID = post.userID;
-                    }
-                    x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
-                    list.add({ element: element });
-                    lastSeen.push(post.id);
+                var addPosts = async posts => {
+                    var itemsToAdd = [];
+                    var postIDs = [];
+                    for (var i = 0; i < posts.length; i++) {
+                        var post = posts[i];
+                        var postID = post.id;
+                        if (addedPosts.indexOf(postID) !== -1) {
+                            continue;
+                        }
+                        var element = await makePostElement(post, listOptions);
+                        var args = { postID: postID };
+                        if (post.groupID !== undefined) {
+                            args.groupID = post.groupID;
+                        } else if (post.userID !== undefined) {
+                            args.userID = post.userID;
+                        }
+                        x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
+                        itemsToAdd.push({ element: element });
+                        postIDs.push(postID);
+                    };
+                    list.addMultiple(itemsToAdd); // todo dont add new ones, but show notification
+                    addedPosts = addedPosts.concat(postIDs);
                 };
+                await addPosts(posts);
                 container.add(list);
+                if (posts.length >= sourceOptions.limit) {
+                    var showModeButtonText = 'Show more';
+                    var showMoreButton = x.makeButton(showModeButtonText, async () => {
+                        showMoreButton.setText('Loading ...');
+                        showMoreButton.disable();
+                        sourceOptions.limit += postsPerLoadedPage;
+                        var loadedPostsCount = null;
+                        try {
+                            var posts = await source(x.shallowCopyObject(sourceOptions));
+                            await addPosts(posts);
+                            loadedPostsCount = posts.length;
+                        } catch (e) {
+                            //console.log(e);
+                            // todo
+                        }
+                        if (loadedPostsCount !== null) {
+                            if (loadedPostsCount < sourceOptions.limit) {
+                                showMoreButton.remove();
+                                return;
+                            }
+                        }
+                        showMoreButton.setText(showModeButtonText);
+                        showMoreButton.enable();
+                    }, { align: 'center' });
+                    container.add(showMoreButton);
+                }
             }
             return container;
         });
         component.getLastSeen = () => {
-            return lastSeen;
+            return addedPosts;
         };
         return component;
     };
