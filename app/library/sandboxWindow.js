@@ -863,12 +863,17 @@
         var icon = options.icon !== undefined ? options.icon : null;
         var styleID = options.style !== undefined ? options.style : null;
         var title = options.title !== undefined ? options.title : null;
+        var align = options.align !== undefined ? options.align : null;
         var container = document.createElement('div');
         container.setAttribute('class', 'x-button');
         container.setAttribute('tabindex', '0');
         container.setAttribute('role', 'button');
         if (styleID !== null) {
             container.setAttribute('x-style', styleID);
+        }
+        if (align === 'center') {
+            container.style.marginLeft = 'auto';
+            container.style.marginRight = 'auto';
         }
         var disabled = false;
         x.addClickToOpen(container, () => {
