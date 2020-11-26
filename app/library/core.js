@@ -173,11 +173,16 @@
             return [];
         };
 
+        let onCurrentUserChanged = async () => {
+            localCache = {}; // because of propertyCall/ cache
+        };
+
         let setLoggedInUser = async userID => {
             var usersIDs = await getLoggedInUsersList();
             usersIDs.push(userID);
             usersIDs = x.arrayUnique(usersIDs);
             await appDB.set('a', x.pack('', usersIDs));
+            await onCurrentUserChanged();
         };
 
         let setLoggedOutUser = async userID => {
@@ -188,6 +193,7 @@
             } else {
                 await appDB.set('a', x.pack('', usersIDs));
             }
+            await onCurrentUserChanged();
         };
 
         let getPrivateUsers = async () => {
