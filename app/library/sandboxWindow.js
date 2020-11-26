@@ -895,6 +895,9 @@
             setIcon: icon => {
                 setIcon(icon);
             },
+            remove: () => {
+                container.parentNode.removeChild(container);
+            },
             element: container
         };
     };
