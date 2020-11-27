@@ -1174,9 +1174,11 @@
             await showLoadingScreen();
             var result = await x.currentUser.login(x.getFullID(id), password);
             if (result === true) {
-                await showAppScreen(true);
-                x.open('home/home');
-                onUserLogin();
+                showPushNotificationsScreen(async () => {
+                    await showAppScreen(true);
+                    x.open('home/home');
+                    onUserLogin();
+                });
             } else {
                 var text = 'An error occured. Please try again later!';
                 if (result === 'invalidAuthKey') {
@@ -1480,9 +1482,11 @@
                         screen2.addTitle('It\'s done!');
                         screen2.addText('\nYour profile is successfully created!\n\n');
                         screen2.addButton('Enter', async () => {
-                            await showAppScreen(false);
-                            x.open('user/home', { userID: x.currentUser.getID() });
-                            onUserLogin();
+                            showPushNotificationsScreen(async () => {
+                                await showAppScreen(false);
+                                x.open('user/home', { userID: x.currentUser.getID() });
+                                onUserLogin();
+                            });
                         });
                         await screen2.show();
                     } else {
@@ -1512,9 +1516,11 @@
             await showLoadingScreen();
             var userID = await x.currentUser.createPrivateUser();
             if (await x.currentUser.loginPrivateUser(userID)) {
-                await showAppScreen(false);
-                x.open('user/home');
-                onUserLogin();
+                showPushNotificationsScreen(async () => {
+                    await showAppScreen(false);
+                    x.open('user/home');
+                    onUserLogin();
+                });
             } else {
                 throw new Error();
             }
@@ -1535,9 +1541,11 @@
             var privateUsersIDs = await x.currentUser.getPrivateUsers();
             if (privateUsersIDs.length > 0) {
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
-                    await showAppScreen(false);
-                    x.open('user/home');
-                    onUserLogin();
+                    showPushNotificationsScreen(async () => {
+                        await showAppScreen(false);
+                        x.open('user/home');
+                        onUserLogin();
+                    });
                 } else {
                     throw new Error();
                 }
@@ -1556,6 +1564,26 @@
             }
             document.querySelector('.x-app-toolbar-left').setAttribute('aria-hidden', accessible ? 'false' : 'true');
             document.querySelector('.x-app-toolbar-bottom').setAttribute('aria-hidden', accessible ? 'false' : 'true');
+        }
+    };
+
+    var showPushNotificationsScreen = async callback => {
+        if (x.deviceHasPushManagerSupport()) { // todo detect if blocked or incognito mode
+            var screen = makeHomeScreen(null);
+            screen.addTitle('Welcome back!');
+            screen.addText('\nDo you want to enable device notifications while you\'re logged in?\n\n');
+            screen.addButton('Yes, enable', async () => {
+                await showLoadingScreen();
+                await x.currentUser.enableDeviceNotifications();
+                callback();
+            });
+            screen.addButton('No, thanks', async () => {
+                await showLoadingScreen();
+                callback();
+            }, '2');
+            await screen.show();
+        } else {
+            callback();
         }
     };
 
@@ -1784,13 +1812,6 @@
     };
 
     var onUserLogin = async (isAutoLogin = false) => {
-        if (!isAutoLogin) {
-            if (x.deviceHasPushManagerSupport()) {
-                if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
-                    x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
-                }
-            }
-        }
         x.runBackgroundTasks({ delay: 1, repeat: true });
         x.runUpdateTasks(); // async call // todo optimize call
     };
