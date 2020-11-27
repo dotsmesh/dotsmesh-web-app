@@ -9,9 +9,11 @@
         "approve",
         "invite",
         "inviteGetURL",
-        "remove"
+        "remove",
+        "invitationDetails"
     ],
     "actions": [
+        "deleteInvitation",
         "isMember",
         "getMemberData",
         "modifyPendingMembersNotification",

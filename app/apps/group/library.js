@@ -50,8 +50,52 @@
         return result;
     };
 
-    var parseInvitationData = async (groupID, rawData) => {
-        return rawData;
+    var parseInvitationData = async (groupID, invitationID, rawData) => {
+        var result = {};
+        result.type = null;
+        result.id = invitationID;
+        var data = x.unpack(rawData);
+        if (data.name === 't') {
+            var value = data.value;
+            if (value.d !== undefined && value.a !== undefined && value.m !== undefined) { // a - access key, d - invitation data, m - memberID that created it
+                result.accessKey = value.a; // double hashed
+                var invData = x.unpack(value.d);
+                if (invData.name === '0') { // 0 - specific user
+                    if (invData.value.m !== undefined) { // m - member data
+                        var invitedMemeberData = x.unpack(await x.group.decryptShared(groupID, invData.value.m));
+                        if (invitedMemeberData.name === '') {
+                            invitedMemeberDataValue = invitedMemeberData.value;
+                            var dateInvited = invitedMemeberDataValue.d !== undefined ? x.parseDateID(invitedMemeberDataValue.d) : null;
+                            var invitedUserID = invitedMemeberDataValue.i !== undefined ? invitedMemeberDataValue.i : null; // todo compare with the memberID
+                            var invitedByUserID = invitedMemeberDataValue.w !== undefined ? invitedMemeberDataValue.w : null; // todo compare with the memberID
+                            result.type = 'personalInvitation';
+                            result.userID = invitedUserID;
+                            result.invitedBy = invitedByUserID;
+                            result.dateInvited = dateInvited;
+                        } else {
+                            throw new Error();
+                        }
+                    }
+                } else if (invData.name === '1') { // 1 - no user specified
+                    if (invData.value.m !== undefined) { // m - member data
+                        var invitedMemeberData = x.unpack(await x.group.decryptShared(groupID, invData.value.m));
+                        if (invitedMemeberData.name === '1') {
+                            invitedMemeberDataValue = invitedMemeberData.value;
+                            var dateCreated = invitedMemeberDataValue.d !== undefined ? x.parseDateID(invitedMemeberDataValue.d) : null;
+                            var createdByUserID = invitedMemeberDataValue.w !== undefined ? invitedMemeberDataValue.w : null; // todo compare with the memberID
+                            result.type = 'urlInvitation';
+                            result.createdBy = createdByUserID;
+                            result.dateCreated = dateCreated;
+                        } else {
+                            throw new Error();
+                        }
+                    }
+                }
+            }
+        } else {
+            throw new Error();
+        }
+        return result;
     };
 
     var getInvitationsList = async groupID => {
@@ -61,9 +105,31 @@
         for (var i = 0; i < list.length; i++) {
             var item = list[i];
             var value = item.value;
-            result.push(await parseInvitationData(groupID, value));
+            result.push(await parseInvitationData(groupID, item.key, value));
         }
         return result;
+    };
+
+    var getInvitation = async (groupID, invitationID) => {
+        var dataStorage = await x.group.getFullDataStorage(groupID, 'p/i/');
+        var rawData = await dataStorage.get(invitationID);
+        if (rawData !== null) {
+            return await parseInvitationData(groupID, invitationID, rawData);
+        }
+        return null;
+    };
+
+    var deleteInvitation = async (groupID, invitationID) => {
+        var invitation = await getInvitation(groupID, invitationID);
+        if (invitation !== null) {
+            var response = await x.group.call(groupID, 'group.invitations.delete', {
+                accessKey: invitation.accessKey
+            }, { auth: 'auto' });
+            var status = response.status;
+            if (status === 'ok') {
+                await x.announceChanges(['group/' + groupID + '/invitations']);
+            }
+        }
     };
 
     var parseMemberData = async (groupID, rawData, pending) => {
@@ -494,6 +560,7 @@
         getPendingMembersList: getPendingMembersList,
         getPendingMembersUserIDs: getPendingMembersUserIDs,
         getInvitationsList: getInvitationsList,
+        getInvitation: getInvitation,
         getMemberActivity: getMemberActivity,
         isMember: isMember,
         //getMemberDetails: getMemberDetails,
@@ -506,6 +573,7 @@
         modifyGroupPostsNotification: modifyGroupPostsNotification,
         updateGroupPostReactionsNotification: updateGroupPostReactionsNotification,
         modifyGroupPostReactionsNotification: modifyGroupPostReactionsNotification,
-        getProfileImage: getProfileImage
+        getProfileImage: getProfileImage,
+        deleteInvitation: deleteInvitation
     };
 };
