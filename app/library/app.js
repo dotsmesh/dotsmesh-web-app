@@ -1150,10 +1150,10 @@
         var screen = makeHomeScreen(addToHistory ? 'login#' : null);
         screen.addBackButton();
         screen.addTitle('Hello!');
-        screen.addText('\nEnter your ID and password to\nlog in to your profile.');
+        screen.addText('\nEnter your ID and password to\nsign in to your profile.');
         screen.addTextbox('id', 'ID');
         screen.addPassword('password', 'Password');
-        screen.addSubmitButton('Log in', async () => {
+        screen.addSubmitButton('Sign in', async () => {
             var id = screen.getValue('id').toLowerCase();
             var password = screen.getValue('password');
             if (id.length === 0) {
@@ -1174,7 +1174,7 @@
             await showLoadingScreen();
             var result = await x.currentUser.login(x.getFullID(id), password);
             if (result === true) {
-                showPushNotificationsScreen(async () => {
+                showPushNotificationsScreen('Welcome back!', async () => {
                     await showAppScreen(true);
                     x.open('home/home');
                     onUserLogin();
@@ -1478,17 +1478,18 @@
                         signupData.password = null;
                         signupData.name = null;
                         signupData.image = null;
-                        var screen2 = makeHomeScreen();
-                        screen2.addTitle('It\'s done!');
-                        screen2.addText('\nYour profile is successfully created!\n\n');
-                        screen2.addButton('Enter', async () => {
-                            showPushNotificationsScreen(async () => {
-                                await showAppScreen(false);
-                                x.open('user/home', { userID: x.currentUser.getID() });
-                                onUserLogin();
-                            });
+                        showPushNotificationsScreen('Your profile is successfully created!', async () => {
+                            await showAppScreen(false);
+                            x.open('user/home', { userID: x.currentUser.getID() });
+                            onUserLogin();
                         });
-                        await screen2.show();
+                        // var screen2 = makeHomeScreen();
+                        // screen2.addTitle('It\'s done!');
+                        // screen2.addText('\nYour profile is successfully created!\n\n');
+                        // screen2.addButton('Enter', async () => {
+
+                        // });
+                        // await screen2.show();
                     } else {
                         // todo login error
                     }
@@ -1516,7 +1517,7 @@
             await showLoadingScreen();
             var userID = await x.currentUser.createPrivateUser();
             if (await x.currentUser.loginPrivateUser(userID)) {
-                showPushNotificationsScreen(async () => {
+                showPushNotificationsScreen('Welcome!', async () => {
                     await showAppScreen(false);
                     x.open('user/home');
                     onUserLogin();
@@ -1541,7 +1542,7 @@
             var privateUsersIDs = await x.currentUser.getPrivateUsers();
             if (privateUsersIDs.length > 0) {
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
-                    showPushNotificationsScreen(async () => {
+                    showPushNotificationsScreen('Welcome back!', async () => {
                         await showAppScreen(false);
                         x.open('user/home');
                         onUserLogin();
@@ -1567,11 +1568,11 @@
         }
     };
 
-    var showPushNotificationsScreen = async callback => {
+    var showPushNotificationsScreen = async (title, callback) => {
         if (x.deviceHasPushManagerSupport()) { // todo detect if blocked or incognito mode
             var screen = makeHomeScreen(null);
-            screen.addTitle('Welcome back!');
-            screen.addText('\nDo you want to enable device notifications while you\'re logged in?\n\n');
+            screen.addTitle(title);
+            screen.addText('\nDo you want to enable device notifications while you\'re signed in?\n\n');
             screen.addButton('Yes, enable', async () => {
                 await showLoadingScreen();
                 await x.currentUser.enableDeviceNotifications();
