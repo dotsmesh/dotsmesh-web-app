@@ -559,7 +559,7 @@
             var button = x.addToolbarButton('Notification settings', async () => {
                 var action = exists ? 'delete' : 'add';
                 var serviceData = await serviceDataSource(action);
-                await x.open('system/manageNotification', {
+                x.open('system/manageNotification', {
                     action: action,
                     serviceData: serviceData,
                     text, text

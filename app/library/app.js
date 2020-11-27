@@ -303,6 +303,7 @@
             var frame = container.firstChild;
             frame.setAttribute('tabindex', accessible ? '0' : '-1');
             frame.setAttribute('aria-hidden', accessible ? 'false' : 'true');
+            await initializePromise;
             window.channel.send('setAccessibility', { accessible: accessible });
         };
         window.isVisible = () => {
@@ -424,7 +425,7 @@
         if (window !== null) {
             await window.show();
         } else {
-            await x.open(preloadData.location, preloadData.args, preloadData.options, false);
+            x.open(preloadData.location, preloadData.args, preloadData.options, false);
         }
         delete preloadedWindows[windowID];
     };
@@ -612,7 +613,7 @@
         'p/': async (type, propertyID, value) => {
             var postID = value.substr(2).toLowerCase(); // todo postid
             await showAppScreen(false);
-            await x.open('posts/post', { userID: propertyID, postID: postID }, { addToHistory: false });
+            x.open('posts/post', { userID: propertyID, postID: postID }, { addToHistory: false });
             return true;
         },
         '': async (type, propertyID, value, secret) => {
@@ -623,7 +624,7 @@
                     x.open('user/home', { userID: propertyID, connectKey: connectKey }, { addToHistory: false });
                 } else {
                     await showAppScreen(false);
-                    await x.open('user/home', { userID: propertyID }, { addToHistory: false });
+                    x.open('user/home', { userID: propertyID }, { addToHistory: false });
                 }
                 return true;
             } else if (type === 'group') {
@@ -631,7 +632,7 @@
                     if (x.currentUser.exists()) {
                         await showAppScreen(false);
                         await x.services.call('groups', 'addURLInvitation', { groupID: propertyID, accessKey: secret });
-                        await x.open('group/home', { id: propertyID }, { addToHistory: false });
+                        x.open('group/home', { id: propertyID }, { addToHistory: false });
                         return true;
                     } else {
                         await showWelcomeScreen(false);
@@ -689,10 +690,10 @@
             var showHome = async () => {
                 if (x.currentUser.isPublic()) {
                     await showAppScreen(false);
-                    await x.open('home/home', {}, { addToHistory: false });
+                    x.open('home/home', {}, { addToHistory: false });
                 } else if (x.currentUser.isPrivate()) {
                     await showAppScreen(false);
-                    await x.open('explore/home', {}, { addToHistory: false });
+                    x.open('explore/home', {}, { addToHistory: false });
                 } else {
                     await showWelcomeScreen(false);
                 }
@@ -774,7 +775,7 @@
                         }
                         await window.show(false, false);
                     } else if (typeof stateDetails.location !== 'undefined' && typeof stateDetails.args !== 'undefined') {
-                        await x.open(stateDetails.location, stateDetails.args, {
+                        x.open(stateDetails.location, stateDetails.args, {
                             addToHistory: false,
                             openerID: typeof stateDetails.openerID !== 'undefined' ? stateDetails.openerID : null
                         });
@@ -1174,8 +1175,8 @@
             var result = await x.currentUser.login(x.getFullID(id), password);
             if (result === true) {
                 await showAppScreen(true);
-                await x.open('home/home');
-                await onUserLogin();
+                x.open('home/home');
+                onUserLogin();
             } else {
                 var text = 'An error occured. Please try again later!';
                 if (result === 'invalidAuthKey') {
@@ -1480,8 +1481,8 @@
                         screen2.addText('\nYour profile is successfully created!\n\n');
                         screen2.addButton('Enter', async () => {
                             await showAppScreen(false);
-                            await x.open('user/home', { userID: x.currentUser.getID() });
-                            await onUserLogin();
+                            x.open('user/home', { userID: x.currentUser.getID() });
+                            onUserLogin();
                         });
                         await screen2.show();
                     } else {
@@ -1512,8 +1513,8 @@
             var userID = await x.currentUser.createPrivateUser();
             if (await x.currentUser.loginPrivateUser(userID)) {
                 await showAppScreen(false);
-                await x.open('user/home');
-                await onUserLogin();
+                x.open('user/home');
+                onUserLogin();
             } else {
                 throw new Error();
             }
@@ -1535,8 +1536,8 @@
             if (privateUsersIDs.length > 0) {
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
                     await showAppScreen(false);
-                    await x.open('user/home');
-                    await onUserLogin();
+                    x.open('user/home');
+                    onUserLogin();
                 } else {
                     throw new Error();
                 }
@@ -1786,7 +1787,7 @@
         if (!isAutoLogin) {
             if (x.deviceHasPushManagerSupport()) {
                 if (await x.currentUser.getDeviceNotificationsStatus() === 'disabled') {
-                    await x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
+                    x.open('system/manageDeviceNotifications', { mode: 'r' }, { modal: true, width: 300 });
                 }
             }
         }

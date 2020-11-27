@@ -38,7 +38,7 @@ async (args, library) => {
         var list = x.makeList();
 
         list.add(x.makeTextButton(async () => {
-            await x.open('system/manageDeviceNotifications', {}, { modal: true, width: 300 });
+            x.open('system/manageDeviceNotifications', {}, { modal: true, width: 300 });
         }, 'Device notifications', x.deviceHasPushManagerSupport() && await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled'));
 
         return list;

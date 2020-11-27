@@ -37,7 +37,7 @@ async (args, library) => {
 
     container.add(x.makeButton('Send as message', () => {
         x.pickContact(async userID => {
-            await x.open('messages/thread', {
+            x.open('messages/thread', {
                 userID: userID,
                 attachment: await attachment.pack()
             });
