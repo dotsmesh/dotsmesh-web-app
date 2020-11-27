@@ -207,6 +207,14 @@
         return result;
     };
 
+    var minifyGroupProperties = details => {
+        var data = {};
+        for (var name in details) {
+            data[detailsMap[name]] = details[name];
+        }
+        return data;
+    };
+
     var getList = async (details = []) => {
         var storage = getDetailsStorage();
         var list = await storage.getList(detailsToShortDetails(details));
@@ -226,6 +234,17 @@
         if (result !== null) {
             return updateGroupProperties(result);
         }
+        var cache = x.cache.get('groups-url-invitations');
+        var value = await cache.get(id);
+        if (value !== null) {
+            var result = updateGroupProperties(value);
+            for (var detail of details) {
+                if (result[detail] === undefined) {
+                    result[detail] = null;
+                }
+            }
+            return result;
+        }
         return null;
     };
 
@@ -236,14 +255,8 @@
     }
 
     var setGroupDetails = async (id, details) => {
-        details.date = Date.now();
         var storage = getDetailsStorage();
-        var data = {};
-        for (var name in details) {
-            data[detailsMap[name]] = details[name];
-        }
-        // todo if exists
-        await storage.set(id, data);
+        await storage.set(id, minifyGroupProperties(details));
         await x.announceChanges(['groups']);
     };
 
@@ -296,7 +309,9 @@
                     details.memberAccessKey = accessKey; // validate
                     details.membersKeys = data.k; // validate
                     details.membersIDSalt = data.s; // validate
-                    await addInvitation(groupID, details);
+                    //await addInvitation(groupID, details);
+                    var cache = x.cache.get('groups-url-invitations');
+                    await cache.set(groupID, minifyGroupProperties(details));
                 }
             }
         }
@@ -311,9 +326,9 @@
         //     await setGroupDetails(groupID, { providedAccessKey: group.providedAccessKey });
         // }
 
-        var secrets = await get(groupID, ['membersKeys', 'membersIDSalt']);
-        var membersKeys = secrets.membersKeys;
-        var membersIDSalt = secrets.membersIDSalt;
+        var details = await get(groupID);
+        var membersKeys = details.membersKeys;
+        var membersIDSalt = details.membersIDSalt;
 
         // var sharedGroupAccessKey = await x.cryptoData.encrypt(x.pack('', {
         //     a: group.providedAccessKey
@@ -335,8 +350,10 @@
         }, { auth: 'auto' });
         var status = response.status;
         if (status === 'ok' || status === 'pendingApproval') {
-            var storage = getDetailsStorage();
-            await storage.set(groupID, { j: status === 'ok' ? 1 : 2, a: newAccessKey });
+            details.date = Date.now();
+            details.status = status === 'ok' ? 1 : 2;
+            details.memberAccessKey = newAccessKey;
+            await setGroupDetails(groupID, details);
             await x.property.observeChanges(groupID, ['gm/' + memberID + '/s'], 'g');
             await x.announceChanges(['groups', 'group/' + groupID + '/members']);
         } else {
@@ -353,8 +370,7 @@
                 var memberID = await x.groups.getMemberID(groupID, currentUserID);
                 var dataStorage = await x.group.getSharedDataStorage(groupID);
                 if (await dataStorage.get('m/a/' + memberID + '/a') !== null) {
-                    var storage = getDetailsStorage();
-                    await storage.set(groupID, { j: 1 });
+                    await setGroupDetails(groupID, { status: 1 });
                     await x.announceChanges(['groups', 'group/' + groupID + '/members', 'group/' + groupID + '/member/' + currentUserID]);
                     var profile = await x.property.getProfile('group', groupID);
                     var notification = await x.notifications.make('gms$' + groupID);
