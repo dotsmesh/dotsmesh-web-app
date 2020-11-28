@@ -478,8 +478,8 @@
         return x.proxyCall('refresh');
     };
 
-    x.alert = text => {
-        return x.proxyCall('alert', text);
+    x.alert = (text, icon = null) => {
+        return x.proxyCall('alert', text, icon);
     };
 
     x.confirm = async (text, icon = null) => {

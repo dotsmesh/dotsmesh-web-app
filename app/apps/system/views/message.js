@@ -6,8 +6,14 @@
 
 async (args, library) => {
     var text = args.text;
+    var icon = args.icon;
 
     x.setTemplate('modal-text');
+
+    if (icon !== null) {
+        x.add(x.makeIcon(icon));
+    }
+
     x.add(x.makeText(text, true));
 
     x.add(x.makeButton('OK', async () => {

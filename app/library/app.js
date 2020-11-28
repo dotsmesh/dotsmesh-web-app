@@ -430,8 +430,8 @@
         delete preloadedWindows[windowID];
     };
 
-    x.alert = text => {
-        x.open('system/message', { text: text }, { modal: true, width: 300 });
+    x.alert = (text, icon = null) => {
+        x.open('system/message', { text: text, icon: icon }, { modal: true, width: 300 });
     };
 
     x.confirm = async (text, icon = null) => {
