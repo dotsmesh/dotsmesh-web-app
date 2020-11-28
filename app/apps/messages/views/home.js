@@ -6,7 +6,8 @@
 
 async (args, library) => {
     x.setTitle('Messages');
-
+    x.setTemplate('column-big');
+    
     if (x.currentUser.isPrivate()) {
         x.add(x.makeTitle('Messages'));
         x.add(x.makeHint('This feature is currently available for public profiles only.'));
