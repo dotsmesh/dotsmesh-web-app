@@ -7,9 +7,11 @@
 async (args, library) => {
     x.setTitle('Add contact');
 
-    x.add(x.makeText('Every public profile has a unique ID. Enter the ID of the profile you are looking for.'));
+    x.add(x.makeIcon('search'));
 
-    var fieldID = x.makeFieldTextbox('', { placeholder: 'ID' });
+    x.add(x.makeText('Every public profile has a unique ID. Enter the ID of the profile you are looking for.', true));
+
+    var fieldID = x.makeFieldTextbox('', { placeholder: 'ID', align: 'center' });
     x.add(fieldID);
     fieldID.focus();
 

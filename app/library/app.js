@@ -434,8 +434,8 @@
         x.open('system/message', { text: text }, { modal: true, width: 300 });
     };
 
-    x.confirm = async text => {
-        var result = await x.open('system/confirm', { text: text }, { modal: true, width: 300 });
+    x.confirm = async (text, icon = null) => {
+        var result = await x.open('system/confirm', { text: text, icon: icon }, { modal: true, width: 300 });
         return result === 'ok';
     };
 

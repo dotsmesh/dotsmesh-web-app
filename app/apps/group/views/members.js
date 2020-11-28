@@ -58,7 +58,7 @@ async (args, library) => {
                 name: 'modifyPendingMembersNotification',
                 args: { action: action, groupID: groupID, lastSeenUsersIDs: lastSeen }
             }
-        }, 'Get notified when a new member is pending approval.');
+        }, 'Get notified when a new member is pending approval.', 'You\'ll receive a notification when a new member is pending approval.');
         x.windowEvents.addEventListener('show', async () => {
             await library.updatePendingMembersNotification(groupID, { lastSeenUsersIDs: lastSeen });
         });

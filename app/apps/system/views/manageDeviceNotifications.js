@@ -12,6 +12,8 @@ async (args, library) => {
 
     x.setTitle('Device notifications');
 
+    x.add(x.makeIcon('push-notifications'));
+
     if (x.deviceHasPushManagerSupport()) {
         var enabled = await x.currentUser.getDeviceNotificationsStatus() === 'enabled';
 

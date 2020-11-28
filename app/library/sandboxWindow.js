@@ -482,8 +482,8 @@
         return x.proxyCall('alert', text);
     };
 
-    x.confirm = async text => {
-        return x.proxyCall('confirm', text);
+    x.confirm = async (text, icon = null) => {
+        return x.proxyCall('confirm', text, icon);
     };
 
     x.downloadFile = async (dataURI, name) => {
@@ -554,7 +554,7 @@
         };
     };
 
-    x.addToolbarNotificationsButton = (notificationID, serviceDataSource, text) => {
+    x.addToolbarNotificationsButton = (notificationID, serviceDataSource, notEnabledText, enabledText) => {
         x.wait(async () => {
             var exists = x.currentUser.exists() ? await x.notifications.exists(notificationID) : false;
             var button = x.addToolbarButton('Notification settings', async () => {
@@ -563,12 +563,14 @@
                 x.open('system/manageNotification', {
                     action: action,
                     serviceData: serviceData,
-                    text, text
+                    text: exists ? enabledText : notEnabledText
                 }, { modal: true, width: 300 });
             }, exists ? 'notification-tick' : 'notification', 'right');
-            observers.push([async () => {
-                exists = await x.notifications.exists(notificationID);
-                button.setIcon(exists ? 'notification-tick' : 'notification');
+            observers.push([() => {
+                return async () => {
+                    exists = await x.notifications.exists(notificationID);
+                    button.setIcon(exists ? 'notification-tick' : 'notification');
+                };
             }, () => {
                 return ['notifications/' + notificationID]
             }])
@@ -767,6 +769,7 @@
     x.makeText = (text, center = false, isHTML = false) => {
         var container = document.createElement('div');
         container.setAttribute('class', 'x-text');
+        text = x.stringReplaceAll(text, "\n", '<br>');
         if (isHTML) {
             container.innerHTML = text;
         } else {
@@ -984,7 +987,14 @@
         if (options.type !== undefined) {
             input.setAttribute('type', options.type);
         }
-        input.setAttribute('aria-label', label);
+        if (options.align === 'center') {
+            input.style.textAlign = 'center';
+        }
+        if (label !== null) {
+            input.setAttribute('aria-label', label);
+        } else if (options.placeholder !== undefined) {
+            input.setAttribute('aria-label', options.placeholder);
+        }
         input.addEventListener('keydown', e => {
             if (e.keyCode === 13) {
                 submitForm();
@@ -1678,7 +1688,6 @@
                 sourceOptionsToSend.limit = visiblePostIDs.length;
             }
             sourceOptionsToSend.limit++; // Add one to know if there is show more button
-            console.log(sourceOptionsToSend);
             var posts = await source(sourceOptionsToSend);
 
             var itemsToAddFirst = [];
@@ -2127,6 +2136,18 @@
         return {
             element: container
         }
+    };
+
+    x.makeIcon = (icon, options = {}) => {
+        var size = options.size !== undefined ? options.size : 80;
+        var align = options.align !== undefined ? options.align : 'center';
+        var color = options.color !== undefined ? options.color : '#333';
+        var imageElement = document.createElement('div');
+        imageElement.setAttribute('style', 'width:' + size + 'px;height:' + size + 'px;background-repeat:no-repeat;background-position:center;background-size:contain;' + (align === 'center' ? 'margin:0 auto;' : ''));
+        if (icon !== null) {
+            imageElement.style.backgroundImage = 'url(\'' + x.getIconDataURI(icon, color, size) + '\')';
+        }
+        return imageElement;
     };
 
     x.makeProfileButton = async (type, id, options = {}) => {
@@ -2688,23 +2709,25 @@
                 }
             }
 
-            var nameContainer = document.createElement('div');
-            nameContainer.setAttribute('style', (theme === 'dark' ? lightTextStyle : darkTextStyle) + titleStyle + 'padding-top:15px;max-width:100%;overflow:hidden;text-align:center;text-overflow:ellipsis;');
-            nameContainer.innerText = details.name;
-            container.appendChild(nameContainer);
+            if (mode === 'simple' || mode === 'full') {
+                var nameContainer = document.createElement('div');
+                nameContainer.setAttribute('style', (theme === 'dark' ? lightTextStyle : darkTextStyle) + titleStyle + 'padding-top:15px;max-width:100%;overflow:hidden;text-align:center;text-overflow:ellipsis;');
+                nameContainer.innerText = details.name;
+                container.appendChild(nameContainer);
 
-            var idText = null;
-            if (type === 'user') {
-                idText = x.isPrivateID(id) ? 'private profile' : x.getShortID(id);
-            } else if (type === 'groupMember') {
-                var [groupID, userID] = id.split('$');
-                idText = x.isPrivateID(userID) ? 'private profile' : x.getShortID(userID);
-            }
-            if (idText !== null) {
-                var idContainer = document.createElement('div');
-                idContainer.setAttribute('style', textStyle + 'font-size:13px;max-width:100%;color:' + (theme === 'dark' ? darkThemeHintColor : lightThemeHintColor) + ';overflow:hidden;text-align:center;text-overflow:ellipsis;');
-                idContainer.innerText = idText;
-                container.appendChild(idContainer);
+                var idText = null;
+                if (type === 'user') {
+                    idText = x.isPrivateID(id) ? 'private profile' : x.getShortID(id);
+                } else if (type === 'groupMember') {
+                    var [groupID, userID] = id.split('$');
+                    idText = x.isPrivateID(userID) ? 'private profile' : x.getShortID(userID);
+                }
+                if (idText !== null) {
+                    var idContainer = document.createElement('div');
+                    idContainer.setAttribute('style', textStyle + 'font-size:13px;max-width:100%;color:' + (theme === 'dark' ? darkThemeHintColor : lightThemeHintColor) + ';overflow:hidden;text-align:center;text-overflow:ellipsis;');
+                    idContainer.innerText = idText;
+                    container.appendChild(idContainer);
+                }
             }
 
             if (mode === 'full') {

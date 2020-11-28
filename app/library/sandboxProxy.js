@@ -578,62 +578,64 @@
         var profilesCache = x.cache.get('profiles');
 
         x.property.getProfile = async (type, id) => {
-            if (type === 'groupMember') {
-                var [groupID, userID] = id.split('$');
-                if (x.isPublicID(userID)) {
-                    type = 'user';
-                    id = userID;
+            if (id !== null) {
+                if (type === 'groupMember') {
+                    var [groupID, userID] = id.split('$');
+                    if (x.isPublicID(userID)) {
+                        type = 'user';
+                        id = userID;
+                    }
                 }
-            }
-            if (type === 'user') {
-                var dataStorage = x.user.getSharedDataStorage(id).getContext('p/');
-            } else if (type === 'group') {
-                var dataStorage = x.group.getSharedDataStorage(id).getContext('p/');
-            } else if (type === 'groupMember') {
-                var [groupID, userID] = id.split('$');
-                var memberID = await x.groups.getMemberID(groupID, userID);
-                var dataStorage = x.group.getMemberSharedDataStorage(groupID, memberID).getContext('p/');
-            } else {
-                throw new Error();
-            }
+                if (type === 'user') {
+                    var dataStorage = x.user.getSharedDataStorage(id).getContext('p/');
+                } else if (type === 'group') {
+                    var dataStorage = x.group.getSharedDataStorage(id).getContext('p/');
+                } else if (type === 'groupMember') {
+                    var [groupID, userID] = id.split('$');
+                    var memberID = await x.groups.getMemberID(groupID, userID);
+                    var dataStorage = x.group.getMemberSharedDataStorage(groupID, memberID).getContext('p/');
+                } else {
+                    throw new Error();
+                }
 
-            var getData = async key => {
-                try {
-                    var cacheKey = type + '-' + id;
-                    var data = await profilesCache.get(cacheKey);
-                    data = data === null ? {} : data;
-                    if (data[key] === undefined) {
-                        try {
-                            if (type === 'user' && x.isPrivateID(id)) {
-                                if (id === x.currentUser.getID()) {
-                                    data[key] = await x.currentUser.getPrivateProfileDetail(key);
+                var getData = async key => {
+                    try {
+                        var cacheKey = type + '-' + id;
+                        var data = await profilesCache.get(cacheKey);
+                        data = data === null ? {} : data;
+                        if (data[key] === undefined) {
+                            try {
+                                if (type === 'user' && x.isPrivateID(id)) {
+                                    if (id === x.currentUser.getID()) {
+                                        data[key] = await x.currentUser.getPrivateProfileDetail(key);
+                                    } else {
+                                        data[key] = null;
+                                    }
                                 } else {
-                                    data[key] = null;
+                                    data[key] = await dataStorage.get(key);
                                 }
-                            } else {
-                                data[key] = await dataStorage.get(key);
+                            } catch (e) {
+                                if (['userNotFound', 'invalidUserID', 'groupNotFound', 'invalidGroupID', 'invalidAccessKey', 'invalidMemberID', 'memberNotFound'].indexOf(e.name) !== -1) {
+                                    data[key] = null;
+                                } else {
+                                    throw e;
+                                }
                             }
-                        } catch (e) {
-                            if (['userNotFound', 'invalidUserID', 'groupNotFound', 'invalidGroupID', 'invalidAccessKey', 'invalidMemberID', 'memberNotFound'].indexOf(e.name) !== -1) {
-                                data[key] = null;
-                            } else {
-                                throw e;
-                            }
+                            await profilesCache.set(cacheKey, data);
                         }
-                        await profilesCache.set(cacheKey, data);
+                        return data[key];
+                    } catch (e) {
+                        if (e.name === 'networkError') {
+                            // var error = x.makeAppError('propertyUnavailable', '');
+                            // error.details['reason'] = e;
+                            // throw error;
+                            return null;
+                        } else {
+                            throw e;
+                        }
                     }
-                    return data[key];
-                } catch (e) {
-                    if (e.name === 'networkError') {
-                        // var error = x.makeAppError('propertyUnavailable', '');
-                        // error.details['reason'] = e;
-                        // throw error;
-                        return null;
-                    } else {
-                        throw e;
-                    }
-                }
-            };
+                };
+            }
             if (id === null) {
                 var data = null;
             } else {

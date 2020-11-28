@@ -7,9 +7,15 @@
 async (args, library) => {
     x.setTitle('New group');
 
-    x.add(x.makeText('Just like the public profiles, a group requires a group key. It points to the place where your data will be stored. Get one at <a onclick="x.openURL(\'https://hosting.dotsmesh.com/\');">hosting.dotsmesh.com</a>.', false, true));
+    x.add(x.makeProfilePreviewComponent('group', null, {
+        theme: 'light',
+        mode: 'image',
+        imageSize: 80
+    }));
 
-    var fieldGroupKey = x.makeFieldTextbox('Group key', { maxLength: 200 });
+    x.add(x.makeText('Just like the public profiles, a group requires a group key. It points to the place where your data will be stored. Get one at <a onclick="x.openURL(\'https://hosting.dotsmesh.com/\');">hosting.dotsmesh.com</a>.\n\nAlready got one?', true, true));
+
+    var fieldGroupKey = x.makeFieldTextbox(null, { placeholder: 'Group key', align: 'center', maxLength: 200 });
     x.add(fieldGroupKey);
 
     x.add(x.makeButton('Create', async () => {

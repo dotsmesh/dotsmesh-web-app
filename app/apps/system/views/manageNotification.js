@@ -11,6 +11,8 @@ async (args, library) => {
     x.setTemplate('modal-text');
     x.setTitle('Notifications');
 
+    x.add(x.makeIcon('notification'));
+
     x.add(x.makeText(args.text, true));
 
     var call = async () => {

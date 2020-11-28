@@ -69,7 +69,7 @@ async (args, library) => {
 
     if (post.userID === currentUserID && canDelete) {  // observe user join
         x.addToolbarButton('Delete this post', async () => {
-            if (await x.confirm('Are you sure you want to delete this post?')) {
+            if (await x.confirm('Are you sure you want to delete this post?', 'delete')) {
                 x.showLoading();
                 await library.deletePost(propertyType, propertyID, postID);
                 await x.announceChanges(['user/' + currentUserID, 'posts/' + postID]);
@@ -145,7 +145,7 @@ async (args, library) => {
                 name: 'modifyGroupPostReactionsNotification',
                 args: { action: action, groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() }
             }
-        }, 'Get notified when there is activity in this post.');
+        }, 'Get notified when there is activity in this post.', 'You\'ll receive a notification when there is activity in this post.');
         x.windowEvents.addEventListener('show', async () => {
             await x.services.call('group', 'updateGroupPostReactionsNotification', { groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() });
         });

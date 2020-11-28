@@ -82,7 +82,7 @@ async (args, library) => {
                     name: 'modifyUserPostsNotification',
                     args: { action: action, userID: userID, lastSeenPosts: listComponent.getLastSeen() }
                 }
-            }, 'Get notified when there are new posts here.');
+            }, 'Get notified when there are new posts here.', 'You\'ll receive a notification when there are new posts here.');
             x.windowEvents.addEventListener('show', async () => {
                 await library.updateUserPostsNotification(userID, { lastSeenPosts: listComponent.getLastSeen() });
             });

@@ -9,9 +9,11 @@ async (args, library) => {
 
     x.setTitle('Do you have a key?');
 
-    x.add(x.makeText('You\'ll need a key to send your connection request to this profile. This is an anti-spam mechanism.'));
+    x.add(x.makeIcon('key'));
 
-    var fieldKey = x.makeFieldTextbox(null, { placeholder: 'Connection key' });
+    x.add(x.makeText('You\'ll need a key to send your connection request to this profile. This is an anti-spam mechanism.', true));
+
+    var fieldKey = x.makeFieldTextbox(null, { placeholder: 'Connection key', align: 'center' });
     x.add(fieldKey);
 
     x.add(x.makeButton('Send connection request', async () => {

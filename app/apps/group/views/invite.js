@@ -9,6 +9,13 @@ async (args, library) => {
     x.setTitle('Invite');
 
     x.setTemplate('modal-text');
+
+    x.add(x.makeProfilePreviewComponent('group', groupID, {
+        theme: 'light',
+        mode: 'simple',
+        imageSize: 150
+    }));
+
     x.add(x.makeText('Invite new members to this group.', true));
 
     var container = x.makeContainer();

@@ -14,6 +14,12 @@ async (args, library) => {
     var showJoinButton = false;
     var showLeaveButton = false;
 
+    x.add(x.makeProfilePreviewComponent('group', groupID, {
+        theme: 'light',
+        mode: 'simple',
+        imageSize: 150
+    }));
+
     var details = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['status', 'invitedBy'] });
     let status = details.status;
     if (status === 'joined') {
