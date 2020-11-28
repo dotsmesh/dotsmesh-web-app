@@ -73,7 +73,7 @@
             return await x.getHash('SHA-512', hashedPassword + '$' + id);
         };
 
-        let getPushSubscription = async host => { // Returns the push notification subscription as JSON or NULL
+        let getPushSubscription = async host => { // Returns the push notification subscription as text or NULL
             if (x.deviceHasPushManagerSupport()) {
                 var registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {

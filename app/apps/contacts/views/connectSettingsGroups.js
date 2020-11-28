@@ -20,7 +20,7 @@ async (args, library) => {
                 onClick: (async groupID => {
                     x.open('contacts/connectSettingsGroup', { groupID: groupID }, { modal: true, width: 300 });
                 }).bind(null, groupID),
-                details: group.allowConnectRequests === 1 ? 'Connection requests allowed' : 'Connection requests forbidden'
+                details: group.allowConnectRequests === 1 ? 'Allowed' : 'Forbidden'
             }));
         }
 

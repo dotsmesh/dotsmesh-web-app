@@ -16,7 +16,7 @@ async (args, library) => {
     var list = x.makeList();
 
     list.add(x.makeTextButton(async () => {
-        x.alert('English is the only supported language today. Contact us and tell us which one we should add next.');
+        x.alert('Currently, English is the only supported language. Contact us and tell us which one we should add next.');
     }, 'Language', 'English'));
 
     // list.add(x.makeTextButton(async () => {

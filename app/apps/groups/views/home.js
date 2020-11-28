@@ -28,7 +28,7 @@ async (args, library) => {
         var groupsCount = Object.keys(groups).length;
         if (groupsCount === 0) {
             var container = x.makeContainer(true);
-            container.add(x.makeHint('Groups are the place to share, collaborate, discuss, or just have fun with others.'));
+            container.add(x.makeHint('Groups are a great place to share, collaborate, discuss, or just have fun with others.'));
             // container.add(x.makeSmallTitle('Want to try one?'));
             // container.add(x.makeHint('There is a private demo group you can join to take a look this feature of the platform. Get a hosting key to create your own.'));
             // container.add(x.makeButton('Visit', async () => {

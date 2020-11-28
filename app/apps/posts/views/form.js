@@ -14,12 +14,12 @@ async (args, library) => {
     if (args.userID !== undefined) { // USER
         propertyType = 'user';
         propertyID = args.userID;
-        x.setTitle('New public post');
+        x.setTitle(editMode ? 'Edit post' : 'New public post');
     } else if (args.groupID !== undefined) { // GROUP
         propertyType = 'group';
         propertyID = args.groupID;
         var profile = await x.group.getProfile(propertyID);
-        x.setTitle('New post in ' + profile.name);
+        x.setTitle(editMode ? 'Edit post' : 'New post in ' + profile.name);
     }
 
     var attachment = args.attachment !== undefined ? x.attachment.unpack(null, args.attachment.value) : null;

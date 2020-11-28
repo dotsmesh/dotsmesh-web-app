@@ -13,12 +13,11 @@ async (args, library) => {
         x.setTitle('Add to contacts');
     }
 
-
     x.add(x.makeProfilePreviewComponent('user', userID, {
         theme: 'light',
-        mode: 'simple'
+        mode: 'simple',
+        imageSize: 150
     }));
-
 
     x.add(x.makeComponent(async () => {
         var contact = await library.get(userID);

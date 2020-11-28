@@ -93,7 +93,7 @@ async (args, library) => {
         if (hasContent) {
             return container;
         } else {
-            return x.makeHint('This is the place where all the things that require your attention will be shown. If empty, you can enjoy a cup of coffee, do a few pushups or explore what others have shared.')
+            return x.makeHint('This is the place where all the things that require your attention will be shown. If empty, you can enjoy a cup of coffee, do a few pushups, or explore what others have shared.')
         }
     }, { observeChanges: ['notifications'] });
     x.add(component);
