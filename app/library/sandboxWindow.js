@@ -874,6 +874,7 @@
         var styleID = options.style !== undefined ? options.style : null;
         var title = options.title !== undefined ? options.title : null;
         var align = options.align !== undefined ? options.align : null;
+        var visible = options.visible !== undefined ? options.visible : true;
         var container = document.createElement('div');
         container.setAttribute('class', 'x-button');
         container.setAttribute('tabindex', '0');
@@ -905,13 +906,18 @@
         if (icon !== null) {
             setIcon(icon);
         }
+        var show = () => {
+            container.style.display = 'block';
+        };
+        var hide = () => {
+            container.style.display = 'none';
+        }
+        if (!visible) {
+            hide();
+        }
         return {
-            show: () => {
-                container.style.display = 'block';
-            },
-            hide: () => {
-                container.style.display = 'none';
-            },
+            show: show,
+            hide: hide,
             disable: () => {
                 disabled = true;
                 container.setAttribute('disabled', 'true');
