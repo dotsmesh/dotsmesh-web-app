@@ -2606,14 +2606,15 @@
 
             var mode = options.mode !== undefined ? options.mode : 'full';
             var theme = options.theme !== undefined ? options.theme : 'dark';
+            var imageSize = options.imageSize !== undefined ? options.imageSize : 200;
 
             var container = document.createElement('div');
             container.setAttribute('style', 'position:relative;display:flex;flex-direction:column;align-items:center;padding-bottom:20px;');
 
             var imageContainer = document.createElement('div');
-            imageContainer.setAttribute('style', 'height:200px;position:relative;');
+            imageContainer.setAttribute('style', 'height:' + imageSize + 'px;position:relative;');
 
-            var imageElement = await getProfileImageElement(type, id, 200);
+            var imageElement = await getProfileImageElement(type, id, imageSize);
             imageElement.style.position = 'relative';
             imageElement.style.zIndex = '2';
             imageContainer.appendChild(imageElement);
