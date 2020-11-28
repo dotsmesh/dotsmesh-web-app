@@ -10,7 +10,7 @@ async (args, library) => {
     x.setTitle(title);
     x.add(x.makeTitle(title));
 
-    // toto check if admin
+    // todo check if admin
     x.addToolbarSecretButton('This list is visible only to the group administrators!');
 
     x.add(x.makeSmallTitle('Personal'));

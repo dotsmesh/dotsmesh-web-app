@@ -35,36 +35,49 @@ async (args, library) => {
     } else if (type === 'group') {
         x.setTitle('Pick a group');
     }
-    x.add(x.makeComponent(async () => {
-        let list = x.makeList();
-        if (type === 'user') {
-            var contacts = await x.services.call('contacts', 'getList', { details: ['name'] }); // todo just id is needed
-            for (let i in contacts) {
-                var contact = contacts[i];
-                if (contact.providedAccessKey !== null && contact.accessKey !== null) {
-                    var userID = contact.id;
-                    list.add(await x.makeProfileButton('user', userID, {
-                        onClick: (async userID => {
-                            if (await callService(userID)) {
-                                x.back({ id: userID });
-                            }
-                        }).bind(null, userID)
-                    }));
-                }
-            }
-        } else if (type === 'group') {
-            var groups = await x.services.call('groups', 'getList');
-            for (let groupID in groups) {
-                list.add(await x.makeProfileButton('group', groupID, {
-                    onClick: (async groupID => {
-                        if (await callService(groupID)) {
-                            x.back({ id: groupID });
+
+    var list = x.makeList();
+    var addedItemsCount = 0;
+    var emptyText = '';
+    if (type === 'user') {
+        emptyText = 'There are no contacts to show!';
+        var contacts = await x.services.call('contacts', 'getList', { details: ['name'] }); // todo just id is needed
+        for (let i in contacts) {
+            var contact = contacts[i];
+            if (contact.providedAccessKey !== null && contact.accessKey !== null) {
+                var userID = contact.id;
+                list.add(await x.makeProfileButton('user', userID, {
+                    onClick: (async userID => {
+                        if (await callService(userID)) {
+                            x.back({ id: userID });
                         }
-                    }).bind(null, groupID)
+                    }).bind(null, userID)
                 }));
+                addedItemsCount++;
             }
         }
-        return list;
-    }));
+    } else if (type === 'group') {
+        emptyText = 'There are no groups to show!';
+        var groups = await x.services.call('groups', 'getList');
+        for (let groupID in groups) {
+            list.add(await x.makeProfileButton('group', groupID, {
+                onClick: (async groupID => {
+                    if (await callService(groupID)) {
+                        x.back({ id: groupID });
+                    }
+                }).bind(null, groupID)
+            }));
+            addedItemsCount++;
+        }
+    }
+    if (addedItemsCount > 0) {
+        x.add(list);
+    } else {
+        x.setTemplate('modal-text');
+        x.add(x.makeText(emptyText, true));
+        x.add(x.makeButton('OK', async () => {
+            await x.back();
+        }));
+    }
 
 };

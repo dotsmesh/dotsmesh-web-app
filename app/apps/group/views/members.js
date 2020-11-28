@@ -13,7 +13,7 @@ async (args, library) => {
     x.add(x.makeTitle(title));
 
     if (!isMembersMode) {
-        // tdoto check if admin
+        // todo check if admin
         x.addToolbarSecretButton('This list is visible only to the group administrators!');
     }
 

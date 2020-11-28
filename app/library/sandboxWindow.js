@@ -579,7 +579,7 @@
 
     x.addToolbarSecretButton = text => {
         x.addToolbarButton('About', () => {
-            x.alert(text);
+            x.alert(text, 'lock');
         }, 'lock');
     };
 

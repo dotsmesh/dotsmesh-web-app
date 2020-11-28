@@ -94,7 +94,7 @@ async (args, library) => {
             name: 'modifyGroupPostsNotification',
             args: { action: action, groupID: groupID, lastSeenPosts: listComponent.getLastSeen() }
         }
-    }, 'Get notified when there is a new post in this group.', 'You\'ll receive a notification when there is a new post in this group.');
+    }, 'Get notified when there are new posts in this group.', 'You\'ll receive a notification when there are new posts in this group.');
     x.windowEvents.addEventListener('show', async () => {
         await library.updateGroupPostsNotification(groupID, { lastSeenPosts: listComponent.getLastSeen() });
     });
