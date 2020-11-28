@@ -600,27 +600,31 @@
     //css += 'body[x-type="default"] .x-list[x-type="list"] > div:not(:last-child){margin-bottom:' + contentSpacing + ';}';
 
     x.makeList = (options = {}) => {
-        var type = typeof options.type !== 'undefined' ? options.type : 'list';
-        var showSpacing = typeof options.showSpacing !== 'undefined' ? options.showSpacing : false;
+        var type = options.type !== undefined ? options.type : 'list';
+        var showSpacing = options.showSpacing !== undefined ? options.showSpacing : false;
+        var visible = options.visible !== undefined ? options.visible : true;
         var container = document.createElement('div');
         container.setAttribute('class', 'x-list');
         container.setAttribute('x-type', type);
         var itemsVersion = 0;
-        var add = item => {
+        var add = (item, position = 'last') => {
             var itemContainer = document.createElement('div');
             itemContainer.appendChild(item.element);
-            container.appendChild(itemContainer);
+            if (item.id !== undefined) {
+                itemContainer.setAttribute('x-list-item-id', item.id);
+            }
+            if (position === 'first') {
+                if (container.firstChild !== null) {
+                    container.insertBefore(itemContainer, container.firstChild);
+                } else {
+                    container.appendChild(itemContainer);
+                }
+            } else {
+                container.appendChild(itemContainer);
+            }
             itemsVersion++;
         };
         var updateLayout = null;
-        var addMultiple = items => {
-            for (var item of items) {
-                add(item);
-            }
-            if (updateLayout !== null) {
-                updateLayout();
-            }
-        };
         if (type === 'grid') {
             var spacing = showSpacing ? contentSpacingInt : 0; // edgeSpacingInt
             var gridItemWidth = 500;
@@ -684,51 +688,44 @@
             x.windowEvents.addEventListener('beforeShow', updateSize);
             x.windowEvents.addEventListener('update', updateSize);
             x.windowEvents.addEventListener('resize', updateSize);
-
             updateLayout = updateSize;
-
-            // var addOnResize = (element, callback) => {
-            //     var rect = element.getBoundingClientRect();
-            //     var previousValue = Math.floor(rect.width) + '/' + Math.floor(rect.height);
-            //     var call = 0;
-            //     var addObserver = () => {
-            //         var observer = new ResizeObserver(entries => {
-            //             var rect = entries[0].contentRect;
-            //             if (rect.width > 0 && rect.height > 0) { // weird in Firefox
-            //                 var currentValue = Math.floor(rect.width) + '/' + Math.floor(rect.height);
-            //                 //console.log(currentValue);
-            //                 if (previousValue !== currentValue) {
-            //                     observer.unobserve(element);
-            //                     delete observer;
-            //                     previousValue = currentValue;
-            //                     call = 1;
-            //                 }
-            //             }
-            //         });
-            //         observer.observe(element);
-            //     };
-            //     addObserver();
-            //     var check = () => {
-            //         requestAnimationFrame(() => {
-            //             if (call === 1) {
-            //                 call = 2;
-            //             } else if (call === 2) {
-            //                 call = 3;
-            //                 callback();
-            //             } else if (call === 3) {
-            //                 call = 0;
-            //                 //addObserver();
-            //             }
-            //             check();
-            //         });
-            //     };
-            //     check();
-            // };
-            // addOnResize(container, updateSize);
+        }
+        var show = () => {
+            container.style.display = 'block';
+        };
+        var hide = () => {
+            container.style.display = 'none';
+        }
+        if (!visible) {
+            hide();
         }
         return {
-            add: add,
-            addMultiple: addMultiple,
+            show: show,
+            hide: hide,
+            add: (item, position = 'last') => {
+                add(item, position);
+                if (updateLayout !== null) {
+                    updateLayout();
+                }
+            },
+            addMultiple: items => {
+                for (var item of items) {
+                    add(item);
+                }
+                if (updateLayout !== null) {
+                    updateLayout();
+                }
+            },
+            remove: id => {
+                var itemContainer = container.querySelector('[x-list-item-id="' + id + '"]');
+                if (itemContainer !== null) {
+                    itemsVersion++;
+                    itemContainer.parentNode.removeChild(itemContainer);
+                    if (updateLayout !== null) {
+                        updateLayout();
+                    }
+                }
+            },
             element: container
         };
     };
