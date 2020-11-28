@@ -148,7 +148,8 @@
             if (x.arrayIntersect(observedKeys, keys).length === 0) { // no need to update
                 continue;
             }
-            promises.push(observer[0]());
+            var updateFunction = observer[0](); // Returns the update function. This allows changing it.
+            promises.push(updateFunction());
         }
         if (promises.length > 0) {
             await Promise.all(promises);
@@ -1411,17 +1412,10 @@
         });
         var observedKeys = options.observeChanges !== undefined ? options.observeChanges : [];
         var component = {
-            update: async (args = {}) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        var result = await source(args);
-                        container.innerHTML = '';
-                        addElements(result);
-                        resolve();
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+            update: async () => {
+                var result = await source();
+                container.innerHTML = '';
+                addElements(result);
             },
             observeChanges: keys => {
                 observedKeys = observedKeys.concat(keys);
@@ -1429,7 +1423,7 @@
             element: container,
             promise: promise
         };
-        observers.push([component.update, () => { return observedKeys }]);
+        observers.push([() => { return component.update }, () => { return observedKeys }]);
         return component;
     };
 
