@@ -73,18 +73,18 @@ async (args, library) => {
 
     x.add(component);
 
-    x.add(x.makeSmallTitle('Suggestions'));
-    x.add(x.makeHint('These are just a few profiles you can follow to get started. Invite your friends to make this screen more personal.'));
+    // x.add(x.makeSmallTitle('Suggestions'));
+    // x.add(x.makeHint('These are just a few profiles you can follow to get started. Invite your friends to make this screen more personal.'));
 
-    x.add(x.makeComponent(async () => {
-        let list = x.makeList({ type: 'grid' });
-        var userIDs = ['ivo', 'dailyquotes', 'photodobo'];
-        for (var i = 0; i < userIDs.length; i++) {
-            var userID = x.getFullID(userIDs[i]);
-            list.add(await x.makeProfileButton('user', userID, { details: x.getShortID(userID) }));
-        }
-        return list;
-    }));
+    // x.add(x.makeComponent(async () => {
+    //     let list = x.makeList({ type: 'grid' });
+    //     var userIDs = ['ivo', 'dailyquotes', 'photodobo'];
+    //     for (var i = 0; i < userIDs.length; i++) {
+    //         var userID = x.getFullID(userIDs[i]);
+    //         list.add(await x.makeProfileButton('user', userID, { details: x.getShortID(userID) }));
+    //     }
+    //     return list;
+    // }));
 
     // x.addToolbarButton(async () => {
     //     await library.updateAllProperties();
