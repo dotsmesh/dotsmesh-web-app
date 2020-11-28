@@ -71,7 +71,7 @@ async (args, library) => {
 
     x.add(x.makeHint('This feature is coming soon!'), { template: 'column2' });
 
-    var component = x.makePostsListComponent(async options => {
+    var component = await x.makePostsListComponent(async options => {
         //console.table(await library.getMemberActivity(groupID, userID));
         return [];
     });

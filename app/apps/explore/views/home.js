@@ -57,7 +57,7 @@ async (args, library) => {
             }
         }
 
-        var postsList = x.makePostsListComponent(async (options) => {
+        var postsList = await x.makePostsListComponent(async (options) => {
             var posts = await library.getPropertiesPosts(following, { order: options.order, offset: options.offset, limit: options.limit });
             library.updateAllProperties(5 * 60);
             return posts;

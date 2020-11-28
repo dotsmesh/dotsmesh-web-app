@@ -51,7 +51,7 @@ async (args, library) => {
 
         x.add(x.makeTitle('Recently published'), { template: 'column2' });
 
-        var listComponent = x.makePostsListComponent(async options => {
+        var listComponent = await x.makePostsListComponent(async options => {
             var result = await x.property.getPosts('user', userID, { order: options.order, offset: options.offset, limit: options.limit, cacheList: true, cacheValues: true });
             if (!isCurrentUser) {
                 x.property.checkForNewPosts('user', userID, result.length > 0 ? result[0].id : null);

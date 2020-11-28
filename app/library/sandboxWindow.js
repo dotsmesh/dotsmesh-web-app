@@ -1415,10 +1415,9 @@
                 }
             }
         }
-        var args = options.args !== undefined ? options.args : {};
         var promise = new Promise(async (resolve, reject) => {
             try {
-                var result = await source(args);
+                var result = await source();
                 addElements(result);
                 resolve();
             } catch (e) {
@@ -1626,93 +1625,139 @@
         return container;
     };
 
-    x.makePostsListComponent = (source, options) => {
+    x.makePostsListComponent = async (source, options) => {
         var listOptions = typeof options === 'undefined' ? {} : x.shallowCopyObject(options);
         listOptions.mode = 'summary';
         var addButton = typeof listOptions.addButton !== 'undefined' ? listOptions.addButton : null;
         var emptyText = typeof listOptions.emptyText !== 'undefined' ? listOptions.emptyText : null;
-        var addedPosts = [];
+        var visiblePostIDs = [];
+        var newestPostDate = null;
         var postsPerLoadedPage = 20;
         var sourceOptions = {
             order: 'desc',
             offset: 0,
             limit: postsPerLoadedPage
         };
-        var component = x.makeComponent(async () => {
-            // todo when x.property.checkForNewPosts triggers update dont rebuild the entire container
-            var posts = await source(x.shallowCopyObject(sourceOptions));
-            var container = x.makeContainer(true);
-            if (addButton !== null) {
-                var addButtonDetails = typeof addButton === 'function' ? await addButton() : addButton;
-                if (addButtonDetails !== null) {
-                    container.add(x.makeIconButton(addButtonDetails.onClick, 'plus', addButtonDetails.text));//, null, true
+
+        var container = x.makeContainer(true);
+
+        if (addButton !== null) {
+            var addButtonDetails = typeof addButton === 'function' ? await addButton() : addButton;
+            if (addButtonDetails !== null) {
+                container.add(x.makeIconButton(addButtonDetails.onClick, 'plus', addButtonDetails.text));
+            }
+        }
+
+        var emptyTextHint = null;
+        if (emptyText !== null) {
+            emptyTextHint = x.makeHint(emptyText, { visible: false });
+            container.add(emptyTextHint);
+        }
+
+        var list = x.makeList({
+            type: 'grid',
+            showSpacing: true,
+            visible: false
+        });
+        container.add(list);
+
+        var showModeButtonText = 'Show more';
+        var showMoreButton = x.makeButton(showModeButtonText, async () => {
+            showMoreButton.setText('Loading ...');
+            showMoreButton.disable();
+            sourceOptions.limit += postsPerLoadedPage;
+            await loadPosts();
+            showMoreButton.setText(showModeButtonText);
+            showMoreButton.enable();
+        }, { align: 'center', visible: false });
+        container.add(showMoreButton);
+
+        var loadPosts = async () => {
+            var sourceOptionsToSend = x.shallowCopyObject(sourceOptions);
+            if (visiblePostIDs.length > sourceOptionsToSend.limit) {
+                sourceOptionsToSend.limit = visiblePostIDs.length;
+            }
+            sourceOptionsToSend.limit++; // Add one to know if there is show more button
+            console.log(sourceOptionsToSend);
+            var posts = await source(sourceOptionsToSend);
+
+            var itemsToAddFirst = [];
+            var itemsToAddLast = [];
+            var loadedPostIDs = [];
+            var newVisiblePostIDs = [];
+            for (var i = 0; i < posts.length; i++) {
+                var post = posts[i];
+                var postID = post.id; // todo there may be 2 posts from different users/groups
+                loadedPostIDs.push(postID);
+                if (i === sourceOptionsToSend.limit - 1) { // the last post that's used for the show more button only
+                    continue;
+                }
+                newVisiblePostIDs.push(postID);
+                if (visiblePostIDs.indexOf(postID) !== -1) {
+                    continue;
+                }
+                var element = await makePostElement(post, listOptions);
+                var args = { postID: postID };
+                if (post.groupID !== undefined) {
+                    args.groupID = post.groupID;
+                } else if (post.userID !== undefined) {
+                    args.userID = post.userID;
+                }
+                x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
+                var addFirst = newestPostDate !== null && post.date >= newestPostDate;
+                if (newestPostDate === null || newestPostDate < post.date) {
+                    newestPostDate = post.date;
+                }
+                if (addFirst) {
+                    itemsToAddFirst.push({ id: postID, element: element });
+                } else {
+                    itemsToAddLast.push({ id: postID, element: element });
+                }
+            };
+            if (itemsToAddFirst.length > 0) {// todo dont add new ones, but show notification, unless added by the current user
+                itemsToAddFirst.reverse();
+                for (var item of itemsToAddFirst) {
+                    list.add(item, 'first');
                 }
             }
-            if (posts.length === 0) {
-                if (emptyText !== null) {
-                    container.add(x.makeHint(emptyText));
-                }
+            if (itemsToAddLast.length > 0) {
+                list.addMultiple(itemsToAddLast);
+            }
+
+            var itemsToRemove = x.arrayDifference(visiblePostIDs, loadedPostIDs);
+            for (var postIDToRemove of itemsToRemove) {
+                list.remove(postIDToRemove);
+            }
+
+            visiblePostIDs = x.arrayUnique(visiblePostIDs.concat(newVisiblePostIDs));
+
+            if (loadedPostIDs.length > sourceOptions.limit) {
+                showMoreButton.show();
             } else {
-                var list = x.makeList({
-                    type: 'grid',
-                    showSpacing: true
-                });
-                var addPosts = async posts => {
-                    var itemsToAdd = [];
-                    var postIDs = [];
-                    for (var i = 0; i < posts.length; i++) {
-                        var post = posts[i];
-                        var postID = post.id;
-                        if (addedPosts.indexOf(postID) !== -1) {
-                            continue;
-                        }
-                        var element = await makePostElement(post, listOptions);
-                        var args = { postID: postID };
-                        if (post.groupID !== undefined) {
-                            args.groupID = post.groupID;
-                        } else if (post.userID !== undefined) {
-                            args.userID = post.userID;
-                        }
-                        x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
-                        itemsToAdd.push({ element: element });
-                        postIDs.push(postID);
-                    };
-                    list.addMultiple(itemsToAdd); // todo dont add new ones, but show notification
-                    addedPosts = addedPosts.concat(postIDs);
-                };
-                await addPosts(posts);
-                container.add(list);
-                if (posts.length >= sourceOptions.limit) {
-                    var showModeButtonText = 'Show more';
-                    var showMoreButton = x.makeButton(showModeButtonText, async () => {
-                        showMoreButton.setText('Loading ...');
-                        showMoreButton.disable();
-                        sourceOptions.limit += postsPerLoadedPage;
-                        var loadedPostsCount = null;
-                        try {
-                            var posts = await source(x.shallowCopyObject(sourceOptions));
-                            await addPosts(posts);
-                            loadedPostsCount = posts.length;
-                        } catch (e) {
-                            //console.log(e);
-                            // todo
-                        }
-                        if (loadedPostsCount !== null) {
-                            if (loadedPostsCount < sourceOptions.limit) {
-                                showMoreButton.remove();
-                                return;
-                            }
-                        }
-                        showMoreButton.setText(showModeButtonText);
-                        showMoreButton.enable();
-                    }, { align: 'center' });
-                    container.add(showMoreButton);
-                }
+                showMoreButton.hide();
             }
+            if (loadedPostIDs.length === 0) {
+                if (emptyTextHint !== null) {
+                    emptyTextHint.show();
+                }
+                list.hide();
+            } else {
+                if (emptyTextHint !== null) {
+                    emptyTextHint.hide();
+                }
+                list.show();
+            }
+        };
+
+        var component = x.makeComponent(async () => {
+            await loadPosts();
             return container;
         });
+        component.update = async () => {
+            await loadPosts();
+        };
         component.getLastSeen = () => {
-            return addedPosts;
+            return visiblePostIDs;
         };
         return component;
     };
@@ -2480,7 +2525,7 @@
                 x.open('posts/post', args);
                 //x.addClickToOpen(element, { location: 'posts/post', args: args, preload: true });
             };
-                var posts = await x.property.getPosts('user', propertyID, { ids: [postID], cacheValues: true });
+            var posts = await x.property.getPosts('user', propertyID, { ids: [postID], cacheValues: true });
             if (posts[0] !== undefined) {
                 var post = posts[0];
                 if (size !== null) {

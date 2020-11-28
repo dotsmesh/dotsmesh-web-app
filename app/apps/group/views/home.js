@@ -67,7 +67,7 @@ async (args, library) => {
 
     x.add(x.makeTitle('Recently published'), { template: 'column2' });
 
-    var listComponent = x.makePostsListComponent(async options => {
+    var listComponent = await x.makePostsListComponent(async options => {
         var posts = await x.property.getPosts('group', groupID, { order: options.order, offset: options.offset, limit: options.limit, cacheValues: true });
         return posts;
     }, {
