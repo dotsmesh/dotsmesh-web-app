@@ -736,11 +736,23 @@
         css += '.x-hint{' + textStyle + 'color:' + darkThemeHintColor + ';padding:0 ' + contentSpacing + ';max-width:400px;}';
     }
 
-    x.makeHint = text => {
+    x.makeHint = (text, options = {}) => {
+        var visible = options.visible !== undefined ? options.visible : true;
         var container = document.createElement('div');
         container.setAttribute('class', 'x-hint');
         container.innerText = text;
+        var show = () => {
+            container.style.display = 'block';
+        };
+        var hide = () => {
+            container.style.display = 'none';
+        }
+        if (!visible) {
+            hide();
+        }
         return {
+            show: show,
+            hide: hide,
             element: container
         }
     };
