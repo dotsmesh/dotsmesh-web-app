@@ -14,9 +14,12 @@ async (args, library) => {
 
         var anonymousConnectIsAllowed = await library.getOpenConnectStatus();
         var list = x.makeList();
-        list.add(x.makeTextButton(async () => {
+        list.add(x.makeIconButton(async () => {
             x.open('contacts/connectSettingsOpenConnect', {}, { modal: true, width: 300 });
-        }, 'Requests from everyone', (anonymousConnectIsAllowed ? 'Allowed' : 'Forbidden')));
+        }, 'globe', 'Requests from everyone', {
+            details: (anonymousConnectIsAllowed ? 'Allowed' : 'Forbidden'),
+            imageSize: 50
+        }));
 
         var enabledGroupCount = 0;
         var totalGroupCount = 0;
@@ -28,15 +31,21 @@ async (args, library) => {
             }
             totalGroupCount++;
         }
-        list.add(x.makeTextButton(async () => {
+        list.add(x.makeIconButton(async () => {
             x.open('contacts/connectSettingsGroups', {}, { modal: true, width: 300 });
-        }, 'Requests from groups', 'Allowed for ' + enabledGroupCount + '/' + totalGroupCount + ' groups'));
+        }, 'group', 'Requests from groups', {
+            details: 'Allowed for ' + enabledGroupCount + '/' + totalGroupCount + ' groups',
+            imageSize: 50
+        }));
 
         var connectKeys = await library.getConnectKeysList();
         var connectKeysCount = connectKeys.length;
-        list.add(x.makeTextButton(async () => {
+        list.add(x.makeIconButton(async () => {
             x.open('contacts/connectSettingsKeys', {}, { modal: true, width: 300 });
-        }, 'Connection keys', connectKeysCount + ' active'));
+        }, 'key', 'Connection keys', {
+            details: connectKeysCount + ' active',
+            imageSize: 50
+        }));
 
         return list;
     }, { observeChanges: ['contactsOpenStatus', 'contactsConnectKeys', 'groups/membersConnectStatus'] }));

@@ -2184,16 +2184,16 @@
         return button;
     };
 
-    x.makeIconButton = (onClick, icon, text = null, details = null, hint = null) => {//, inline
-        // if (typeof inline === 'undefined') {
-        //     inline = false;
-        // }
+    x.makeIconButton = (onClick, icon, text = null, options = {}) => {//, inline
+        var details = options.details !== undefined ? options.details : null;
+        var hint = options.hint !== undefined ? options.hint : null;
+        var imageSize = options.imageSize !== undefined ? options.imageSize : 30;
         var imageElement = document.createElement('div');
-        imageElement.setAttribute('style', 'border:1px solid #353535;box-sizing:border-box;width:30px;height:30px;border-radius:50%;background-size:18px;background-repeat:no-repeat;background-position:center;');
+        imageElement.setAttribute('style', 'background-color:#333;box-sizing:border-box;width:' + imageSize + 'px;height:' + imageSize + 'px;border-radius:50%;background-size:70%;background-repeat:no-repeat;background-position:center;');
         if (icon !== null) {
-            imageElement.style.backgroundImage = 'url(\'' + x.getIconDataURI(icon, '#fff') + '\')';
+            imageElement.style.backgroundImage = 'url(\'' + x.getIconDataURI(icon, '#fff', imageSize) + '\')';
         }
-        return makeImageButton(onClick, imageElement, 30, text, details, hint);//, inline
+        return makeImageButton(onClick, imageElement, imageSize, text, details, hint);//, inline
     };
 
     x.makeTextButton = (onClick, text, details = null, hint = null) => {

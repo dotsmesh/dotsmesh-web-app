@@ -14,9 +14,12 @@ async (args, library) => {
         let connectKeys = await library.getConnectKeysList();
         var list = x.makeList();
         for (var connectKey of connectKeys) {
-            list.add(await x.makeTextButton(((connectKey) => {
+            list.add(await x.makeIconButton(((connectKey) => {
                 x.open('contacts/connectSettingsKey', { key: connectKey.key }, { modal: true, width: 300 });
-            }).bind(null, connectKey), connectKey.key));
+            }).bind(null, connectKey), 'key', connectKey.key, {
+                details: x.getHumanDate(x.parseDateID(connectKey.dateCreated)),
+                imageSize: 50
+            }));
         }
         return list;
     }, { observeChanges: ['contactsConnectKeys'] }));
