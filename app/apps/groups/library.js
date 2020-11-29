@@ -355,8 +355,10 @@
             details.status = status === 'ok' ? 1 : 2;
             details.memberAccessKey = newAccessKey;
             await setGroupDetails(groupID, details);
+            var cache = x.appCache.get('groups-url-invitations');
+            await cache.delete(groupID);
+            await x.announceChanges(['groups', 'group/' + groupID + '/members']); // must be before observeChanges because the groupCryptoKeys is cleared here
             await x.property.observeChanges(groupID, ['gm/' + memberID + '/s'], 'g');
-            await x.announceChanges(['groups', 'group/' + groupID + '/members']);
         } else {
             // todo
         }

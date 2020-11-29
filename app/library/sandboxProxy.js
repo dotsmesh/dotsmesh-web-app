@@ -797,7 +797,7 @@
                 }
                 return await x.posts.makeFromRawList(type, id, temp);
             } catch (e) {
-                if (e.name === 'propertyUnavailable') {
+                if (['notAMember', 'invalidMemberID', 'invalidAccessKey', 'groupNotFound', 'propertyUnavailable'].indexOf(e.name) !== -1) {
                     return [];
                 } else {
                     throw e;
