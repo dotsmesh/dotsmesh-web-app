@@ -769,11 +769,13 @@
     x.makeText = (text, center = false, isHTML = false) => {
         var container = document.createElement('div');
         container.setAttribute('class', 'x-text');
-        text = x.stringReplaceAll(text, "\n", '<br>');
         if (isHTML) {
-            container.innerHTML = text;
+            container.innerHTML = x.stringReplaceAll(text, "\n", '<br>');
         } else {
             container.innerText = text;
+            if (container.innerHTML.indexOf("\n") !== -1) {
+                container.innerHTML = x.stringReplaceAll(container.innerHTML, "\n", '<br>');
+            }
         }
         if (center) {
             container.style.textAlign = 'center';
