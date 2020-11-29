@@ -19,25 +19,26 @@ async (args, library) => {
     if (invitation.type === 'personalInvitation') {
         var list = x.makeList();
         var userID = invitation.userID;
+        list.add(x.makeText('Invited profile:'));
         list.add(await x.makeProfileButton('user', userID));
-        list.add(x.makeSmallTitle('Invited by'));
+        x.add(list);
+        var list = x.makeList();
+        list.add(x.makeText('Invited by:'));
         list.add(await x.makeProfileButton('groupMember', groupID + '$' + invitation.invitedBy, {
             onClick: { location: 'group/member', args: { groupID: groupID, userID: invitation.invitedBy }, preload: true }
         }));
-        list.add(x.makeSmallTitle('Date invited'));
-        list.add(x.makeText(x.getHumanDate(invitation.dateInvited)));
         x.add(list);
+        x.add(x.makeText('Date invited' + "\n" + x.getHumanDate(invitation.dateInvited)));
         deleteButtonText = 'Delete invitation';
         deleteConfirmText = 'Are you sure you want to delete this personal invitation?';
     } else if (invitation.type === 'urlInvitation') {
         var list = x.makeList();
-        list.add(x.makeSmallTitle('Created by'));
+        list.add(x.makeText('URL created by:'));
         list.add(await x.makeProfileButton('groupMember', groupID + '$' + invitation.createdBy, {
             onClick: { location: 'group/member', args: { groupID: groupID, userID: invitation.createdBy }, preload: true }
         }));
-        list.add(x.makeSmallTitle('Date created'));
-        list.add(x.makeText(x.getHumanDate(invitation.dateCreated)));
         x.add(list);
+        x.add(x.makeText('Date created:' + "\n" + x.getHumanDate(invitation.dateCreated)));
         deleteButtonText = 'Delete URL';
         deleteConfirmText = 'Are you sure you want to delete this invitation URL?';
     } else {

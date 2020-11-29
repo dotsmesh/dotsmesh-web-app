@@ -54,8 +54,9 @@ async (args, library) => {
             if (invitation.type === 'urlInvitation') {
                 list.add(await x.makeIconButton((invitationID => {
                     x.open('group/invitationDetails', { groupID: groupID, invitationID: invitationID }, { modal: true, width: 300 });
-                }).bind(null, invitation.id), 'lock', 'Created by ' + x.getShortID(invitation.createdBy), {
-                    details: x.getHumanDate(invitation.dateCreated)
+                }).bind(null, invitation.id), 'key', 'Created by ' + x.getShortID(invitation.createdBy), {
+                    details: x.getHumanDate(invitation.dateCreated),
+                    imageSize: 50
                 }));
                 addedCount++;
             }
