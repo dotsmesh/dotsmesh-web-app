@@ -26,7 +26,7 @@
     var contactsStorage = null;
     var getContactsStorage = () => {
         if (contactsStorage === null) {
-            contactsStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('l-', x.currentUser.isPublic() ? x.cache.get('contacts-dc') : null);
+            contactsStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('l-', x.currentUser.isPublic() ? x.currentUserCache.get('contacts-dc') : null);
         }
         return contactsStorage;
     };
@@ -34,7 +34,7 @@
     var oldConnectKeysStorage = null;
     var getOldConnectKeysStorage = () => {
         if (oldConnectKeysStorage === null) {
-            oldConnectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('k-', x.currentUser.isPublic() ? x.cache.get('contactsk-dc') : null);
+            oldConnectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('k-', x.currentUser.isPublic() ? x.currentUserCache.get('contactsk-dc') : null);
         }
         return oldConnectKeysStorage;
     };
@@ -42,7 +42,7 @@
     var connectKeysStorage = null;
     var getConnectKeysStorage = () => {
         if (connectKeysStorage === null) {
-            connectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('y-', x.currentUser.isPublic() ? x.cache.get('contactsy-dc') : null);
+            connectKeysStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('y-', x.currentUser.isPublic() ? x.currentUserCache.get('contactsy-dc') : null);
         }
         return connectKeysStorage;
     };
@@ -50,12 +50,12 @@
     var requestsStorage = null;
     var getRequestsStorage = () => {
         if (requestsStorage === null) {
-            requestsStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('p-', x.currentUser.isPublic() ? x.cache.get('contactsp-dc') : null);
+            requestsStorage = x.currentUser.getDataStorage('p/c/').getDetailsContext('p-', x.currentUser.isPublic() ? x.currentUserCache.get('contactsp-dc') : null);
         }
         return requestsStorage;
     };
 
-    var cache = x.cache.get('contacts');
+    var cache = x.currentUserCache.get('contacts');
 
     var contactsDetailsMap = {
         name: 'n',

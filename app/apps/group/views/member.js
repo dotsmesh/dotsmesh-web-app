@@ -37,34 +37,36 @@ async (args, library) => {
     });
     x.add(component, { template: 'column1' });
 
-    var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['administratorsKeys'] });
-    var isAdministrator = memberGroupDetails !== null && memberGroupDetails.administratorsKeys !== null;
+    if (x.currentUser.exists()) {
+        var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['administratorsKeys'] });
+        var isAdministrator = memberGroupDetails !== null && memberGroupDetails.administratorsKeys !== null;
 
-    if (isAdministrator && !isCurrentUser) {
-        var component = x.makeSecretComponent('Administrators only', async component2 => {
-            var memberData = await library.getMemberData(groupID, userID);
-            if (memberData !== null) { // just removed
-                if (memberData.status === 'pendingApproval') {
-                    var button = x.makeButton('Approve or deny membership', async () => {
-                        var result = await x.open('group/approve', { groupID: groupID, userID: userID }, { modal: true, width: 300 });
-                        if (result === 'removed') {
-                            x.showMessage('The membership request has been denied!');
-                        }
-                    });
-                    component2.add(button);
-                } else {
-                    var button = x.makeButton('Remove from group', async () => {
-                        var result = await x.open('group/remove', { groupID: groupID, userID: userID }, { modal: true, width: 300 });
-                        if (result === 'removed') {
-                            x.showMessage('The member has been removed!');
-                        }
-                    });
-                    component2.add(button);
+        if (isAdministrator && !isCurrentUser) {
+            var component = x.makeSecretComponent('Administrators only', async component2 => {
+                var memberData = await library.getMemberData(groupID, userID);
+                if (memberData !== null) { // just removed
+                    if (memberData.status === 'pendingApproval') {
+                        var button = x.makeButton('Approve or deny membership', async () => {
+                            var result = await x.open('group/approve', { groupID: groupID, userID: userID }, { modal: true, width: 300 });
+                            if (result === 'removed') {
+                                x.showMessage('The membership request has been denied!');
+                            }
+                        });
+                        component2.add(button);
+                    } else {
+                        var button = x.makeButton('Remove from group', async () => {
+                            var result = await x.open('group/remove', { groupID: groupID, userID: userID }, { modal: true, width: 300 });
+                            if (result === 'removed') {
+                                x.showMessage('The member has been removed!');
+                            }
+                        });
+                        component2.add(button);
+                    }
                 }
-            }
-        });
-        component.observeChanges(['group/' + groupID + '/members', 'group/' + groupID + '/member/' + userID, 'group/' + groupID + '/invitations']);
-        x.add(component, { template: 'column1' });
+            });
+            component.observeChanges(['group/' + groupID + '/members', 'group/' + groupID + '/member/' + userID, 'group/' + groupID + '/invitations']);
+            x.add(component, { template: 'column1' });
+        }
     }
 
     x.add(x.makeTitle('Recent activity'), { template: 'column2' });

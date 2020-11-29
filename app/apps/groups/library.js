@@ -8,7 +8,7 @@
     var groupsDataStorage = null;
     var getDetailsStorage = () => {
         if (groupsDataStorage === null) {
-            groupsDataStorage = x.currentUser.getDataStorage('p/g/').getDetailsContext('l-', x.currentUser.isPublic() ? x.cache.get('groups-dc') : null);
+            groupsDataStorage = x.currentUser.getDataStorage('p/g/').getDetailsContext('l-', x.currentUser.isPublic() ? x.currentUserCache.get('groups-dc') : null);
         }
         return groupsDataStorage;
     };
@@ -225,16 +225,15 @@
         return result;
     };
 
-    var get = async (id, details) => {
-        if (typeof details === 'undefined') {
-            details = [];
+    var get = async (id, details = []) => {
+        if (x.currentUser.exists()) {
+            var storage = getDetailsStorage();
+            var result = await storage.get(id, detailsToShortDetails(details));
+            if (result !== null) {
+                return updateGroupProperties(result);
+            }
         }
-        var storage = getDetailsStorage();
-        var result = await storage.get(id, detailsToShortDetails(details));
-        if (result !== null) {
-            return updateGroupProperties(result);
-        }
-        var cache = x.cache.get('groups-url-invitations');
+        var cache = x.appCache.get('groups-url-invitations');
         var value = await cache.get(id);
         if (value !== null) {
             var result = updateGroupProperties(value);
@@ -291,8 +290,10 @@
     };
 
     var addURLInvitation = async (groupID, accessKey) => {
-        if (await get(groupID) !== null) {
-            return; // already added, dont overwrite
+        if (x.currentUser.exists()) { // may be opened when not signed in
+            if (await get(groupID) !== null) {
+                return; // already added, dont overwrite
+            }
         }
         var response = await x.group.call(groupID, 'group.invitations.get', {
         }, { auth: 'accessKey', accessKey: accessKey });
@@ -310,7 +311,7 @@
                     details.membersKeys = data.k; // validate
                     details.membersIDSalt = data.s; // validate
                     //await addInvitation(groupID, details);
-                    var cache = x.cache.get('groups-url-invitations');
+                    var cache = x.appCache.get('groups-url-invitations');
                     await cache.set(groupID, minifyGroupProperties(details));
                 }
             }

@@ -17,7 +17,7 @@
     var followingStorage = null;
     var getFollowingDataStorage = () => {
         if (followingStorage === null) {
-            followingStorage = getDataStorage().getDetailsContext('f-', x.currentUser.isPublic() ? x.cache.get('exploref-dc') : null);
+            followingStorage = getDataStorage().getDetailsContext('f-', x.currentUser.isPublic() ? x.currentUserCache.get('exploref-dc') : null);
         }
         return followingStorage;
     };
@@ -50,7 +50,7 @@
     var propertiesDataStorage = null;
     var getPropertiesDataStorage = () => {
         if (propertiesDataStorage === null) {
-            propertiesDataStorage = getDataStorage().getDetailsContext('p-', x.currentUser.isPublic() ? x.cache.get('explorep-dc') : null);
+            propertiesDataStorage = getDataStorage().getDetailsContext('p-', x.currentUser.isPublic() ? x.currentUserCache.get('explorep-dc') : null);
         }
         return propertiesDataStorage;
     };

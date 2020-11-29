@@ -2642,27 +2642,29 @@
 
             if (type === 'group' && options.groupUserID !== undefined) {
 
-                var isActiveMemberOrPendingMember = false;
-                var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
-                if (memberGroupDetails !== null) {
-                    var status = memberGroupDetails.status;
-                    isActiveMemberOrPendingMember = status === 'joined' || status === 'pendingApproval';
-                }
+                if (x.currentUser.exists()) {
+                    var isActiveMemberOrPendingMember = false;
+                    var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
+                    if (memberGroupDetails !== null) {
+                        var status = memberGroupDetails.status;
+                        isActiveMemberOrPendingMember = status === 'joined' || status === 'pendingApproval';
+                    }
 
-                if (isActiveMemberOrPendingMember) {
-                    var groupUserID = options.groupUserID;
-                    var memberElement = await getProfileImageElement('groupMember', id + '$' + groupUserID, 66);
-                    memberElement.style.position = 'relative';
-                    memberElement.style.boxSizing = 'border-box';
-                    memberElement.style.zIndex = '3';
-                    memberElement.style.position = 'relative';
-                    memberElement.style.marginLeft = '134px';
-                    memberElement.style.marginTop = '-66px';
-                    memberElement.style.boxShadow = '0 0 0 4px #111';
-                    memberElement.style.cursor = 'pointer';
-                    x.addClickToOpen(memberElement, { location: 'group/member', args: { groupID: id, userID: groupUserID }, preload: true });
-                    imageContainer.appendChild(memberElement);
-                    component.observeChanges(['groupMember/' + id + '$' + groupUserID + '/profile']);
+                    if (isActiveMemberOrPendingMember) {
+                        var groupUserID = options.groupUserID;
+                        var memberElement = await getProfileImageElement('groupMember', id + '$' + groupUserID, 66);
+                        memberElement.style.position = 'relative';
+                        memberElement.style.boxSizing = 'border-box';
+                        memberElement.style.zIndex = '3';
+                        memberElement.style.position = 'relative';
+                        memberElement.style.marginLeft = '134px';
+                        memberElement.style.marginTop = '-66px';
+                        memberElement.style.boxShadow = '0 0 0 4px #111';
+                        memberElement.style.cursor = 'pointer';
+                        x.addClickToOpen(memberElement, { location: 'group/member', args: { groupID: id, userID: groupUserID }, preload: true });
+                        imageContainer.appendChild(memberElement);
+                        component.observeChanges(['groupMember/' + id + '$' + groupUserID + '/profile']);
+                    }
                 }
             }
 
@@ -2797,7 +2799,7 @@
                         if (currentUserExists) {
                             x.open('explore/followForm', { id: x.getTypedID(type, id) }, { modal: true, width: 300 });
                         } else {
-                            x.requireUser({ type: 'follow', id: id }); // todo group maybe
+                            x.requireUser({ type: type === 'user' ? 'followUser' : 'followGroup', id: id });
                         }
                     }, { style: 'style2' });
                     component.observeChanges(['explore/following/' + type + '/' + id]);
@@ -2902,43 +2904,49 @@
                     }
                 } else if (type === 'group') {
                     component.observeChanges(['group/' + id + '/member/' + x.currentUser.getID()]);
-                    var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
-                    if (memberGroupDetails !== null) {
-                        var status = memberGroupDetails.status;
-                        var isJoined = status === 'joined';
+                    if (x.currentUser.exists()) {
+                        var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: id, details: ['status', 'invitedBy'] });
+                        if (memberGroupDetails !== null) {
+                            var status = memberGroupDetails.status;
+                            var isJoined = status === 'joined';
 
-                        // FOLLOW BUTTON
-                        if (isJoined) {
-                            var button = await getFollowButton();
-                            buttonsContainer.appendChild(button.element);
-                        }
-
-                        if (!isJoined) {
-                            // JOIN BUTTONs
-                            var text = null;
-                            if (status === 'pendingApproval') {
-                                text = 'Pending approval';
-                            } else if (status === null) {
-                                text = 'Join/Leave';
+                            // FOLLOW BUTTON
+                            if (isJoined) {
+                                var button = await getFollowButton();
+                                buttonsContainer.appendChild(button.element);
                             }
-                            var button = x.makeButton(text, async () => {
-                                var result = await x.open('group/membership', { id: id }, { modal: true, width: 300 });
-                                if (result === 'left') {
-                                    x.showMessage('You\'ve successfully left the group!');
+
+                            if (!isJoined) {
+                                // JOIN BUTTONs
+                                var text = null;
+                                if (status === 'pendingApproval') {
+                                    text = 'Pending approval';
+                                } else if (status === null) {
+                                    text = 'Join/Leave';
                                 }
-                            }, { style: status === null ? 'style1' : 'style2' });
-                            buttonsContainer.appendChild(button.element);
-                        }
+                                var button = x.makeButton(text, async () => {
+                                    var result = await x.open('group/membership', { id: id }, { modal: true, width: 300 });
+                                    if (result === 'left') {
+                                        x.showMessage('You\'ve successfully left the group!');
+                                    }
+                                }, { style: status === null ? 'style1' : 'style2' });
+                                buttonsContainer.appendChild(button.element);
+                            }
 
-                        if (isJoined) {
-                            // INVITE BUTTON
-                            var button = x.makeButton('', () => {
-                                x.open('group/invite', { id: id }, { modal: true, width: 300 });
-                            }, { style: 'style2', icon: 'group-plus' });
-                            buttonsContainer.appendChild(button.element);
+                            if (isJoined) {
+                                // INVITE BUTTON
+                                var button = x.makeButton('', () => {
+                                    x.open('group/invite', { id: id }, { modal: true, width: 300 });
+                                }, { style: 'style2', icon: 'group-plus' });
+                                buttonsContainer.appendChild(button.element);
+                            }
                         }
+                    } else {
+                        var button = x.makeButton('Join', async () => {
+                            x.requireUser({ type: 'joinGroup', id: id });
+                        }, { style: 'style2' });
+                        buttonsContainer.appendChild(button.element);
                     }
-
                 }
                 if (buttonsContainer.childNodes.length > 0) {
                     container.appendChild(buttonsContainer);

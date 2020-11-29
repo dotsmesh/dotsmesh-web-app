@@ -154,7 +154,8 @@
             }
             localCache = {};
             await Promise.all([
-                x.cache.clear(),
+                x.currentUserCache.clear(),
+                x.appCache.clear(),
                 //unregisterServiceWorker(),
                 emptyDB("dotsmesh-app", await getUserAppDBPrefix(userID) + 's/'), // session data
                 setLoggedOutUser(userID)
@@ -1128,16 +1129,13 @@
                         }
                     }
                 } else if (type === 'group') {
-                    if (currentUserExists) {
-                        var properties = await x.services.call('groups', 'getDetails', { groupID: id, details: ['memberAccessKey', 'status'] });
-                        if (properties !== null) {
-                            callOptions.accessKey = await x.getHash('SHA-512', properties.memberAccessKey);
-                            callOptions.memberID = properties.status !== null ? await x.groups.getMemberID(id, currentUserID) : null;
-                        } else {
-                            throw x.makeAppError('invalidMemberID', 'No info about this group!');
-                        }
+                    // Dont check for currentUser because a group invitation url may be opened
+                    var properties = await x.services.call('groups', 'getDetails', { groupID: id, details: ['memberAccessKey', 'status'] });
+                    if (properties !== null) {
+                        callOptions.accessKey = await x.getHash('SHA-512', properties.memberAccessKey);
+                        callOptions.memberID = currentUserExists && properties.status !== null ? await x.groups.getMemberID(id, currentUserID) : null;
                     } else {
-                        throw x.makeAppError('invalidMemberID', 'No current user!');
+                        throw x.makeAppError('invalidMemberID', 'No info about this group!');
                     }
                 }
                 localCache[cacheKey] = callOptions;
@@ -2043,11 +2041,9 @@
     // CACHE
 
     {
-        x.cache = {};
-
         var localBackupCache = {};
 
-        x.cache.get = namespace => {
+        let getCache = namespace => {
             var hasCaches = typeof caches !== 'undefined'; // Not suppored on Safari (iPad)
             if (hasCaches) {
                 var keyPrefix = '/app.cache/' + namespace + '/';
@@ -2121,13 +2117,38 @@
             };
         };
 
-        x.cache.clear = async (prefix = '') => { // todo prefix
+        let clearCache = async (prefix = '') => { // todo prefix
             if (typeof caches !== 'undefined') { // Not suppored on Safari (iPad)
                 await caches.delete('dotsmesh-cache');
             } else {
                 localBackupCache = {};
             }
-        }
+        };
+
+        x.currentUserCache = {};
+
+        x.currentUserCache.get = namespace => {
+            if (x.currentUser.exists()) {
+                return getCache('1' + x.currentUser.getID() + '/' + namespace);
+            } else {
+                return getCache('2/' + namespace);
+            }
+        };
+
+        x.currentUserCache.clear = async (prefix = '') => { // todo prefix
+            await clearCache(); // todo clear for current user only
+        };
+
+        x.appCache = {};
+
+        x.appCache.get = namespace => {
+            return getCache('0/' + namespace);
+        };
+
+        x.appCache.clear = async (prefix = '') => { // todo prefix
+            await clearCache(); // todo clear for app only
+        };
+
     }
 
 
@@ -2148,12 +2169,13 @@
 
     // caches is only available in window and service worker, not in workers. Thats why a proxy is needed.
     var localCacheProxyData = [];
-    var cacheProxyCall = async (method, args) => {
-        var namespace = x.currentUser.getID() + '/' + args[0];
-        if (typeof localCacheProxyData[namespace] === 'undefined') {
-            localCacheProxyData[namespace] = x.cache.get(namespace);
+    var cacheProxyCall = async (type, method, args) => {
+        var namespace = args[0];
+        var cacheKey = type + '/' + (type === 'user' ? '0' + x.currentUser.getID() : '1') + '/' + namespace;
+        if (localCacheProxyData[cacheKey] === undefined) {
+            localCacheProxyData[cacheKey] = type === 'user' ? x.currentUserCache.get(namespace) : x.appCache.get(namespace);
         }
-        var cache = localCacheProxyData[namespace];
+        var cache = localCacheProxyData[cacheKey];
         if (method === 'set') {
             return await cache.set(args[1], args[2]);
         } else if (method === 'get') {
@@ -2252,11 +2274,16 @@
             // 'image.cropCircle': async image => {
             //     return await x.image.cropCircle(image);
             // },
-            'cache._set': (...args) => { return cacheProxyCall('set', args) },
-            'cache._get': (...args) => { return cacheProxyCall('get', args) },
-            'cache._delete': (...args) => { return cacheProxyCall('delete', args) },
-            'cache._clear': (...args) => { return cacheProxyCall('clear', args) },
-            'cache.clear': x.cache.clear,
+            'currentUserCache._set': (...args) => { return cacheProxyCall('user', 'set', args) },
+            'currentUserCache._get': (...args) => { return cacheProxyCall('user', 'get', args) },
+            'currentUserCache._delete': (...args) => { return cacheProxyCall('user', 'delete', args) },
+            'currentUserCache._clear': (...args) => { return cacheProxyCall('user', 'clear', args) },
+            'currentUserCache.clear': x.currentUserCache.clear,
+            'appCache._set': (...args) => { return cacheProxyCall('app', 'set', args) },
+            'appCache._get': (...args) => { return cacheProxyCall('app', 'get', args) },
+            'appCache._delete': (...args) => { return cacheProxyCall('app', 'delete', args) },
+            'appCache._clear': (...args) => { return cacheProxyCall('app', 'clear', args) },
+            'appCache.clear': x.appCache.clear,
             'notifications.get': x.notifications.get,
             'notifications.set': x.notifications.set,
             'notifications.exists': x.notifications.exists,

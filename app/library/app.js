@@ -629,14 +629,10 @@
                 return true;
             } else if (type === 'group') {
                 if (secret.length > 0) {
-                    if (x.currentUser.exists()) {
-                        await showAppScreen(false);
-                        await x.services.call('groups', 'addURLInvitation', { groupID: propertyID, accessKey: secret });
-                        x.open('group/home', { id: propertyID }, { addToHistory: false });
-                        return true;
-                    } else {
-                        await showWelcomeScreen(false);
-                    }
+                    await showAppScreen(false);
+                    await x.services.call('groups', 'addURLInvitation', { groupID: propertyID, accessKey: secret });
+                    x.open('group/home', { id: propertyID }, { addToHistory: false });
+                    return true;
                 }
             }
             return false;
@@ -727,7 +723,6 @@
                 }
                 propertyID = x.getFullID(propertyID.toLowerCase());
                 var suffix = slashIndex === -1 ? '' : hashValue.substr(slashIndex + 1);
-                //if (x.isPublicID(propertyID)) {
                 var callback = null;
                 for (var prefix in hashHandlers) {
                     if (suffix.indexOf(prefix) !== -1) {
@@ -740,7 +735,6 @@
                         return true;
                     }
                 }
-                //}
                 replaceLocationState(null, null, null); // not supported hash
             }
             var type = state !== null && typeof state.type !== 'undefined' ? state.type : null;
@@ -934,6 +928,15 @@
         container.setAttribute('x-visible', '1');
     };
 
+    var openAfterLogin = null;
+    var showUserAfterLoginWindow = defaultAction => {
+        if (openAfterLogin !== null) {
+            x.open(openAfterLogin.location, openAfterLogin.args);
+        } else {
+            defaultAction();
+        }
+    };
+
     var makeHomeScreen = historyState => {
         if (typeof historyState === 'undefined') {
             historyState = null;
@@ -1072,7 +1075,6 @@
         if (typeof context === 'undefined') {
             context = null;
         }
-        //console.log(context);
         if (addToHistory) {
             pushLocationState({
                 type: 'welcome-screen',
@@ -1085,13 +1087,19 @@
         }
         screen.element.querySelector('.x-home-screen-content').classList.add('x-welcome-screen-header');
         var done = false;
-        //console.log(context);
+        openAfterLogin = null;
         if (context !== null) {
-            if (context.type === 'follow') {
+            if (context.type === 'followUser') {
                 var details = await x.services.call('profile', 'getDetails', { propertyType: 'user', propertyID: context.id, details: ['name'] });
                 screen.addTitle('Hey, hello!' + "\n" + 'You\'ll need a profile for that!');
                 screen.addText("\nA profile is required for following " + details.name + ". Luckily, that's easy. You can freely create a private one or sign up for a public one.\n\n");
+                openAfterLogin = { location: 'user/home', args: { userID: context.id } };
                 done = true;
+            } else if (context.type === 'joinGroup') {
+                screen.addTitle('Hey, hello!' + "\n" + 'You\'ll need a profile for that!');
+                screen.addText("\nA profile is required for joining this group. Luckily, that's easy. You can freely create a private one or sign up for a public one.\n\n");
+                done = true;
+                openAfterLogin = { location: 'group/home', args: { id: context.id } };
             } else if (context.type === 'profile') {
                 screen.addTitle('Hello!' + "\n" + 'Interested in your own profile?');
                 screen.addText("\nA profile gives you the ability to follow and connect with others. It's free and unbelievably easy to create a private profile. You can also sign up for a public one.\n\n");
@@ -1176,7 +1184,9 @@
             if (result === true) {
                 showPushNotificationsScreen('Welcome back!', async () => {
                     await showAppScreen(true);
-                    x.open('home/home');
+                    showUserAfterLoginWindow(() => {
+                        x.open('home/home');
+                    });
                     onUserLogin();
                 });
             } else {
@@ -1480,7 +1490,9 @@
                         signupData.image = null;
                         showPushNotificationsScreen('Your profile is successfully created!', async () => {
                             await showAppScreen(false);
-                            x.open('user/home', { userID: x.currentUser.getID() });
+                            showUserAfterLoginWindow(() => {
+                                x.open('user/home');
+                            });
                             onUserLogin();
                         });
                         // var screen2 = makeHomeScreen();
@@ -1519,7 +1531,9 @@
             if (await x.currentUser.loginPrivateUser(userID)) {
                 showPushNotificationsScreen('Welcome!', async () => {
                     await showAppScreen(false);
-                    x.open('user/home');
+                    showUserAfterLoginWindow(() => {
+                        x.open('user/home');
+                    });
                     onUserLogin();
                 });
             } else {
@@ -1544,7 +1558,9 @@
                 if (await x.currentUser.loginPrivateUser(privateUsersIDs[0])) {
                     showPushNotificationsScreen('Welcome back!', async () => {
                         await showAppScreen(false);
-                        x.open('user/home');
+                        showUserAfterLoginWindow(() => {
+                            x.open('user/home');
+                        });
                         onUserLogin();
                     });
                 } else {

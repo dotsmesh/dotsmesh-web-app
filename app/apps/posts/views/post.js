@@ -139,16 +139,18 @@ async (args, library) => {
             }));//, { template: 'column1' }
         }
 
-        x.addToolbarNotificationsButton('gpr$' + propertyID + '$' + postID, action => {
-            return {
-                appID: 'group',
-                name: 'modifyGroupPostReactionsNotification',
-                args: { action: action, groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() }
-            }
-        }, 'Get notified when there is activity in this post.', 'You\'ll receive a notification when there is activity in this post.');
-        x.windowEvents.addEventListener('show', async () => {
-            await x.services.call('group', 'updateGroupPostReactionsNotification', { groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() });
-        });
+        if (x.currentUser.exists()) {
+            x.addToolbarNotificationsButton('gpr$' + propertyID + '$' + postID, action => {
+                return {
+                    appID: 'group',
+                    name: 'modifyGroupPostReactionsNotification',
+                    args: { action: action, groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() }
+                }
+            }, 'Get notified when there is activity in this post.', 'You\'ll receive a notification when there is activity in this post.');
+            x.windowEvents.addEventListener('show', async () => {
+                await x.services.call('group', 'updateGroupPostReactionsNotification', { groupID: propertyID, postID: postID, lastSeenPostReactions: discussionComponent.getLastSeen() });
+            });
+        }
     }
 
     // x.add(x.makeTitle('Author'), { template: 'column2' });

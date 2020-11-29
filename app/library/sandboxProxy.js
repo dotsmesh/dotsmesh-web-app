@@ -132,27 +132,50 @@
     // CACHE
 
     {
-        x.cache = {};
+        x.currentUserCache = {};
 
-        x.cache.get = namespace => {
+        x.currentUserCache.get = namespace => {
             return {
                 set: async (key, value) => {
-                    return await x.proxyCall('cache._set', namespace, key, value);
+                    return await x.proxyCall('currentUserCache._set', namespace, key, value);
                 },
                 get: async key => {
-                    return await x.proxyCall('cache._get', namespace, key);
+                    return await x.proxyCall('currentUserCache._get', namespace, key);
                 },
                 delete: async key => {
-                    return await x.proxyCall('cache._delete', namespace, key);
+                    return await x.proxyCall('currentUserCache._delete', namespace, key);
                 },
                 clear: async (prefix = '') => {
-                    return await x.proxyCall('cache._clear', namespace, prefix);
+                    return await x.proxyCall('currentUserCache._clear', namespace, prefix);
                 }
             };
         };
 
-        x.cache.clear = async (prefix = '') => {
-            await x.proxyCall('cache.clear', prefix);
+        x.currentUserCache.clear = async (prefix = '') => {
+            await x.proxyCall('currentUserCache.clear', prefix);
+        };
+
+        x.appCache = {};
+
+        x.appCache.get = namespace => {
+            return {
+                set: async (key, value) => {
+                    return await x.proxyCall('appCache._set', namespace, key, value);
+                },
+                get: async key => {
+                    return await x.proxyCall('appCache._get', namespace, key);
+                },
+                delete: async key => {
+                    return await x.proxyCall('appCache._delete', namespace, key);
+                },
+                clear: async (prefix = '') => {
+                    return await x.proxyCall('appCache._clear', namespace, prefix);
+                }
+            };
+        };
+
+        x.appCache.clear = async (prefix = '') => {
+            await x.proxyCall('appCache.clear', prefix);
         };
     }
 
@@ -575,7 +598,7 @@
     {
         x.property = {};
 
-        var profilesCache = x.cache.get('profiles');
+        var profilesCache = x.currentUserCache.get('profiles');
 
         x.property.getProfile = async (type, id) => {
             if (id !== null) {

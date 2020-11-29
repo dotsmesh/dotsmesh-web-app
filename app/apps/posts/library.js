@@ -19,7 +19,7 @@
         throw new Error();
     };
 
-    var cache = x.cache.get('posts');
+    var cache = x.currentUserCache.get('posts');
 
     var clearPostCache = async (propertyID, postID) => {
         var postCacheKey = 'posts/' + propertyID + '/p/' + postID;

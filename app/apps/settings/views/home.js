@@ -49,7 +49,9 @@ async (args, library) => {
     var list = x.makeList();
 
     list.add(x.makeTextButton(async () => {
-        await x.cache.clear(); // announce clear local caches too
+        // announce clear local caches too
+        await x.currentUserCache.clear();
+        await x.appCache.clear();
         x.alert('Cache is cleared successfully!');
     }, 'Clear cache', ''));
 
