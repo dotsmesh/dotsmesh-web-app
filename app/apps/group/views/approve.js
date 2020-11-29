@@ -14,6 +14,12 @@ async (args, library) => {
 
     var container = x.makeContainer();
 
+    x.add(x.makeProfilePreviewComponent('groupMember', groupID + '$' + userID, {
+        theme: 'light',
+        mode: 'simple',
+        imageSize: 150
+    }));
+
     container.add(x.makeButton('Approve', async () => {
         if (await x.confirm('Are you sure you want to add this person to the group?')) {
             x.showLoading();

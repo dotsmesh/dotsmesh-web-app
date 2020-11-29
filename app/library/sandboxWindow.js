@@ -2670,16 +2670,19 @@
 
             if (type === 'groupMember') {
                 var [groupID, userID] = id.split('$');
-                var memberElement = await getProfileImageElement('group', groupID, 66);
+                var groupImageSize = Math.floor(imageSize * 66 / 200);
+                var memberElement = await getProfileImageElement('group', groupID, groupImageSize);
                 memberElement.style.position = 'relative';
                 memberElement.style.boxSizing = 'border-box';
                 memberElement.style.zIndex = '3';
                 memberElement.style.position = 'relative';
-                memberElement.style.marginLeft = '134px';
-                memberElement.style.marginTop = '-66px';
-                memberElement.style.boxShadow = '0 0 0 4px #111';
-                memberElement.style.cursor = 'pointer';
-                x.addClickToOpen(memberElement, { location: 'group/home', args: { id: groupID }, preload: true });
+                memberElement.style.marginLeft = (imageSize - groupImageSize) + 'px';
+                memberElement.style.marginTop = '-' + groupImageSize + 'px';
+                memberElement.style.boxShadow = modal ? '0 0 0 4px #fff' : '0 0 0 4px #111';
+                if (mode === 'full') {
+                    memberElement.style.cursor = 'pointer';
+                    x.addClickToOpen(memberElement, { location: 'group/home', args: { id: groupID }, preload: true });
+                }
                 imageContainer.appendChild(memberElement);
                 component.observeChanges(['group/' + groupID + '/profile']);
             }

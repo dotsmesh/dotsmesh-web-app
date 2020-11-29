@@ -12,9 +12,15 @@ async (args, library) => {
 
     x.setTitle('Remove a member?');
 
+    x.add(x.makeProfilePreviewComponent('groupMember', groupID + '$' + userID, {
+        theme: 'light',
+        mode: 'simple',
+        imageSize: 150
+    }));
+
     x.add(x.makeText('Are you sure, you want to remove this member from the group?', true));
 
-    x.add(x.makeButton('Yes, remove!', async () => {
+    x.add(x.makeButton('Yes, remove', async () => {
         x.showLoading();
         await library.removeMember(groupID, userID);
         await x.back('removed');
