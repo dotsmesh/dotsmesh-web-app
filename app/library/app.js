@@ -1837,6 +1837,19 @@
     // APP STARTER
 
     x.startApp = async () => {
+
+        if (location.protocol !== 'https:') {
+            var text = 'The Dots Mesh web app requires a secure connection! Please, try opening https://' + location.host;
+            var errorScreen = makeHomeScreen();
+            errorScreen.addTitle('Oops!');
+            errorScreen.addText("\n" + text + "\n\n");
+            errorScreen.addButton('OK, let\'s try it', () => {
+                window.location = 'https://' + location.host;
+            });
+            errorScreen.show();
+            return;
+        }
+
         appReadyState = 'loading';
         var autoLoginResult = await x.currentUser.autoLogin();
         await processLocationState();
