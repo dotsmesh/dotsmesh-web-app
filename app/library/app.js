@@ -10,6 +10,8 @@
 
     var appReadyState = null;
 
+    var userApps = ['home', 'explore', 'contacts', 'messages', 'groups', 'settings'];
+
     var hasHandeledAnError = false;
     var handleError = async error => {
         if (hasHandeledAnError) {
@@ -551,9 +553,10 @@
     css += '.x-app-modal[x-visible="0"][x-closed]{top:100%;left:-100%;}';
 
     css += '.x-app-toolbar-left{display:none;}';
-    css += '.x-app-toolbar-bottom{z-index:100;position:fixed;box-sizing:border-box;display:flex;background-color:#222;box-shadow:0 0 5px 0 #111;flex-direction:row;bottom:0;left:0;width:100%;height:50px;justify-content:center;}';
-    css += '.x-app-toolbar-bottom>.x-app-toolbar-button{max-width:100px;}';
-    css += '.x-app-toolbar-bottom > *{flex:1 1 auto;}';
+    css += '.x-app-toolbar-bottom{z-index:100;position:fixed;box-sizing:border-box;background-color:#222;box-shadow:0 0 5px 0 #111;bottom:0;left:0;width:100%;height:50px;max-width:100%;overflow-y:hidden;overflow-x:auto;}';
+    css += '.x-app-toolbar-bottom>div{display:flex;flex-direction:row;min-width:max-content;width:100%;}';
+    css += '.x-app-toolbar-bottom .x-app-toolbar-button{flex:1 0 auto;}';
+    // css += '.x-app-toolbar-bottom > *{flex:0 0 auto;}';
 
     // css += '.x-app-menu-button{z-index:131;width:42px;height:42px;position:fixed;top:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}';
     // css += '.x-app-menu-button .x-app-toolbar-user-image{background-color:#333;width:25px;height:25px;display:block;border-radius:50%;cursor:pointer;background-size:cover;background-position:center;flex:0 0 auto;}';
@@ -580,11 +583,8 @@
     css += '.x-app-toolbar-button[x-home-app]>span:not(:empty){width:20px;height:20px;line-height:21px;text-align:center;display:block;background:#24a4f2;color:#fff;font-size:11px;border-radius:50%;margin-top:4px;margin-left:14px;font-weight:bold;}';
 
     css += '@media only screen and (min-width:600px){';
-    // css += '.x-app-menu-button{display:none !important;}';
-    // css += '.x-app-menu{display:none !important;}';
-    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;border-right:1px solid #222;flex-direction:column;top:0;left:0;width:50px;height:100%;}';
+    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;border-right:1px solid #222;flex-direction:column;top:0;left:0;width:50px;height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;}';
     css += '.x-app-toolbar-bottom{display:none;}';
-    //css += '.x-app-toolbar-left>div{display:flex;flex-direction:row;}';
     css += '.x-app-window{max-width:calc(100% - 50px);height:100%;}';//240px
     css += '.x-app-window[x-visible="1"]{left:50px;}';//240px
     css += '*{scrollbar-width:thin;scrollbar-color:#666 transparent;}';
@@ -1620,48 +1620,17 @@
         container.setAttribute('class', 'x-screen x-app-screen');
         container.innerHTML = '<div class="x-app-modals-background"><div></div></div>' +
             '<div class="x-app-toolbar-left"><div></div><div></div></div>' +
-            '<div class="x-app-toolbar-bottom"></div>';
-        // '<div class="x-app-menu-button"></div>' +
-        // '<div class="x-app-menu"><div></div></div>';
+            '<div class="x-app-toolbar-bottom"><div></div></div>';
 
         document.body.appendChild(container);
         var modalBackground = container.childNodes[0];
         modalBackground.addEventListener('click', closeLastLoadingModalWindow);
         var leftToolbarContainer = container.childNodes[1];
         var bottomToolbarContainer = container.childNodes[2];
-        // var menuButton = container.childNodes[2];
-        // var menuContainer = container.childNodes[3];
-
-        // menuButton.addEventListener('click', async () => {
-        //     if (x.currentUser.exists()) {
-        //         if (menuContainer.getAttribute('x-visible')) {
-        //             menuContainer.removeAttribute('x-visible');
-        //         } else {
-        //             menuContainer.setAttribute('x-visible', '1');
-        //         }
-        //         updateModalBackground();
-        //     } else {
-        //         await closeAllWindows();
-        //         await showWelcomeScreen(true, { type: 'profile' });
-        //     }
-        // });
-
-        // menuContainer.addEventListener('click', () => {
-        //     menuContainer.removeAttribute('x-visible');
-        //     updateModalBackground();
-        // });
-
-        // var button = document.createElement('a');
-        // button.setAttribute('class', 'x-app-menu-close-button');
-        // button.style.backgroundImage = 'url(\'' + x.getIconDataURI('close', '#999') + '\')';
-        // menuContainer.firstChild.appendChild(button);
 
         for (var i = 0; i < 2; i++) {
-
             var leftMode = i === 0;
-
-            var buttonsContainer = leftMode ? leftToolbarContainer.firstChild : bottomToolbarContainer;
-            var userApps = leftMode ? ['home', 'explore', 'contacts', 'messages', 'groups', 'settings'] : ['home', 'explore'];
+            var defaultButtonsContainer = leftMode ? leftToolbarContainer.firstChild : bottomToolbarContainer.firstChild;
 
             var imageElement = document.createElement('span');
             imageElement.setAttribute('class', 'x-app-toolbar-user-image');
@@ -1670,7 +1639,7 @@
             button.setAttribute('tabindex', '0');
             button.setAttribute('role', 'button');
             button.appendChild(imageElement);
-            buttonsContainer.appendChild(button);
+            defaultButtonsContainer.appendChild(button);
             if (x.currentUser.exists()) {
                 var clickData = {
                     location: 'user/home',
@@ -1689,6 +1658,10 @@
 
             if (x.currentUser.exists()) {
                 userApps.forEach(appID => {
+                    var userAppButtonsContainer = defaultButtonsContainer;
+                    if (appID === 'settings' && leftMode) {
+                        userAppButtonsContainer = leftToolbarContainer.lastChild;
+                    }
                     var button = document.createElement('a');
                     button.setAttribute('class', 'x-app-toolbar-button x-app-toolbar-button-app');
                     button.setAttribute('tabindex', '0');
@@ -1700,46 +1673,13 @@
                         button.setAttribute('x-home-app', '1');
                         button.setAttribute('aria-label', app.name);
                     }
-                    buttonsContainer.appendChild(button);
+                    userAppButtonsContainer.appendChild(button);
                     x.addClickToOpen(button, {
                         location: appID + '/home',
                         preload: true
                     });
                 });
-                if (!leftMode) {
-                    var button = document.createElement('a');
-                    button.setAttribute('class', 'x-app-toolbar-button x-app-toolbar-button-app');
-                    button.setAttribute('tabindex', '0');
-                    button.setAttribute('role', 'button');
-                    button.setAttribute('title', 'More');
-                    button.style.backgroundImage = 'url(\'' + x.getIconDataURI('more', '#aaa') + '\')';
-                    buttonsContainer.appendChild(button);
-                    x.addClickToOpen(button, () => {
-                        var apps = [
-                            { id: 'contacts' },
-                            { id: 'messages' },
-                            { id: 'groups' },
-                            { id: 'settings' }
-                        ];
-                        for (var i in apps) {
-                            apps[i].name = x.getApp(apps[i].id).name;
-                        }
-                        x.open('user/menu', { apps: apps }, { modal: true, width: 300 });
-                    });
-                }
             }
-
-            // if (leftMode) {
-            //     var button = document.createElement('a');
-            //     button.setAttribute('class', 'x-app-toolbar-button x-app-toolbar-button-app');
-            //     button.style.backgroundImage = 'url(\'data:image/svg+xml;base64,' + btoa(x.logo) + '\')';
-            //     toolbarContainer.firstChild.appendChild(button);
-            //     x.addClickToOpen(button, () => {
-            //         //x.open('user/homeNone');
-            //         closeAllWindows();
-            //         showWelcomeScreen();
-            //     });
-            // }
 
         }
 
