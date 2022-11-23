@@ -839,16 +839,15 @@
     };
 
     css += '.x-button{' + textStyle + 'border-radius:4px;user-select:none;box-sizing:border-box;height:42px;line-height:42px;display:block;cursor:pointer;position:relative;}'; // position:relative; because of notification badge;
-    //css += ':not(.x-button)+.x-button,.x-button:first-child{border-top-left-radius:2px;border-top-right-radius:2px;}';
-    //css += ':not(.x-button)+.x-button,.x-button:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px;}';
     css += '.x-button-icon{min-width:42px;background-repeat:no-repeat;background-size:20px;background-position:center;}';
     css += '.x-button-icon:not(:empty){padding-left:38px;}';
     css += '.x-button[disabled]{cursor:default;}';
+    css += '.x-button+.x-button{margin-top:10px;}';
     if (modal) {
-        css += '.x-button{color:#000;width:100%;text-align:center;}';
-        css += '.x-button:not([disabled]):hover{background-color:#eee;}';
-        css += '.x-button:not([disabled]):active{background-color:#e8e8e8;}';
-        css += '.x-button:not([disabled]):focus{background-color:#e8e8e8;}';
+        css += '.x-button{background-color:#24a4f2;color:#fff;width:100%;text-align:center;}';
+        css += '.x-button:not([disabled]):hover{background-color:#1c9be8;}';
+        css += '.x-button:not([disabled]):active{background-color:#188ed6;}';
+        css += '.x-button:not([disabled]):focus{background-color:#188ed6;}';
         css += '.x-button:not(:empty){padding:0 16px;}';
     } else {
         css += '.x-button{color:#fff;display:inline-block;border-radius:21px;}';//display:table;margin:0 auto;width:auto;
