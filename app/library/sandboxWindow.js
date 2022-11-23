@@ -1079,6 +1079,9 @@
         if (options.readonly !== undefined && options.readonly) {
             textarea.setAttribute('readonly', 'readonly');
         }
+        if (options.breakWords !== undefined && options.breakWords) {
+            textarea.style.wordBreak = 'break-all';
+        }
         textarea.setAttribute('aria-label', label);
         if (height !== null) {
             textarea.style.height = height;

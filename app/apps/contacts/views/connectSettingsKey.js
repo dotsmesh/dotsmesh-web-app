@@ -24,7 +24,7 @@ async (args, library) => {
     }
 
     if (resultMode) {
-        var fieldURL = x.makeFieldTextarea('URL', { readonly: true });
+        var fieldURL = x.makeFieldTextarea('URL', { readonly: true, breakWords: true });
         x.add(fieldURL);
         fieldURL.setValue('https://dotsmesh.com/#' + currentUserID + '/c/' + key);
     }

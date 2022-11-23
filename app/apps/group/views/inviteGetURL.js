@@ -10,7 +10,7 @@ async (args, library) => {
 
     x.add(x.makeText('Send the following URL to the people you want to invite to this group:'));
 
-    var fieldURL = x.makeFieldTextarea('', { readonly: true });
+    var fieldURL = x.makeFieldTextarea('', { readonly: true, breakWords: true });
     x.add(fieldURL);
 
     x.add(x.makeButton('OK', () => {

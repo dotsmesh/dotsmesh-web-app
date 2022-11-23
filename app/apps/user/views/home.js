@@ -5,7 +5,7 @@
  */
 
 async (args, library) => {
-    x.setTemplate('columns-profile');
+    x.setTemplate('column-big'); // columns-profile
     var userID = args.userID === undefined ? x.currentUser.getID() : args.userID;
     var connectKey = args.connectKey !== undefined ? args.connectKey : null;
 
@@ -43,13 +43,13 @@ async (args, library) => {
     x.add(x.makeProfilePreviewComponent('user', userID, {
         showEditButton: isCurrentUser,
         connectKey: connectKey
-    }), { template: 'column1' });
+    }));//, { template: 'column1' }
 
     if (isCurrentUser && x.currentUser.isPrivate()) {
-        x.add(x.makeHint('You are currently signed in with a private profile. Your profile exists only on this device, but you can freely follow others, build a contacts list and join groups.'), { template: 'column2' });
+        x.add(x.makeHint('You are currently signed in with a private profile. Your profile exists only on this device, but you can freely follow others, build a contacts list and join groups.'));//, { template: 'column2' }
     } else {
 
-        x.add(x.makeTitle('Recently published'), { template: 'column2' });
+        x.add(x.makeTitle('Recently published'));//, { template: 'column2' }
 
         var listComponent = await x.makePostsListComponent(async options => {
             var result = await x.property.getPosts('user', userID, { order: options.order, offset: options.offset, limit: options.limit, cacheList: true, cacheValues: true });
@@ -73,7 +73,7 @@ async (args, library) => {
             emptyText: isCurrentUser ? 'All your posts are publicly visible by everyone, including your contacts and followers. They can share easily with their audience too.' : 'No posts have been published yet.'
         });
         listComponent.observeChanges(['user/' + userID + '/profile', 'user/' + userID + '/posts']);
-        x.add(listComponent, { template: 'column2' });
+        x.add(listComponent);//, { template: 'column2' }
 
         if (!isCurrentUser && currentUserExists) {
             x.addToolbarNotificationsButton('up$' + userID, action => {
