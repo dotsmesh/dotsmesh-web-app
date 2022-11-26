@@ -12,26 +12,16 @@ async (args, library) => {
 
     x.add(x.makeProfilePreviewComponent('group', groupID, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
     var allowed = await x.services.call('groups', 'getMembersConnectStatus', { groupID: groupID });
-    if (allowed) {
-        x.add(x.makeText('Group members are allowed to send you connection requests.', true));
-        x.add(x.makeButton('Disable', async () => {
-            x.showLoading();
-            await x.services.call('groups', 'setMembersConnectStatus', { groupID: groupID, allow: false })
-            await x.back();
-        }));
-    } else {
-        x.add(x.makeText('Connection requests from this group\'s members are forbidden.', true));
-        x.add(x.makeButton('Allow', async () => {
-            x.showLoading();
-            await x.services.call('groups', 'setMembersConnectStatus', { groupID: groupID, allow: true })
-            await x.back();
-        }));
-    }
+    x.add(x.makeText(allowed ? 'Group members are allowed to send you connection requests.' : 'Connection requests from this group\'s members are forbidden.', { align: 'center' }));
+    x.add(x.makeButton(allowed ? 'Disable' : 'Allow', async () => {
+        x.showLoading();
+        await x.services.call('groups', 'setMembersConnectStatus', { groupID: groupID, allow: !allowed })
+        await x.back();
+    }, { marginTop: 'big' }));
 
     //var group = await x.group.getProfile(groupID);
 

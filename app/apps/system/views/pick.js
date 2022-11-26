@@ -51,7 +51,9 @@ async (args, library) => {
                         if (await callService(userID)) {
                             x.back({ id: userID });
                         }
-                    }).bind(null, userID)
+                    }).bind(null, userID),
+                    details: x.getShortID(userID),
+                    style: 'style3'
                 }));
                 addedItemsCount++;
             }
@@ -65,7 +67,8 @@ async (args, library) => {
                     if (await callService(groupID)) {
                         x.back({ id: groupID });
                     }
-                }).bind(null, groupID)
+                }).bind(null, groupID),
+                style: 'style3'
             }));
             addedItemsCount++;
         }
@@ -73,11 +76,11 @@ async (args, library) => {
     if (addedItemsCount > 0) {
         x.add(list);
     } else {
-        x.setTemplate('modal-text');
-        x.add(x.makeText(emptyText, true));
+        x.add(x.makeIcon('contacts'));
+        x.add(x.makeText(emptyText, { align: 'center' }));
         x.add(x.makeButton('OK', async () => {
             await x.back();
-        }));
+        }, { marginTop: 'big' }));
     }
 
 };

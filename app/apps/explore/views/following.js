@@ -6,8 +6,14 @@
 
 async (args, library) => {
     x.setTitle('Followed profiles and groups');
-    x.add(x.makeTitle('Followed profiles and groups'));
+    //x.add(x.makeTitle('Followed profiles and groups'));
 
+    x.addToProfile(x.makeAppPreviewComponent('explore', {
+        hint: 'Followed profiles and groups',
+        emptyText: 'You are not following any profiles or groups, yet.'
+    }));
+
+    // todo sort by date
     var component = x.makeComponent(async () => {
         var following = await library.getFollowing();
         var followingCount = following.length;
@@ -22,27 +28,31 @@ async (args, library) => {
                     profilesIDs.push(propertyData.id);
                 }
             }
-            var result = [];
+            //var result = [];
+            var list = x.makeList({ type: 'blocks' });
             if (profilesIDs.length > 0) {
-                result.push(x.makeSmallTitle('Profiles'));
-                var list = x.makeList({ type: 'grid' });
+                //result.push(x.makeSmallTitle('Profiles'));
+                //var list = x.makeList({ type: 'blocks' });
                 for (var userID of profilesIDs) {
                     list.add(await x.makeProfileButton('user', userID, { details: x.getShortID(userID) }));
                 }
-                result.push(list);
+                //result.push(list);
             }
             if (groupsIDs.length > 0) {
-                result.push(x.makeSmallTitle('Groups'));
-                var list = x.makeList({ type: 'grid' });
+                //result.push(x.makeSmallTitle('Groups'));
+                //var list = x.makeList({ type: 'blocks' });
                 for (var groupID of groupsIDs) {
-                    list.add(await x.makeProfileButton('group', groupID));
+                    list.add(await x.makeProfileButton('group', groupID, { details: 'group' }));
                 }
-                result.push(list);
+                //result.push(list);
                 component.observeChanges(['group/' + groupID + '/profile']);
             }
-            return result;
+            x.setTemplate();
+            return list;
         } else {
-            return x.makeHint('There are no profiles and groups here');
+            x.setTemplate('empty');
+            //return x.makeHint('There are no profiles and groups here');
+            return null;
         }
     });
     component.observeChanges(['explore/following']);

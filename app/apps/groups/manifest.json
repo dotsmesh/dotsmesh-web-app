@@ -12,6 +12,7 @@
         "leave",
         "getInvitationURL",
         "addURLInvitation",
+        "isAdministrator",
         "exists",
         "getMembersConnectStatus",
         "setMembersConnectStatus",

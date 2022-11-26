@@ -8,16 +8,14 @@ async (args, library) => {
     var groupID = args.groupID;
     var userID = args.userID;
     x.setTitle('Approve or deny membership');
-    x.setTemplate('modal-text');
 
-    x.add(x.makeText(''));
+    //x.add(x.makeText(''));
 
     var container = x.makeContainer();
 
     x.add(x.makeProfilePreviewComponent('groupMember', groupID + '$' + userID, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
     container.add(x.makeButton('Approve', async () => {
@@ -26,7 +24,7 @@ async (args, library) => {
             await library.approveMember(groupID, userID);
             await x.back('approved');
         }
-    }));
+    }, { marginTop: 'big' }));
 
     container.add(x.makeButton('Deny', async () => {
         if (await x.confirm('Are you sure you want to remove this person from the group?')) {

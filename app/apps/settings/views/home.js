@@ -5,75 +5,61 @@
  */
 
 async (args, library) => {
+    var title = 'Settings';
+    x.setTitle(title);
+    x.setTemplate('column');
 
-    x.setTitle('Settings');
-    x.setTemplate('column-tiny');
+    x.addToProfile(x.makeAppPreviewComponent('settings', {
+        title: title
+    }));
 
-    x.add(x.makeTitle('Settings'));
-
-    var container = x.makeContainer();
-
-    var list = x.makeList();
+    var list = x.makeList({ type: 'blocks' });
 
     list.add(x.makeTextButton(async () => {
         x.alert('Currently, English is the only supported language. Contact us and tell us which one we should add next.');
-    }, 'Language', 'English'));
+    }, 'Language', { details: 'English' }));
 
     // list.add(x.makeTextButton(async () => {
     //     x.alert('Not implemented yet!');
     // }, 'Theme', 'Default'));
-
-    container.add(list);
-
 
     // if (x.currentUser.exists()) {
     //     x.addToolbarButton(async () => {
     //         await x.currentUser.logout();    
     //     }, 'logout', 'right');
     // }
-
-    container.add(x.makeSeparator());
-
-    container.add(x.makeComponent(async () => {
+    list.add(x.makeComponent(async () => {
         var list = x.makeList();
 
         list.add(x.makeTextButton(async () => {
             x.open('system/manageDeviceNotifications', {}, { modal: true, width: 300 });
-        }, 'Device notifications', x.deviceHasPushManagerSupport() && await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled'));
+        }, 'Device notifications', { details: x.deviceHasPushManagerSupport() && await x.currentUser.getDeviceNotificationsStatus() === 'enabled' ? 'Enabled' : 'Disabled' }));
 
         return list;
     }, { observeChanges: ['deviceNotificationsStatus'] }));
 
-    container.add(x.makeSeparator());
-
-    var list = x.makeList();
-
     list.add(x.makeTextButton(async () => {
-        // announce clear local caches too
-        await x.currentUserCache.clear();
-        await x.appCache.clear();
-        x.alert('Cache is cleared successfully!');
-    }, 'Clear cache', ''));
+        if (await x.confirm('Are you sure you want to remove the locally stored data?', { icon: 'delete' })) {
+            x.showLoading();
+            // announce clear local caches too
+            await x.currentUserCache.clear();
+            await x.appCache.clear();
+            x.hideLoading();
+            x.alert('Cache is cleared successfully!');
+        }
+    }, 'Clear cache', { details: 'Remove locally stored data' }));
 
-    container.add(list);
-
-    container.add(x.makeSeparator());
-
-    var list = x.makeList();
+    //list.add(x.makeSeparator());
 
     list.add(x.makeTextButton(async () => {
         x.open('settings/feedback', {}, { modal: true, width: 400 });
-    }, 'Feedback', ''));
+    }, 'Feedback', { details: 'Share your app experience with the Dots Mesh team' }));
 
     list.add(x.makeTextButton(async () => {
         x.open('settings/about', {}, { modal: true, width: 300 });
-    }, 'About', ''));
+    }, 'About', { details: 'Learn more about this app' }));
 
-    container.add(list);
-
-    container.add(x.makeSeparator());
-
-    var list = x.makeList();
+    //list.add(x.makeSeparator());
 
     if (x.currentUser.isPublic()) {
 
@@ -83,7 +69,7 @@ async (args, library) => {
 
         list.add(x.makeTextButton(async () => {
             x.open('user/changePassword', {}, { modal: true, width: 300 });
-        }, 'Change password', ''));
+        }, 'Change password', { details: 'Change your account\'s password' }));
 
         // x.add(x.makeTextButton(async () => {
         //     x.alert('Not implemented yet!');
@@ -96,10 +82,8 @@ async (args, library) => {
 
     list.add(x.makeTextButton(async () => {
         await x.currentUser.logout();
-    }, 'Log out', ''));
+    }, 'Log out', { details: 'Remove your account from this device' }));
 
-    container.add(list);
-
-    x.add(container);
+    x.add(list);
 
 };

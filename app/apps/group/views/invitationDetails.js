@@ -51,6 +51,6 @@ async (args, library) => {
             await x.services.call('group', 'deleteInvitation', { groupID: groupID, invitationID: invitationID });
             await x.back();
         }
-    }));
+    }, { marginTop: 'big' }));
 
 };

@@ -8,14 +8,16 @@ async (args, library) => {
     var groupID = args.groupID;
     x.setTitle('Invitation URL');
 
-    x.add(x.makeText('Send the following URL to the people you want to invite to this group:'));
+    x.add(x.makeIcon('globe'));
+
+    x.add(x.makeText('Send the following URL to the people you want to invite to this group:', { align: 'center' }));
 
     var fieldURL = x.makeFieldTextarea('', { readonly: true, breakWords: true });
     x.add(fieldURL);
 
     x.add(x.makeButton('OK', () => {
         x.back(null, { closeAllModals: true });
-    }));
+    }, { marginTop: 'big' }));
 
     x.showLoading();
     (async () => {

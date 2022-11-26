@@ -244,6 +244,13 @@
             return false;
         };
 
+        x.currentUser.isMatch = (userID) => {
+            if (currentUserData !== null && userID !== undefined && userID !== null && userID.length > 0) {
+                return currentUserData.userID === userID;
+            }
+            return false;
+        };
+
         x.currentUser.signup = async (profileKey, id, password) => { // TRUE - successfull, FALSE - error, userExists
             var fullProfileKey = x.getPropertyFullKey(profileKey);
             var host = x.getPropertyKeyHost(fullProfileKey);

@@ -10,7 +10,13 @@ async (args, library) => {
     var isMembersMode = mode === 'members';
     var title = isMembersMode ? 'Group members' : 'Pending approval';
     x.setTitle(title);
-    x.add(x.makeTitle(title));
+    //x.add(x.makeTitle(title));
+
+    x.addToProfile(x.makeSmallProfilePreviewComponent('group', groupID, {
+        emptyTitle: title,
+        hint: title,
+        emptyText: 'No new members are waiting to be approved'
+    }));
 
     if (!isMembersMode) {
         // todo check if admin
@@ -28,15 +34,16 @@ async (args, library) => {
         }
         if (members.length === 0) {
             if (!isMembersMode) {
-                container.add(x.makeHint('No new members are waiting to be approved'));
+                x.setTemplate('empty');
+                return null;
             }
         } else {
-            let list = x.makeList({ type: 'grid' });
+            let list = x.makeList({ type: 'blocks' });
             for (var i = 0; i < members.length; i++) {
                 var member = members[i];
                 var userID = member.userID;
                 list.add(await x.makeProfileButton('groupMember', groupID + '$' + userID, {
-                    //text: x.getShortID(userID),
+                    details: x.isPublicID(userID) ? x.getShortID(userID) : 'private profile',
                     onClick: { location: 'group/member', args: { groupID: groupID, userID: userID }, preload: true }
                 }));
                 lastSeen.push(userID);
@@ -44,6 +51,7 @@ async (args, library) => {
             }
             container.add(list);
         }
+        x.setTemplate();
         return container;
     }, {
         observeChanges: ['group/' + groupID + '/members']

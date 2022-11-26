@@ -8,22 +8,19 @@ async (args, library) => {
     var groupID = args.groupID;
     var userID = args.userID;
 
-    x.setTemplate('modal-text');
-
-    x.setTitle('Remove a member?');
+    x.setTitle('Remove member');
 
     x.add(x.makeProfilePreviewComponent('groupMember', groupID + '$' + userID, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
-    x.add(x.makeText('Are you sure, you want to remove this member from the group?', true));
+    x.add(x.makeText('Are you sure, you want to remove this member from the group?', { align: 'center' }));
 
     x.add(x.makeButton('Yes, remove', async () => {
         x.showLoading();
         await library.removeMember(groupID, userID);
         await x.back('removed');
-    }));
+    }, { marginTop: 'big' }));
 
 };

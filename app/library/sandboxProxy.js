@@ -51,28 +51,31 @@
             return x.proxyCall('currentUser.sign', text);
         };
 
-        x.currentUser.getID = () => {
+        x.currentUser.getID = () => { // uses the context data (xc) to speed up the operation
             return xc.userID;
-            // todo cache
-            //return x.proxyCall('currentUser.getID');
         };
 
-        x.currentUser.exists = () => {
+        x.currentUser.exists = () => { // uses the context data (xc) to speed up the operation
             return xc.userID !== null;
-            // todo cache
-            //return x.proxyCall('currentUser.getID');
         };
 
-        x.currentUser.isPrivate = () => {
+        x.currentUser.isPrivate = () => { // uses the context data (xc) to speed up the operation
             if (xc.userID !== null) {
                 return x.isPrivateID(xc.userID);
             }
             return false;
         };
 
-        x.currentUser.isPublic = () => {
+        x.currentUser.isPublic = () => { // uses the context data (xc) to speed up the operation
             if (xc.userID !== null) {
                 return !x.isPrivateID(xc.userID);
+            }
+            return false;
+        };
+
+        x.currentUser.isMatch = (userID) => { // uses the context data (xc) to speed up the operation
+            if (xc.userID !== null && userID !== undefined && userID !== null && userID.length > 0) {
+                return xc.userID === userID;
             }
             return false;
         };
@@ -520,6 +523,9 @@
                 }
             }
         }
+        post.getHash = () => {
+            return value; // todo use some fast algorithm
+        };
         post.getResource = async resourceID => {
             return await getResourceFunction(post, resourceID);
         };
@@ -805,9 +811,23 @@
             }
         };
 
+        /**
+         * Requests new posts and announces a change when the last post is different from the one specified
+         * 
+         * @param string type 
+         * @param string id 
+         * @param string|null lastKnownPostID 
+         */
         x.property.checkForNewPosts = async (type, id, lastKnownPostID) => {
             try {
-                var rawPosts = await x.services.call('posts', 'getRawPosts', { propertyType: type, propertyID: id, options: { order: 'desc', ignoreListCache: true } });
+                var rawPosts = await x.services.call('posts', 'getRawPosts', {
+                    propertyType: type,
+                    propertyID: id,
+                    options: {
+                        order: 'desc',
+                        ignoreListCache: true
+                    }
+                });
                 var postIDs = Object.keys(rawPosts);
                 var lastPostID = postIDs.length > 0 ? postIDs[0] : null;
                 if (lastKnownPostID !== lastPostID) {

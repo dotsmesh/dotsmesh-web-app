@@ -5,18 +5,21 @@
  */
 
 async (args, library) => {
-    var text = args.text;
-    var icon = args.icon;
 
-    x.setTemplate('modal-text');
+    var text = args.text;
+    var options = args.options;
+    var icon = options.icon !== undefined ? options.icon : null;
 
     if (icon !== null) {
         x.add(x.makeIcon(icon));
     }
 
-    x.add(x.makeText(text, true));
+    x.add(x.makeText(text, {
+        align: 'center',
+        marginTop: 'modalFirst'
+    }));
 
     x.add(x.makeButton('OK', async () => {
         await x.back();
-    }));
+    }, { marginTop: 'big' }));
 };

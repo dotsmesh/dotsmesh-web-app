@@ -7,8 +7,6 @@
 async (args, library) => {
     var groupID = args.id;
 
-    x.setTemplate('modal-text');
-
     x.setTitle('Group membership');
 
     var showJoinButton = false;
@@ -16,20 +14,19 @@ async (args, library) => {
 
     x.add(x.makeProfilePreviewComponent('group', groupID, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
     var details = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['status', 'invitedBy'] });
     let status = details.status;
     if (status === 'joined') {
-        x.add(x.makeText('You are currently a member of this group!', true));
+        x.add(x.makeText('You are currently a member of this group!', { align: 'center' }));
         showLeaveButton = true;
     } else if (status === 'pendingApproval') {
-        x.add(x.makeText('Your membership must be approved by an administrator!', true));
+        x.add(x.makeText('Your membership must be approved by an administrator!', { align: 'center' }));
         showLeaveButton = true;
     } else {
-        x.add(x.makeText('Welcome to the group! You can look around, but you cannot post or comment until joined!', true));
+        x.add(x.makeText('Welcome to the group! You can look around, but you cannot post or comment until joined!', { align: 'center' }));
         showJoinButton = true;
         showLeaveButton = true;
     }
@@ -63,7 +60,7 @@ async (args, library) => {
                 }, { modal: true, width: 300 });
                 await x.back(result === 'saved' ? 'joined' : null);
             }
-        }));
+        }, { marginTop: 'big' }));
     }
     if (showLeaveButton) {
         container.add(x.makeButton('Leave group', async () => {
@@ -72,7 +69,7 @@ async (args, library) => {
                 await x.services.call('groups', 'leave', { groupID: groupID });
                 await x.back('left');
             }
-        }));
+        }, { marginTop: showJoinButton ? null : 'big' }));
     }
     x.add(container);
 

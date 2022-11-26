@@ -5,8 +5,8 @@
  */
 
 async (args, library) => {
-    x.setTemplate('column-big-message-title');
-    x.scrollBottom();//'column1'
+    x.setTemplate('message');
+    x.scrollBottom();
     if (typeof args.userID !== 'undefined') {
         var userID = args.userID;
         var threadID = await library.getOrMakeThreadID([userID]);
@@ -18,11 +18,18 @@ async (args, library) => {
     var recipients = await library.getThreadRecipients(threadID);
 
     var names = [];
+    var firstRecipientID = null;
     for (var i = 0; i < recipients.length; i++) {
-        var profile = await x.user.getProfile(recipients[i]);
+        var recipientID = recipients[i];
+        var profile = await x.user.getProfile(recipientID);
         names.push(profile.name);
+        firstRecipientID = recipientID; // only one is supported
     }
     x.setTitle('Messaging with ' + names.join(', '), true);
+
+    if (firstRecipientID !== null) {
+        x.addToProfile(x.makeSmallProfilePreviewComponent('user', firstRecipientID));
+    }
 
     var discussionComponent = x.makeDiscussionComponent(async listOptions => {
         var posts = await library.getThreadMessages(threadID, listOptions);
@@ -59,12 +66,12 @@ async (args, library) => {
         await x.notifications.delete('m$' + threadID);
     });
 
-    // x.add(x.makeTitle('Participants'), { template: 'column2' });
+    // x.add(x.makeTitle('Participants'));
     // for (var i = 0; i < recipients.length; i++) {
     //     var userID = recipients[i];
-    //     x.add(await x.makeProfileButton('user', userID, { text: x.getShortID(userID) }), { template: 'column2' });
+    //     x.add(await x.makeProfileButton('user', userID, { text: x.getShortID(userID) }));
     // }
     // var userID = x.currentUser.getID();
-    // x.add(await x.makeProfileButton('user', userID, { text: x.getShortID(userID) }), { template: 'column2' });
+    // x.add(await x.makeProfileButton('user', userID, { text: x.getShortID(userID) }));
 
 };

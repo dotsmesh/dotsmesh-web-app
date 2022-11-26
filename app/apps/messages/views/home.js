@@ -5,22 +5,49 @@
  */
 
 async (args, library) => {
-    x.setTitle('Messages');
-    x.setTemplate('column-big');
-    
+    var title = 'Messages';
+    x.setTitle(title);
+    //x.setTemplate('column');
+
     if (x.currentUser.isPrivate()) {
-        x.add(x.makeTitle('Messages'));
-        x.add(x.makeHint('This feature is currently available for public profiles only.'));
+        x.addToProfile(x.makeAppPreviewComponent('messages', {
+            emptyTitle: title,
+            emptyText: 'This feature is currently available for public profiles only.'
+        }));
+        x.setTemplate('empty');
     } else {
 
-        x.add(x.makeTitle('Messages', {
-            buttonOnClick: () => {
-                x.pickContact((userID) => { // todo must be connected
-                    x.open('messages/thread', { userID: userID });
-                })
-            }
+        // x.add(x.makeTitle('Messages', {
+        //     buttonOnClick: () => {
+        //         x.pickContact((userID) => { // todo must be connected
+        //             x.open('messages/thread', { userID: userID });
+        //         })
+        //     }
+        // }));
+
+        x.addToProfile(x.makeAppPreviewComponent('messages', {
+            emptyTitle: title,
+            emptyText: 'A private communication channel with your contacts.',
+            actionButton: async () => {
+                return {
+                    onClick: async () => {
+                        x.pickContact((userID) => { // todo must be connected
+                            x.open('messages/thread', { userID: userID });
+                        })
+                    },
+                    text: 'New chat'
+                }
+            },
         }));
 
+        // x.add(x.makeTitle('Messages', {
+        // }));
+
+        // x.add(x.makeButton('New chat', () => {
+        //     x.pickContact((userID) => { // todo must be connected
+        //         x.open('messages/thread', { userID: userID });
+        //     })
+        // }, { style: 'style2' }));
 
         // x.add(x.makeIconButton(() => {
         //     x.pickContact((userID) => { // todo must be connected
@@ -32,8 +59,10 @@ async (args, library) => {
             var threads = await library.getLatestThreads();
             var threadsCount = threads.length;
             if (threadsCount === 0) {
-                return x.makeHint('A list of message threads you\'ve started with your contacts.');
+                x.setTemplate('empty');
+                return null;
             } else {
+                x.setTemplate();
                 var list = x.makeList();
                 for (var i = 0; i < threadsCount; i++) {
                     let thread = threads[i];

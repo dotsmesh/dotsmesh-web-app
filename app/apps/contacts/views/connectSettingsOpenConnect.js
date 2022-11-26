@@ -10,34 +10,15 @@ async (args, library) => {
 
     x.add(x.makeIcon('globe'));
 
-    var anonymousConnectIsAllowed = await library.getOpenConnectStatus();
-    if (anonymousConnectIsAllowed) {
-        x.add(x.makeText('Everyone is allowed to send you connection requests.', true));
-        x.add(x.makeButton('Disable', async () => {
-            x.showLoading();
+    var allowed = await library.getOpenConnectStatus();
+    x.add(x.makeText(allowed ? 'Everyone is allowed to send you connection requests.' : 'Connection requests from everyone are disabled.', { align: 'center' }));
+    x.add(x.makeButton(allowed ? 'Disable' : 'Enable', async () => {
+        x.showLoading();
+        if (allowed) {
             await library.setOpenConnectStatus(false);
-            await x.back();
-        }));
-    } else {
-        x.add(x.makeText('Connection requests from everyone are disabled.', true));
-        x.add(x.makeButton('Enable', async () => {
-            x.showLoading();
+        } else {
             await library.setOpenConnectStatus(true);
-            await x.back();
-        }));
-    }
-
-    // x.add(x.makeText('When allowed, everyone will be able to send you connection requests.'));
-
-    // var anonymousConnectIsAllowed = await library.getOpenConnectStatus();
-
-    // var fieldAllow = x.makeFieldCheckbox('Allow');
-    // x.add(fieldAllow);
-    // fieldAllow.setChecked(anonymousConnectIsAllowed);
-
-    // x.add(x.makeButton('Save changes', async () => {
-    //     x.showLoading();
-    //     await library.setOpenConnectStatus(fieldAllow.isChecked());
-    //     await x.back();
-    // }));
+        }
+        await x.back();
+    }, { marginTop: 'big' }));
 };

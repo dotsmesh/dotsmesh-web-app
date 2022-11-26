@@ -365,6 +365,15 @@
         return status;
     };
 
+    var isAdministrator = async (groupID) => {
+        if (x.currentUser.exists()) {
+            var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['administratorsKeys'] });
+            var isAdministrator = memberGroupDetails !== null && memberGroupDetails.administratorsKeys !== null;
+            return isAdministrator;
+        }
+        return false;
+    };
+
     var checkIfApproved = async groupID => {
         try {
             var details = await get(groupID, ['status']);
@@ -480,6 +489,7 @@
         addURLInvitation: addURLInvitation,
         addInvitation: addInvitation,
         getProvidedAccessKeys: getProvidedAccessKeys,
+        isAdministrator: isAdministrator,
         checkIfApproved: checkIfApproved,
         exists: exists,
         setMembersConnectStatus: setMembersConnectStatus,

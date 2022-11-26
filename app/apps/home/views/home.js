@@ -7,9 +7,10 @@
 async (args, library) => {
     x.setTitle('Notifications');
 
-    x.setTemplate('column-big');
-
-    x.add(x.makeTitle('Notifications'));
+    x.addToProfile(x.makeAppPreviewComponent('home', {
+        emptyTitle: 'Notifications',
+        emptyText: 'This is the place where all the things that may require your attention will be shown. If empty, you can enjoy a cup of coffee, do a few pushups, or explore what others have shared.'
+    }));
 
     // var profile = await x.user.getProfile('333.dotshost1.local');
     // var message = {};
@@ -34,16 +35,13 @@ async (args, library) => {
     };
 
     var component = x.makeComponent(async () => {
-        let container = x.makeContainer(true);
+        let container = x.makeContainer({ addSpacing: true });
         var notifications = await x.notifications.getList();
         var hasContent = false;
         for (var notification of notifications) {
             if (!notification.visible) {
                 continue;
             }
-            //if (hasContent === false) {
-            //container.add(x.makeHint('All the things you may want to check out:'));
-            //}
             var onClick = (async notification => {
                 x.notifications.onClick(await x.notifications.getClickData(notification));
             }).bind(null, notification);
@@ -60,7 +58,7 @@ async (args, library) => {
                 }
             }
             if (button === null) {
-                button = x.makeTextButton(onClick, title, text, date);
+                button = x.makeTextButton(onClick, title, text, { details: date });
             }
             var groupID = 'o';
             var tags = notification.tags;
@@ -91,34 +89,13 @@ async (args, library) => {
             }
         }
         if (hasContent) {
+            x.setTemplate();
             return container;
         } else {
-            return x.makeHint('This is the place where all the things that require your attention will be shown. If empty, you can enjoy a cup of coffee, do a few pushups, or explore what others have shared.')
+            x.setTemplate('empty');
+            return null;
+            // return x.makeHint('This is the place where all the things that require your attention will be shown. If empty, you can enjoy a cup of coffee, do a few pushups, or explore what others have shared.', { align: 'center' })
         }
     }, { observeChanges: ['notifications'] });
     x.add(component);
-
-    // var element = document.createElement('div');
-    // element.setAttribute('class', 'x-icon-tick-white');
-    // element.setAttribute('style', 'width:100%;height:100%;background-repeat:no-repeat;background-size:100px;background-position:center;opacity:0.3;font-size:15px;line-height:160%;color:#fff;text-align:center;display:flex;justify-content:center;align-items:center;');
-    // element.innerHTML = '<br><br><br><br><br><br>Nothing urgent!<br>Time for a coffee?';
-    // x.add(element);
-
-
-
-    //x.add(x.makeSmallTitle('Suggestions'));
-
-    // x.add(x.makeSeparator());
-    // x.add(x.makeSmallTitle('Messages'));
-
-    // x.add(x.makeSeparator());
-    // x.add(x.makeSmallTitle('New contacts'));
-
-    // x.add(x.makeSeparator());
-    // x.add(x.makeTitle('Contacts updates'));
-
-    // x.add(x.makeSeparator());
-    // x.add(x.makeTitle('Groups updates'));
-    // x.add(x.makeHint('No groups'));
-
 };

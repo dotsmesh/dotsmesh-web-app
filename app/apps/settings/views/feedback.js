@@ -8,12 +8,10 @@ async (args, library) => {
 
     x.setTitle('Feedback');
 
-    x.add(x.makeText('Help make Dots Mesh even more awesome. Your ideas and suggestions are highly appreciated.'));
+    x.add(x.makeText('Help make Dots Mesh even more awesome. Your ideas and suggestions are highly appreciated.', { marginTop: 'modalFirst' }));
 
     var fieldFeedback = x.makeFieldTextarea('', { placeholder: 'Your feedback', height: '200px' });
     x.add(fieldFeedback);
-
-    x.add(x.makeHint('No additional or identifiable information will be sent.'));
 
     x.add(x.makeButton('Send', async () => {
         var value = fieldFeedback.getValue().trim();
@@ -35,5 +33,7 @@ async (args, library) => {
         }
         x.showMessage('Your feedback is successfully submitted! Thank you!');
         x.hideLoading();
-    }));
+    }, { marginTop: 'big' }));
+
+    x.add(x.makeHint('No additional or identifiable information will be sent.', { align: 'center' }));
 };

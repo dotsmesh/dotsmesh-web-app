@@ -7,15 +7,22 @@
 async (args, library) => {
     x.setTitle('New group');
 
-    x.add(x.makeProfilePreviewComponent('group', null, {
-        theme: 'light',
-        mode: 'image',
-        imageSize: 80
-    }));
+    // x.add(x.makeProfilePreviewComponent('group', null, {
+    //     theme: 'light',
+    //     mode: 'image',
+    //     imageSize: 80
+    // }));
 
-    x.add(x.makeText('Just like the public profiles, a group requires a group key. It points to the place where your data will be stored. Get one at <a onclick="x.openURL(\'https://hosting.dotsmesh.com/\');">hosting.dotsmesh.com</a>.\n\nAlready got one?', true, true));
+    x.add(x.makeIcon('groups'));
 
-    var fieldGroupKey = x.makeFieldTextbox(null, { placeholder: 'Group key', align: 'center', maxLength: 200 });
+    x.add(x.makeText('Just like the public profiles, a group requires a key. It points to the place where the data will be stored. Get one at <a onclick="x.openURL(\'https://hosting.dotsmesh.com/\');">hosting.dotsmesh.com</a>.\n\nAlready got one?', { align: 'center', isHTML: true }));
+
+    var fieldGroupKey = x.makeFieldTextbox(null, {
+        placeholder: 'Group key',
+        align: 'center',
+        maxLength: 200,
+        uppercase: true
+    });
     x.add(fieldGroupKey);
 
     x.add(x.makeButton('Create', async () => {
@@ -33,6 +40,6 @@ async (args, library) => {
             //     throw e;
             // }
         };
-    }));
+    }, { marginTop: 'big' }));
 
 }

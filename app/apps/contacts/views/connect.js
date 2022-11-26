@@ -15,8 +15,7 @@ async (args, library) => {
 
     x.add(x.makeProfilePreviewComponent('user', userID, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
     x.add(x.makeComponent(async () => {
@@ -61,7 +60,7 @@ async (args, library) => {
                     await x.back();
                 }));
             } else if (blockToShow === 'requestSent') {
-                container.add(x.makeText('Connection request sent\n\n', true));
+                container.add(x.makeText('Connection request sent', { align: 'center' }));
             } else if (blockToShow === 'denyRequest') {
                 container.add(x.makeButton('Deny request', async () => {
                     x.showLoading();
@@ -134,7 +133,7 @@ async (args, library) => {
                     }
 
                     x.hideLoading();
-                }));
+                }, { marginTop: 'big' }));
             }
         }
         return container;

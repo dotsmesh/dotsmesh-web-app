@@ -7,7 +7,7 @@
 async (args, library) => {
     var groupID = args.id;
 
-    x.setTemplate('columns-profile');
+    //x.setTemplate('columns');
 
     x.addErrorHandler(['invalidMemberID', 'invalidAccessKey', 'groupNotFound'], async () => {
         x.showLoading();
@@ -26,57 +26,17 @@ async (args, library) => {
         x.showMessage('The group does not exist or you are not a member!', options);
     });
 
+    var isAdministrator = await x.services.call('groups', 'isAdministrator', { groupID: groupID });
+
     x.wait(async () => {
         var profile = await x.group.getProfile(groupID);
         x.setTitle(profile.name + ' (private group)');
     });
 
-    x.add(x.makeProfilePreviewComponent('group', groupID, {
+    x.addToProfile(x.makeProfilePreviewComponent('group', groupID, {
         groupUserID: x.currentUser.getID(),
-        showEditButton: async () => {
-            if (x.currentUser.exists()) {
-                var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['administratorsKeys'] });
-                var isAdministrator = memberGroupDetails !== null && memberGroupDetails.administratorsKeys !== null;
-                return isAdministrator;
-            }
-            return false;
-        }
-    }), { template: 'column1' });
-
-    if (x.currentUser.exists()) {
-        var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['administratorsKeys'] });
-        var isAdministrator = memberGroupDetails !== null && memberGroupDetails.administratorsKeys !== null;
-
-        if (isAdministrator) {
-            let component = x.makeSecretComponent('Administrators only', async component2 => {
-                var sharedDataStorage = await x.group.getSharedDataStorage(groupID); // todo move in library and add cache ???
-                var list = await sharedDataStorage.getList({ keyStartWith: 'm/p/', keyEndWith: '/a', limit: 101, sliceProperties: ['key'] });
-                var pendingCount = list.length;
-                var button = x.makeButton('Pending approval (' + (pendingCount > 100 ? '100+' : pendingCount) + ')', () => {
-                    x.open('group/members', { id: groupID, mode: 'pendingApproval' });
-                });
-                component2.add(button);
-
-                var privateDataStorage = await x.group.getFullDataStorage(groupID, 'p/i/'); // todo move in library and add cache ???
-                var list = await privateDataStorage.getList({ limit: 101, sliceProperties: ['key'] });
-                var invitationsCount = list.length;
-                var button = x.makeButton('Invitations (' + (invitationsCount > 100 ? '100+' : invitationsCount) + ')', () => {
-                    x.open('group/invitations', { id: groupID });
-                });
-                component2.add(button);
-            });
-            component.observeChanges(['group/' + groupID + '/members', 'group/' + groupID + '/invitations']);
-            x.add(component, { template: 'column1' });
-        }
-    }
-
-    x.add(x.makeTitle('Recently published'), { template: 'column2' });
-
-    var listComponent = await x.makePostsListComponent(async options => {
-        var posts = await x.property.getPosts('group', groupID, { order: options.order, offset: options.offset, limit: options.limit, cacheValues: true });
-        return posts;
-    }, {
-        addButton: async () => {
+        showEditButton: isAdministrator,
+        actionButton: async () => {
             if (x.currentUser.exists()) {
                 var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['status'] });
                 if (memberGroupDetails !== null && memberGroupDetails.status === 'joined') {
@@ -90,10 +50,54 @@ async (args, library) => {
             }
             return null;
         },
+    }));
+
+    if (isAdministrator) {
+        let component = x.makeSecretComponent('Administrators only', async component2 => {
+            var sharedDataStorage = await x.group.getSharedDataStorage(groupID); // todo move in library and add cache ???
+            var list = await sharedDataStorage.getList({ keyStartWith: 'm/p/', keyEndWith: '/a', limit: 101, sliceProperties: ['key'] });
+            var pendingCount = list.length;
+            var button = x.makeButton('Pending approval (' + (pendingCount > 100 ? '100+' : pendingCount) + ')', () => {
+                x.open('group/members', { id: groupID, mode: 'pendingApproval' });
+            });
+            component2.add(button);
+
+            var privateDataStorage = await x.group.getFullDataStorage(groupID, 'p/i/'); // todo move in library and add cache ???
+            var list = await privateDataStorage.getList({ limit: 101, sliceProperties: ['key'] });
+            var invitationsCount = list.length;
+            var button = x.makeButton('Invitations (' + (invitationsCount > 100 ? '100+' : invitationsCount) + ')', () => {
+                x.open('group/invitations', { id: groupID });
+            });
+            component2.add(button);
+        });
+        component.observeChanges(['group/' + groupID + '/members', 'group/' + groupID + '/invitations']);
+        x.addToProfile(component);
+    }
+
+    //x.add(x.makeTitle('Recently published'), { template: 'column2' });
+
+    var listComponent = await x.makePostsListComponent(async options => {
+        var posts = await x.property.getPosts('group', groupID, { order: options.order, offset: options.offset, limit: options.limit, cacheValues: true });
+        return posts;
+    }, {
+        // addButton: async () => {
+        //     if (x.currentUser.exists()) {
+        //         var memberGroupDetails = await x.services.call('groups', 'getDetails', { groupID: groupID, details: ['status'] });
+        //         if (memberGroupDetails !== null && memberGroupDetails.status === 'joined') {
+        //             return {
+        //                 onClick: () => {
+        //                     x.open('posts/form', { groupID: groupID }, { modal: true });
+        //                 },
+        //                 text: 'New post'
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // },
         emptyText: 'No posts have been published yet.'
     });
     listComponent.observeChanges(['groups', 'group/' + groupID + '/posts']);
-    x.add(listComponent, { template: 'column2' });
+    x.add(listComponent);
 
     if (x.currentUser.exists()) {
         x.addToolbarNotificationsButton('gp$' + groupID, action => {

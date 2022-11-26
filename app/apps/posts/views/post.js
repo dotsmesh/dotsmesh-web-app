@@ -36,7 +36,7 @@ async (args, library) => {
         }
     }
 
-    x.setTemplate('column-big');
+    //x.setTemplate('column');
 
     // todo wait
     try {
@@ -69,7 +69,7 @@ async (args, library) => {
 
     if (post.userID === currentUserID && canDelete) {  // observe user join
         x.addToolbarButton('Delete this post', async () => {
-            if (await x.confirm('Are you sure you want to delete this post?', 'delete')) {
+            if (await x.confirm('Are you sure you want to delete this post?', { icon: 'delete' })) {
                 x.showLoading();
                 await library.deletePost(propertyType, propertyID, postID);
                 await x.announceChanges(['user/' + currentUserID, 'posts/' + postID]);
@@ -103,7 +103,7 @@ async (args, library) => {
     x.add(component);//, { template: 'column1' }
 
     if (propertyType === 'group') {
-        //x.add(x.makeSeparator());
+        x.add(x.makeSeparator());
         var discussionComponent = x.makeDiscussionComponent(async options => {
             return await library.getPostReactions(propertyType, propertyID, postID, options);
         }, { groupID: propertyID });
@@ -153,11 +153,11 @@ async (args, library) => {
         }
     }
 
-    // x.add(x.makeTitle('Author'), { template: 'column2' });
-    // x.add(await x.makeProfileButton('user', post.userID, { text: x.getShortID(post.userID) }), { template: 'column2' });
+    // x.add(x.makeTitle('Author'));
+    // x.add(await x.makeProfileButton('user', post.userID, { text: x.getShortID(post.userID) }));
     // if (propertyType === 'group') {
-    //     x.add(x.makeTitle('Group'), { template: 'column2' });
-    //     x.add(await x.makeProfileButton('group', propertyID), { template: 'column2' });
+    //     x.add(x.makeTitle('Group'));
+    //     x.add(await x.makeProfileButton('group', propertyID));
     // }
-    //x.add(x.makeHint('Published on 21 Nov, 2020 (23 days ago)'), { template: 'column2' });
+    //x.add(x.makeHint('Published on 21 Nov, 2020 (23 days ago)'));
 };

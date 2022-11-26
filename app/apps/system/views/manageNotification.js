@@ -8,12 +8,11 @@ async (args, library) => {
     var action = args.action;
     var serviceData = args.serviceData;
 
-    x.setTemplate('modal-text');
     x.setTitle('Notifications');
 
     x.add(x.makeIcon('notification'));
 
-    x.add(x.makeText(args.text, true));
+    x.add(x.makeText(args.text, { align: 'center' }));
 
     var call = async () => {
         x.showLoading();
@@ -21,13 +20,7 @@ async (args, library) => {
         //await x.backPrepare();
         await x.back();
     };
-    if (action === 'add') {
-        x.add(x.makeButton('Enable', async () => {
-            await call();
-        }));
-    } else {
-        x.add(x.makeButton('Disable', async () => {
-            await call();
-        }));
-    }
+    x.add(x.makeButton(action === 'add' ? 'Enable' : 'Disable', async () => {
+        await call();
+    }, { marginTop: 'big' }));
 };

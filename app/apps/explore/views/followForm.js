@@ -5,8 +5,6 @@
  */
 
 async (args, library) => {
-    x.setTemplate('modal-text');
-
     x.setTitle('Follow posts');
 
     var typedID = args.id;
@@ -14,31 +12,24 @@ async (args, library) => {
 
     x.add(x.makeProfilePreviewComponent(parsedTypedID.type, parsedTypedID.id, {
         theme: 'light',
-        mode: 'simple',
-        imageSize: 150
+        size: 'medium'
     }));
 
     var isFollowing = await library.isFollowing(parsedTypedID.type, parsedTypedID.id);
     if (parsedTypedID.type === 'user') {
-        x.add(x.makeText(isFollowing ? 'This profile\'s posts are visible in your Explore screen.' : 'Get all the posts from this profile in your Explore screen.', true));
+        x.add(x.makeText(isFollowing ? 'This profile\'s posts are visible in your Explore screen.' : 'Get all the posts from this profile in your Explore screen.', { align: 'center' }));
     } else {
-        x.add(x.makeText(isFollowing ? 'This group\'s posts are visible in your Explore screen.' : 'Get all the posts from this group in your Explore screen.', true));
+        x.add(x.makeText(isFollowing ? 'This group\'s posts are visible in your Explore screen.' : 'Get all the posts from this group in your Explore screen.', { align: 'center' }));
     }
 
-    if (isFollowing) {
-        x.add(x.makeButton('Unfollow', async () => {
-            x.showLoading();
+    x.add(x.makeButton(isFollowing ? 'Unfollow' : 'Follow', async () => {
+        x.showLoading();
+        if (isFollowing) {
             await library.unfollow(parsedTypedID.type, parsedTypedID.id);
-            //await x.backPrepare();
-            await x.back();
-        }));
-    } else {
-        x.add(x.makeButton('Follow', async () => {
-            x.showLoading();
+        } else {
             await library.follow(parsedTypedID.type, parsedTypedID.id);
-            //await x.backPrepare();
-            await x.back();
-        }));
-    }
+        }
+        await x.back();
+    }, { marginTop: 'big' }));
 
 }

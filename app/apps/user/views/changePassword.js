@@ -7,7 +7,6 @@
 async (args, library) => {
     x.setTitle('Change your password');
 
-
     var fieldOldPassword = x.makeFieldTextbox('Old password', { maxLength: 100, type: 'password' });
     x.add(fieldOldPassword);
 

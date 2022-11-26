@@ -5,19 +5,22 @@
  */
 
 async (args, library) => {
-    x.setTitle('Add contact');
+    x.setTitle('New contact');
 
     x.add(x.makeIcon('search'));
 
-    x.add(x.makeText('Every public profile has a unique ID. Enter the ID of the profile you are looking for.', true));
+    x.add(x.makeText('Every public profile has a unique ID. Enter the ID of the profile you are looking for.', { align: 'center' }));
 
     var fieldID = x.makeFieldTextbox('', { placeholder: 'ID', align: 'center' });
     x.add(fieldID);
-    fieldID.focus();
 
     x.add(x.makeButton('Search', async () => {
+        var value = fieldID.getValue().trim().toLowerCase();
+        if (value.length === 0) {
+            fieldID.focus();
+            return;
+        }
         x.showLoading();
-        var value = fieldID.getValue().toLowerCase();
         var id = x.getFullID(value);
         if (!x.isPublicID(id)) {
             x.hideLoading();
@@ -31,5 +34,5 @@ async (args, library) => {
             return;
         }
         x.open('user/home', { userID: id });
-    }));
+    }, { marginTop: 'big' }));
 };

@@ -432,12 +432,12 @@
         delete preloadedWindows[windowID];
     };
 
-    x.alert = (text, icon = null) => {
-        x.open('system/message', { text: text, icon: icon }, { modal: true, width: 300 });
+    x.alert = (text, options = {}) => {
+        x.open('system/message', { text: text, options: options }, { modal: true, width: 300 });
     };
 
-    x.confirm = async (text, icon = null) => {
-        var result = await x.open('system/confirm', { text: text, icon: icon }, { modal: true, width: 300 });
+    x.confirm = async (text, options = {}) => {
+        var result = await x.open('system/confirm', { text: text, options: options }, { modal: true, width: 300 });
         return result === 'ok';
     };
 
@@ -575,15 +575,15 @@
     css += '.x-app-toolbar-user-image{background-color:#333;width:25px;height:25px;display:block;border-radius:50%;cursor:pointer;background-size:cover;background-position:center;flex:0 0 auto;}';
     css += '.x-app-toolbar-button{width:50px;height:50px;user-select:none;display:flex;justify-content:center;align-items:center;box-sizing:border-box;cursor:pointer;}';
     css += '.x-app-toolbar-button-app{font-size:0;color:transparent;background-size:20px;background-repeat:no-repeat;background-position:center;}';
-    css += '.x-app-toolbar-button:hover{background-color:rgba(255,255,255,0.04);}';
-    css += '.x-app-toolbar-button:active{background-color:rgba(255,255,255,0.08);}';
-    css += '.x-app-toolbar-button:focus{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-app-toolbar-button:hover{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-app-toolbar-button:active{background-color:rgba(255,255,255,0.12);}';
+    css += '.x-app-toolbar-button:focus{background-color:rgba(255,255,255,0.12);}';
 
     css += '.x-app-toolbar-button[x-home-app]{align-items:flex-start;}';
     css += '.x-app-toolbar-button[x-home-app]>span:not(:empty){width:20px;height:20px;line-height:21px;text-align:center;display:block;background:#24a4f2;color:#fff;font-size:11px;border-radius:50%;margin-top:4px;margin-left:14px;font-weight:bold;}';
 
-    css += '@media only screen and (min-width:600px){';
-    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;border-right:1px solid #222;flex-direction:column;top:0;left:0;width:50px;height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;}';
+    css += '@media only screen and (min-width:950px){'; // 600 (content) + 2*150 (for header buttons on each side) + 50 (toolbar width)
+    css += '.x-app-toolbar-left{z-index:100;position:fixed;box-sizing:border-box;display:flex;justify-content:space-between;background-color:#222;box-shadow:0 0 5px 0 #111;flex-direction:column;top:0;left:0;width:50px;height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;}';
     css += '.x-app-toolbar-bottom{display:none;}';
     css += '.x-app-window{max-width:calc(100% - 50px);height:100%;}';//240px
     css += '.x-app-window[x-visible="1"]{left:50px;}';//240px
@@ -872,22 +872,22 @@
 
     css += '.x-home-screen-back-button{width:50px;height:50px;cursor:pointer;position:absolute;top:0;left:0;background-size:20px;background-position:center center;background-repeat:no-repeat;background-image:url(\'' + x.getIconDataURI('back', '#999') + '\');}';
     css += '.x-home-screen-back-button>span{display:block;width:calc(100% - 10px);height:calc(100% - 10px);margin-top:5px;margin-left:5px;border-radius:50%;}';
-    css += '.x-home-screen-back-button:hover>span{background-color:rgba(255,255,255,0.04);}';
-    css += '.x-home-screen-back-button:active>span{background-color:rgba(255,255,255,0.08);}';
-    css += '.x-home-screen-back-button:focus>span{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-home-screen-back-button:hover>span{background-color:rgba(255,255,255,0.08);}';
+    css += '.x-home-screen-back-button:active>span{background-color:rgba(255,255,255,0.12);}';
+    css += '.x-home-screen-back-button:focus>span{background-color:rgba(255,255,255,0.12);}';
 
     css += '.x-home-screen-title{text-align:center;font-weight:bold;font-size:25px;line-height:160%;}';
     css += '.x-home-screen-textbox{font-family:' + x.fontFamily + ';max-width:260px;text-align:center;display:block;border:0;border-radius:8px;width:100%;padding:0 13px;height:48px;box-sizing:border-box;background-color:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:15px;}';
     css += '.x-home-screen-textbox:focus{border:1px solid rgba(255,255,255,0.3);}';
-    css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:8px;padding:0 30px;min-height:48px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:48px;text-align:center;cursor:pointer;text-decoration:none;}';
+    css += '.x-home-screen-button{user-select:none;font-size:15px;display:inline-block;border-radius:8px;padding:0 19px;min-height:48px;box-sizing:border-box;background-color:rgba(255,255,255,1);color:#111;line-height:48px;text-align:center;cursor:pointer;text-decoration:none;}';
     css += '.x-home-screen-button:hover{background-color:rgba(255,255,255,0.96);}';
     css += '.x-home-screen-button:active{background-color:rgba(255,255,255,0.92);}';
     css += '.x-home-screen-button:focus{background-color:rgba(255,255,255,0.92);}';
-    css += '.x-home-screen-button-2{background-color:rgba(255,255,255,0.04);color:#fff;}';
-    css += '.x-home-screen-button-2:hover{background-color:rgba(255,255,255,0.08);}';
-    css += '.x-home-screen-button-2:active{background-color:rgba(255,255,255,0.12);}';
-    css += '.x-home-screen-button-2:focus{background-color:rgba(255,255,255,0.12);}';
-    css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:18px 19px 17px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
+    css += '.x-home-screen-button-2{background-color:rgba(255,255,255,0.08);color:#fff;}';
+    css += '.x-home-screen-button-2:hover{background-color:rgba(255,255,255,0.12);}';
+    css += '.x-home-screen-button-2:active{background-color:rgba(255,255,255,0.16);}';
+    css += '.x-home-screen-button-2:focus{background-color:rgba(255,255,255,0.16);}';
+    css += ".x-home-screen-button-3{text-align:left;height:auto;border-radius:8px;line-height:100%;padding:17px 19px;width:260px;background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none' %3e%3cpath d='M10 6l6 6-6 6'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 10px center;background-size:24px;}";
     css += '.x-home-screen-button-3>span{font-size:12px;display:block;padding-top:7px;color:#777;}';
     css += '.x-home-screen-text{font-size:15px;line-height:24px;text-align:center;}';
     css += '.x-home-screen-text-1{font-size:20px;font-weight:bold;}';

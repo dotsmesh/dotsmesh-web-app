@@ -2398,7 +2398,7 @@
                     } else if (format === 'html') {
                         var value = '<a' + (url.length > 0 ? ' href="' + htmlEncode(url) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
                     } else {
-                        var onClick = 'x.previewURL(' + JSON.stringify(url) + ',' + JSON.stringify(title) + ');';
+                        var onClick = 'x.previewURL(' + JSON.stringify(url) + ');';//,' + JSON.stringify(title) + '
                         var value = '<a' + (url.length > 0 ? ' onclick="' + htmlEncode(onClick) + '"' : '') + '' + (title.length > 0 ? ' title="' + htmlEncode(title) + '"' : '') + '>';
                     }
                     text = text.replace(tag, value);

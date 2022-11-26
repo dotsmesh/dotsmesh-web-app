@@ -22,9 +22,7 @@ async (args, library) => {
 
     x.add(x.makeAttachmentPreviewComponent(attachment, { theme: 'light' }));
 
-    var container = x.makeContainer();
-
-    container.add(x.makeButton('Share publicly', async () => {
+    x.add(x.makeButton('Share publicly', async () => {
         var openResult = await x.open('posts/form', {
             userID: x.currentUser.getID(),
             attachment: await attachment.pack(),
@@ -33,9 +31,9 @@ async (args, library) => {
         //     x.back();
         // }
 
-    }));
+    }, { marginTop: 'big' }));
 
-    container.add(x.makeButton('Send as message', () => {
+    x.add(x.makeButton('Send as message', () => {
         x.pickContact(async userID => {
             x.open('messages/thread', {
                 userID: userID,
@@ -44,7 +42,7 @@ async (args, library) => {
         });
     }));
 
-    container.add(x.makeButton('Share in a group', () => {
+    x.add(x.makeButton('Share in a group', () => {
         x.pickGroup(async groupID => {
             var openResult = await x.open('posts/form', {
                 groupID: groupID,
@@ -55,6 +53,4 @@ async (args, library) => {
             // }
         });
     }));
-
-    x.add(container);
 };
