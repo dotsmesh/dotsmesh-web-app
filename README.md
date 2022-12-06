@@ -47,7 +47,7 @@ Just found out about Dots Mesh? Do you know that you can join the platform with 
 
 #### Requirements
 - A web server (Apache, NGINX, etc.)
-- PHP 7.2+
+- PHP 7.4+
 - SSL/TLS certificate
 
 #### Get the code
