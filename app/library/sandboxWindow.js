@@ -2808,6 +2808,7 @@
                 if (size === 'big') {
                     var descriptionText = details.description !== null ? details.description.trim() : '';
                     if (type === 'groupMember') {
+                        descriptionText = ''; // no description
                         var [groupID, userID] = id.split('$');
                         var memberData = await x.services.call('group', 'getMemberData', { groupID: groupID, userID: userID })
                         if (memberData !== null) {
@@ -2836,6 +2837,7 @@
                     }
                     if (descriptionText.length > 0) {
                         result.details = descriptionText;
+                        result.emptyText = descriptionText;
                     }
 
                     if (type === 'group') {
