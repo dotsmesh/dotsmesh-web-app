@@ -898,10 +898,14 @@
         css += '.x-button[x-style="style4"]:not([disabled]):hover{background-color:rgba(255,255,255,0.08);}';
         css += '.x-button[x-style="style4"]:not([disabled]):active{background-color:rgba(255,255,255,0.12);}';
         css += '.x-button[x-style="style4"]:not([disabled]):focus{background-color:rgba(255,255,255,0.12);}';
+        css += '.x-button[x-style="style5"]:not([disabled]):hover{background-color:rgba(255,255,255,0.08);}';
+        css += '.x-button[x-style="style5"]:not([disabled]):active{background-color:rgba(255,255,255,0.12);}';
+        css += '.x-button[x-style="style5"]:not([disabled]):focus{background-color:rgba(255,255,255,0.12);}';
     }
 
     x.makeButton = (text, callback, options = {}) => {
         var icon = options.icon !== undefined ? options.icon : null;
+        var iconColor = options.iconColor !== undefined ? options.iconColor : '#fff';
         var styleID = options.style !== undefined ? options.style : null;
         var title = options.title !== undefined ? options.title : null;
         var align = options.align !== undefined ? options.align : null;
@@ -940,7 +944,7 @@
         setText(text);
         var setIcon = icon => {
             container.setAttribute('class', 'x-button' + (icon !== null ? ' x-button-icon' : ''));
-            container.style.backgroundImage = 'url(\'' + x.getIconDataURI(icon, '#fff') + '\')';
+            container.style.backgroundImage = 'url(\'' + x.getIconDataURI(icon, iconColor) + '\')';
         };
         if (icon !== null) {
             setIcon(icon);
@@ -2768,14 +2772,19 @@
                             args.groupUserID = id;
                         }
                         x.open('profile/form', args, { modal: true, width: 300 });
-                    }, { icon: 'edit', style: 'style3', title: type === 'group' ? 'Customize group' : 'Edit profile' });
+                    }, { 
+                        icon: 'edit', 
+                        iconColor: '#777', 
+                        style: 'style5', 
+                        title: type === 'group' ? 'Customize group' : 'Edit profile'
+                     });
                     editButton.element.style.width = '42px';
                     editButton.element.style.float = 'right';
                     editButton.element.style.borderRadius = '50%';
                     editButton.element.style.position = 'absolute';
                     editButton.element.style.zIndex = '1';
                     editButton.element.style.right = '-8px';
-                    editButton.element.style.top = '0';
+                    editButton.element.style.top = '-8px';
                     imageContainer.appendChild(editButton.element);
                 }
 
