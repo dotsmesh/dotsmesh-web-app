@@ -63,7 +63,7 @@ async (args, library) => {
                 return null;
             } else {
                 x.setTemplate();
-                var list = x.makeList();
+                var list = x.makeList({ type: 'blocks' });
                 for (var i = 0; i < threadsCount; i++) {
                     let thread = threads[i];
                     let otherParticipantsIDs = thread.otherParticipantsIDs;

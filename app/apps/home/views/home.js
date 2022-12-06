@@ -16,7 +16,7 @@ async (args, library) => {
     // var message = {};
     // message.userID = '333.dotshost1.local';
     // message.text = 'asdasdasd';
-    // var threadID = 'r';
+    // var threadID = 'r2';
     // var notification = await x.notifications.make('m$' + threadID);
     // notification.visible = true;
     // notification.title = 'Message from ' + profile.name;
@@ -81,7 +81,7 @@ async (args, library) => {
             var items = group.items;
             if (items.length > 0) {
                 container.add(x.makeSmallTitle(group.name));
-                let list = x.makeList();
+                let list = x.makeList({ type: 'blocks' });
                 for (var item of items) {
                     list.add(item);
                 }

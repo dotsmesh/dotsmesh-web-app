@@ -2772,12 +2772,12 @@
                             args.groupUserID = id;
                         }
                         x.open('profile/form', args, { modal: true, width: 300 });
-                    }, { 
-                        icon: 'edit', 
-                        iconColor: '#777', 
-                        style: 'style5', 
+                    }, {
+                        icon: 'edit',
+                        iconColor: '#777',
+                        style: 'style5',
                         title: type === 'group' ? 'Customize group' : 'Edit profile'
-                     });
+                    });
                     editButton.element.style.width = '42px';
                     editButton.element.style.float = 'right';
                     editButton.element.style.borderRadius = '50%';
