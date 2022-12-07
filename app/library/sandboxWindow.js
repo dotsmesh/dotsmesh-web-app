@@ -3024,7 +3024,7 @@
     css += '.x-profile-title-hint{padding-top:6px;max-width:100%;overflow:hidden;text-align:center;text-overflow:ellipsis;}'; // 6px to match button style4
     css += '.x-profile-title-button{margin-button:-6px;}'; // to make buttons closer if not details added. todo: add style text-button + details
     css += '.x-profile-empty-title{display:none;}';
-    css += '.x-profile-details{padding-stop:calc(' + contentSpacing + ' - 4px);' + textStyle + 'color:#fff;word-break:break-word;text-align:center;width:100%;padding-left:' + edgeContentSpacing + ';padding-right:' + edgeContentSpacing + ';box-sizing:border-box;max-width:300px;}';
+    css += '.x-profile-details{padding-top:calc(' + contentSpacing + ' - 4px);' + textStyle + 'color:#fff;word-break:break-word;text-align:center;width:100%;padding-left:' + edgeContentSpacing + ';padding-right:' + edgeContentSpacing + ';box-sizing:border-box;max-width:300px;}';
     css += '.x-profile-hint{padding-top:calc(2*' + contentSpacing + ');' + hintStyle + 'word-break:break-word;text-align:center;width:100%;padding-left:' + edgeContentSpacing + ';padding-right:' + edgeContentSpacing + ';box-sizing:border-box;max-width:300px;}';
     css += '.x-profile-empty-text{' + textStyle + 'word-break:break-word;text-align:center;padding-top:calc(2*' + contentSpacing + ');display:none;}';
     css += '.x-profile-buttons{padding-top:calc(2*' + contentSpacing + ');display:flex;flex-direction:row;justify-content:center;}';
