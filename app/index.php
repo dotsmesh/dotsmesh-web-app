@@ -56,6 +56,10 @@ if (!defined('DOTSMESH_WEB_APP_DEV_MODE')) {
 
 $app = new App();
 
+if (defined('DOTSMESH_WEB_APP_HOST')) {
+    $app->request->host = DOTSMESH_WEB_APP_HOST;
+}
+
 $hasLogsDirs = defined('DOTSMESH_WEB_APP_LOGS_DIR');
 $app->enableErrorHandler(['logErrors' => $hasLogsDirs, 'displayErrors' => DOTSMESH_WEB_APP_DEV_MODE]);
 
